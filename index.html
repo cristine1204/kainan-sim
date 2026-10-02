@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#faf6f0">
+  <meta name="theme-color" content="#D9531E">
   <meta name="description" content="Build your Pinoy street food cart, serve tusok-tusok orders, and grow your neighborhood food business.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Kainan Sim">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <title>Kainan Sim — Pinoy Street Food Tycoon</title>
@@ -99,6 +99,15 @@
     .scene-counter::after { position: absolute; right: 16%; bottom: -26px; left: 16%; height: 25px; background: #75402e; content: ""; }
     .customer-person { --person-scale: 1; position: absolute; z-index: 2; bottom: 38px; left: 66%; width: 106px; height: 128px; transform: translateX(-50%) scale(var(--person-scale)); filter: drop-shadow(0 5px 5px rgb(69 37 23 / 28%)); transition: filter .25s ease; }
     .customer-person svg { width: 100%; height: 100%; overflow: visible; }
+    .vendor-person { position: absolute; z-index: 2; bottom: 37px; left: 23%; width: 80px; height: 96px; filter: drop-shadow(0 4px 4px rgb(69 37 23 / 28%)); }
+    .vendor-person svg { width: 100%; height: 100%; overflow: visible; }
+    .vendor-outfit-overlay, .vendor-hat-overlay, .vendor-shades-overlay { display: none; }
+    .vendor-person[data-cosmetic="jun-apron"] .vendor-outfit-overlay,
+    .vendor-person[data-cosmetic="bebang-hat"] .vendor-hat-overlay,
+    .vendor-person[data-cosmetic="bossing-shades"] .vendor-shades-overlay { display: initial; }
+    .vendor-sparkle { position: absolute; inset: 7px 0 0; display: none; place-items: center; color: #fff4a6; font-size: 31px; text-shadow: 0 0 6px #fff, 0 0 14px #ffca48; pointer-events: none; }
+    .vendor-person.sparkle .vendor-sparkle { display: grid; animation: vendor-sparkle .9s ease-out both; }
+    @keyframes vendor-sparkle { 0% { opacity: 0; transform: scale(.2) rotate(-25deg); } 30% { opacity: 1; transform: scale(1.2) rotate(12deg); } 100% { opacity: 0; transform: scale(1.8) rotate(35deg); } }
     .customer-person.impatient { transform: translateX(-50%) rotate(-3deg) scale(var(--person-scale)); filter: drop-shadow(0 5px 5px rgb(130 39 27 / 35%)) saturate(.84); }
     .customer-person.arriving { animation: customer-enter .7s cubic-bezier(.16,.84,.34,1.18) both; }
     .customer-person.waiting-idle { animation: customer-idle 2.4s ease-in-out infinite; }
@@ -140,6 +149,7 @@
     .customer-scene[data-mood="happy"] { background: linear-gradient(165deg, #b9dfae 0%, #e7e4a6 37%, #b96a43 37%, #9e4a30 100%); }
     .customer-scene[data-mood="angry"] { background: linear-gradient(165deg, #f4a99b 0%, #f6d0a0 37%, #b96a43 37%, #9e4a30 100%); }
     .scene-sign { position: absolute; z-index: 3; top: 4px; left: 50%; padding: 5px 10px; transform: translateX(-50%); border-radius: 6px; background: #fff5da; color: #8d482b; font-size: 9px; font-weight: 950; letter-spacing: 1.1px; white-space: nowrap; }
+    .scene-sign.neon-equipped { background: #fff; color: #d832a0; box-shadow: 0 0 7px #fff, 0 0 15px #fa48bf, 0 0 25px #fe8e48; }
     .customer-nametag { position: absolute; z-index: 3; bottom: 8px; left: 9px; padding: 5px 9px; border: 1px solid rgb(255 255 255 / 70%); border-radius: 99px; background: #fff; color: #705346; font-size: 9px; font-weight: 800; }
     .order-card { margin: 12px 15px 0; padding: 13px; border: 1px solid #f2c6b7; border-radius: 12px; background: #fff8f5; }
     .micro-label { color: #ab563e; font-size: 9px; font-weight: 900; letter-spacing: .55px; }
@@ -212,7 +222,9 @@
 
     .sauce-panel { padding: 10px; }
     .sauce-grid { display: grid; grid-template-columns: 1fr; gap: 5px; margin-top: 6px; }
-    .sauce-button { min-height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 8px; border: 1px solid #eee5db; border-radius: 10px; background: #fbf8f4; cursor: pointer; font-size: 9px; font-weight: 800; transition: border .15s, background .15s, transform .15s; }
+    .sauce-button { min-height: 38px; display: flex; align-items: center; justify-content: flex-start; gap: 8px; padding: 6px 9px; border: 1px solid #eee5db; border-radius: 10px; background: #fbf8f4; cursor: pointer; font-size: 9px; font-weight: 800; text-align: left; transition: border .15s, background .15s, transform .15s; }
+    .sauce-button > span:first-child { flex: 0 0 30px; font-size: 28px; line-height: 1; text-align: center; }
+    .sauce-button > span:last-child { min-width: 0; }
     .sauce-button:hover:not(:disabled) { transform: translateY(-1px); border-color: #dfb884; }
     .sauce-button.selected { border: 2px solid var(--green); color: var(--green-dark); background: #eef8ed; box-shadow: 0 0 0 2px rgb(43 147 72 / 10%); }
     .sauce-button:disabled { cursor: not-allowed; opacity: .54; }
@@ -262,6 +274,9 @@
     .modal-submit.green-submit:hover { background: var(--green-dark); }
     .modal-cancel { display: block; margin: 10px auto 0; padding: 6px 12px; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 750; }
     .modal-cancel[hidden] { display: none; }
+    .setup-home-button { display: block; margin: 2px auto 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: 9px; background: #fffdf9; color: #765d4a; cursor: pointer; font-size: 10px; font-weight: 800; transition: border-color .15s, background .15s; }
+    .setup-home-button:hover { border-color: #dfb884; background: #fff8ed; }
+    .setup-home-button[hidden] { display: none; }
     .levelup-emblem { animation: bounce .6s ease infinite alternate; }
     .unlock-list { display: grid; gap: 8px; margin-top: 16px; }
     .unlock-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #ece5d8; border-radius: 10px; background: #fffcf7; }
@@ -327,6 +342,8 @@
     .home-button:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.03); }
     .home-button.primary { background: var(--terracotta); color: white; box-shadow: 0 8px 18px rgb(173 73 38 / 22%); }
     .home-button.continue { border-color: rgb(255 255 255 / 85%); background: #fffdf8; }
+    .home-button.install { border-color: #e6bd6b; background: #fff1ca; color: #75491c; }
+    .home-button.install[hidden] { display: none; }
     .home-button:disabled { cursor: not-allowed; opacity: .53; filter: grayscale(.8); box-shadow: none; }
     .save-badge { margin-left: auto; padding: 5px 8px; border-radius: 99px; background: #fff1d6; color: #795622; font-size: 8px; font-weight: 900; }
     .home-settings-button { justify-self: start; min-height: 38px; padding: 8px 11px; border: 1px solid rgb(137 89 58 / 18%); border-radius: 10px; background: rgb(255 255 255 / 58%); color: #704b36; cursor: pointer; font-size: 10px; font-weight: 850; }
@@ -349,8 +366,10 @@
     .setup-avatar { width: 42px; height: 48px; }
     .home-street-note { position: absolute; z-index: 4; right: 11px; bottom: 10px; left: 11px; color: #fff6df; font-size: 8px; font-weight: 850; letter-spacing: .8px; text-align: center; }
     .home-screen.is-leaving .home-shell { animation: home-slide-out .38s ease forwards; }
+    .home-screen.is-arriving .home-shell { animation: home-slide-in .38s ease both; }
     .game-enter { animation: game-fade-in .45s ease both; }
     @keyframes home-slide-out { to { opacity: 0; transform: translateY(-14px) scale(.985); } }
+    @keyframes home-slide-in { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
     @keyframes game-fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .drink-panel { padding: 17px 18px; }
     .drink-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 11px; }
@@ -359,9 +378,9 @@
     .qty-button.add { border-color: var(--green); background: var(--green); color: #fff; }
     .qty-button:disabled { cursor: not-allowed; opacity: .4; }
     .drink-card { min-width: 0; padding: 9px; border: 1px solid #d9e8de; border-radius: 11px; background: linear-gradient(145deg, #f7fff7, #eef8ef); }
-    .drink-topline { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+    .drink-topline { min-height: 76px; display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; gap: 3px; text-align: center; }
     .drink-name { font-size: 9px; font-weight: 900; }
-    .drink-emoji { font-size: 21px; }
+    .drink-emoji { font-size: 54px; line-height: 1; }
     .drink-price { color: #368053; font-size: 8px; font-weight: 900; }
     .drink-note { margin-top: 3px; color: var(--muted); font-size: 7px; }
     .drink-control { display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-top: 7px; }
@@ -409,7 +428,7 @@
       .food-grid { gap: 8px; }
       .food-info { padding-right: 8px; padding-left: 8px; }
       .food-name { font-size: 10px; }
-      .sauce-button { gap: 4px; font-size: 8px; }
+      .sauce-button { gap: 6px; font-size: 8px; }
       .tray-content { grid-template-columns: 74px minmax(0, 1fr); gap: 7px; }
     }
     @media (max-width: 640px) {
@@ -446,6 +465,7 @@
       .scene-awning { top: 21px; height: 17px; }
       .scene-counter { bottom: 26px; height: 25px; }
       .scene-counter::after { bottom: -17px; height: 17px; }
+      .vendor-person { bottom: 13px; left: 23%; width: 52px; height: 63px; }
       .customer-person { --person-scale: .82; bottom: 12px; left: 78%; width: 84px; height: 101px; transform: translateX(-50%) scale(var(--person-scale)); transform-origin: bottom center; }
       .customer-order-bubble { top: 22px; left: 5px; width: min(46%, 112px); padding: 5px 6px; }
       .bubble-label { font-size: 7px; }
@@ -491,7 +511,8 @@
       .tray-actions { margin-top: 4px; }
       .clear-button { padding: 4px 6px; font-size: 7px; }
       .sauce-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
-      .sauce-button { min-height: 31px; padding: 4px 2px; font-size: 7px; }
+      .sauce-button { min-height: 46px; justify-content: flex-start; gap: 3px; padding: 4px 3px; font-size: 7.5px; line-height: 1.15; }
+      .sauce-button > span:first-child { flex-basis: 24px; font-size: 24px; }
       .serve-button { min-height: 37px; padding: 7px; font-size: 10px; }
       .order-station { gap: 6px; }
       .workbench-footer { align-items: center; gap: 6px; }
@@ -527,10 +548,10 @@
       .drink-widget > summary::-webkit-details-marker { display: none; }
       .drink-widget[open] > summary { margin-bottom: 5px; }
       .drink-grid { display: flex; gap: 5px; overflow-x: auto; margin-top: 5px; }
-      .drink-card { padding: 5px 4px; }
-      .drink-card { flex: 0 0 82px; }
+      .drink-card { flex: 0 0 108px; padding: 7px 6px; }
+      .drink-topline { min-height: 57px; flex-direction: column-reverse; justify-content: center; gap: 1px; text-align: center; }
       .drink-name { font-size: 8px; }
-      .drink-emoji { font-size: 16px; }
+      .drink-emoji { font-size: 50px; line-height: 1; }
     }
     @media (max-width: 370px) {
       body { min-width: 0; }
@@ -584,7 +605,8 @@
       .station-head .sanitation-widget > summary { max-width: 105px; overflow: hidden; padding: 4px 5px; color: #685541; font-size: 6px; text-overflow: ellipsis; white-space: nowrap; }
       .station-head .shift-badge { display: none; }
       .workbench-footer .order-summary { display: none; }
-      .sauce-button { min-height: 29px; font-size: 6px; }
+      .sauce-button { min-height: 42px; font-size: 7px; }
+      .sauce-button > span:first-child { flex-basis: 24px; font-size: 24px; }
       .food-panel, .tray-panel, .sauce-panel { padding: 6px; }
       .food-art { height: 30px; }
       .food-art .food-emoji { font-size: 20px; }
@@ -604,6 +626,91 @@
       .sauce-grid { gap: 3px; }
       .tray-chip { font-size: 6px; }
     }
+    @media (max-width: 768px) {
+      html, body { width: 100%; min-width: 0; overflow-x: hidden; }
+      .app { width: 100%; max-width: 100%; padding: 0 12px 24px; }
+      .topbar { width: 100%; flex-wrap: wrap; justify-content: flex-start; gap: 8px; padding: 10px 0; }
+      .brand { flex: 1 1 100%; }
+      .header-actions { width: 100%; display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; }
+      .header-pill, .audio-controls, .language-toggle, .icon-button { flex: 0 0 auto; }
+      .language-toggle { display: block; width: auto; max-width: 132px; }
+      .game-grid { display: grid; width: 100%; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      .game-grid > aside, .game-grid > .workbench,
+      .prep-grid, .prep-foods, .order-station { display: contents; }
+      .customer-panel, .workbench, .panel, .food-panel, .sauce-panel, .tray-panel,
+      .drink-widget, .drink-panel, .station-head {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+      }
+      .customer-panel { display: grid; grid-template-columns: minmax(0, 1fr); overflow: visible; }
+      .customer-heading { grid-column: auto; display: block; padding: 12px; }
+      .customer-heading .section-heading { font-size: 15px; white-space: normal; }
+      .customer-heading small { display: block; }
+      .customer-scene { grid-row: auto; height: clamp(150px, 48vw, 220px); margin: 0 12px; }
+      .vendor-person { bottom: 18px; left: 23%; width: 66px; height: 79px; }
+      .customer-person { --person-scale: .9; bottom: 18px; left: 72%; width: 88px; height: 106px; transform: translateX(-50%) scale(var(--person-scale)); transform-origin: bottom center; }
+      .customer-order-bubble { top: 39px; left: 10px; width: min(46%, 150px); padding: 7px 8px; }
+      .customer-mood { top: 60px; left: calc(72% + 23px); }
+      .scene-sign { top: 4px; font-size: 8px; }
+      .order-card { margin: 10px 12px 0; padding: 12px; }
+      .order-text { font-size: 12px; }
+      .patience-row { grid-column: auto; margin: 10px 12px 6px; font-size: 10px; }
+      .patience-track { grid-column: auto; height: 7px; margin: 0 12px 4px; }
+      .vip-banner { margin: 6px 12px; }
+      .customer-footer, .stats-grid { display: none; }
+      .station-head { order: 2; min-height: 48px; padding: 8px 12px; }
+      .station-head .section-heading { font-size: 14px; white-space: normal; }
+      .station-kicker { font-size: 10px; }
+      .station-head .sanitation-widget > summary { max-width: 180px; padding: 6px 8px; font-size: 9px; }
+      .food-panel { order: 3; padding: 12px; }
+      .food-panel .subhead-row, .drink-panel .subhead-row, .sauce-panel .subhead-row, .tray-panel .subhead-row {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        padding: 0;
+      }
+      .subhead-row .section-heading { font-size: 14px; white-space: normal; }
+      .subhead-caption { max-width: 100%; font-size: 10px; text-align: left; white-space: normal; }
+      .food-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .food-art { height: 60px; }
+      .food-art .food-emoji { font-size: 34px; }
+      .food-info { padding: 8px; }
+      .food-topline { align-items: flex-start; flex-wrap: wrap; }
+      .food-name { font-size: 12px; white-space: normal; overflow-wrap: anywhere; }
+      .food-price { font-size: 10px; }
+      .food-note { display: block; font-size: 9px; white-space: normal; }
+      .sauce-panel { order: 4; padding: 12px; }
+      .sauce-grid { grid-template-columns: minmax(0, 1fr); gap: 7px; }
+      .sauce-button { min-height: 52px; justify-content: flex-start; gap: 10px; padding: 8px 12px; font-size: 12px; }
+      .sauce-button > span:first-child { flex-basis: 34px; font-size: 30px; }
+      .tray-panel { order: 5; padding: 12px; }
+      .tray-content { grid-template-columns: 68px minmax(0, 1fr); min-height: 78px; gap: 8px; padding: 8px; }
+      .cup-wrap { min-height: 68px; }
+      .tray-detail-title, .tray-total { font-size: 9px; }
+      .tray-items { gap: 5px; }
+      .tray-chip { padding: 5px 7px; font-size: 9px; }
+      .tray-actions { gap: 6px; }
+      .clear-button { min-height: 36px; padding: 7px 9px; font-size: 10px; }
+      .serve-button { order: 6; min-height: 50px; padding: 12px; font-size: 14px; }
+      #drink-widget { order: 7; padding: 0; }
+      .drink-widget > summary { min-height: 42px; padding: 10px 12px; border-radius: 11px; font-size: 12px; white-space: normal; }
+      .drink-widget[open] > summary { margin-bottom: 8px; }
+      .drink-panel { padding: 12px; }
+      .drink-grid { display: grid; width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+      .drink-card { width: 100%; min-width: 0; padding: 8px; }
+      .drink-topline { min-height: 77px; }
+      .drink-name { width: 100%; font-size: 10px; line-height: 1.25; white-space: normal; overflow-wrap: anywhere; }
+      .drink-emoji { font-size: 50px; }
+      .drink-price { font-size: 9px; white-space: normal; }
+      .drink-control { flex-wrap: wrap; }
+      .drink-lock { font-size: 8px; white-space: normal; }
+      .game-tools { max-width: 100%; }
+      .game-tools > * { min-width: 0; }
+      .location-select { max-width: min(42vw, 180px); }
+      .shift-banner, .progress-wrap, .workbench-footer { width: 100%; min-width: 0; }
+      .shift-location, .shift-status { min-width: 0; white-space: normal; }
+      .section-heading, .food-name, .drink-name, .shop-title, .quest-title { white-space: normal; overflow-wrap: anywhere; }
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     }
@@ -620,6 +727,7 @@
           <div class="home-actions">
             <button class="home-button primary" id="new-game-button" type="button">🎮 START NEW GAME</button>
             <button class="home-button continue" id="continue-button" type="button" disabled>⏯️ CONTINUE <span class="save-badge" id="save-badge">NO SAVE</span></button>
+            <button class="home-button install" id="install-app-button" type="button">📲 Install App Now</button>
             <button class="home-settings-button" id="home-settings-button" type="button">⚙️ SETTINGS / SETTINGS</button>
           </div>
         </section>
@@ -749,7 +857,17 @@
             <div class="lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
             <div class="scene-awning" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
             <div class="scene-window" aria-hidden="true"></div>
-            <span class="scene-sign" aria-hidden="true">TUSOK-TUSOK</span>
+            <span class="scene-sign" id="scene-sign" aria-hidden="true">TUSOK-TUSOK</span>
+            <div class="vendor-person" id="vendor-person" aria-hidden="true">
+              <svg viewBox="0 0 100 120"><use id="vendor-avatar-use" href="#avatar-manong" width="100" height="120"></use>
+                <path class="vendor-outfit-overlay" d="M28 87h44l7 31H21z" fill="#ffbd3d" stroke="#8f392e" stroke-width="3"/>
+                <path class="vendor-outfit-overlay" d="M39 92h22v17H39z" fill="#fff2bf" stroke="#8f392e" stroke-width="2"/>
+                <path class="vendor-hat-overlay" d="M28 23q1-15 22-17 21 2 22 17z" fill="#fff7df" stroke="#b54a34" stroke-width="3"/>
+                <path class="vendor-hat-overlay" d="M24 23h53q-3 9-27 9T24 23z" fill="#e84d39" stroke="#9b342d" stroke-width="2"/>
+                <path class="vendor-shades-overlay" d="M29 43q9-7 20 0l-2 9H31zm23 0q10-7 20 0l-2 9H54z" fill="#25182b" stroke="#47f5e8" stroke-width="3"/>
+              </svg>
+              <span class="vendor-sparkle">✦</span>
+            </div>
             <div class="customer-order-bubble" id="customer-order-bubble" role="status" aria-live="polite" hidden>
               <span class="bubble-label" id="customer-bubble-label" data-i18n="customer-bubble-label">MY ORDER!</span>
               <span class="bubble-icons" id="customer-order-icons" aria-hidden="true"></span>
@@ -842,6 +960,7 @@
       <div class="vendor-field-row"><span></span><button class="settings-reset" id="reset-progress-button" type="button" hidden>🗑️ Reset Progress</button></div>
       <button class="modal-submit" id="setup-submit" type="button">Simulan ang negosyo! <span aria-hidden="true">→</span></button>
       <button class="modal-cancel" id="setup-cancel" type="button" hidden>Bumalik sa laro</button>
+      <button class="setup-home-button" id="setup-home-button" type="button" hidden>🏠 Back to Main Menu</button>
     </section>
   </div>
 
@@ -906,6 +1025,14 @@
     </section>
   </div>
 
+  <div class="modal-backdrop" id="install-help-modal" role="dialog" aria-modal="true" aria-labelledby="install-title" hidden>
+    <section class="modal">
+      <div class="modal-header"><div class="modal-emblem" aria-hidden="true">📲</div><div class="modal-eyebrow">KAINAN SIM</div><h2 id="install-title">Install Kainan Sim</h2><p class="modal-description" id="install-description">Install this game for quick access and offline play.</p></div>
+      <div class="nothing-new" id="install-instructions"></div>
+      <button class="modal-submit" data-close-modal="install-help-modal" type="button">Close</button>
+    </section>
+  </div>
+
   <div class="modal-backdrop" id="inspection-modal" role="dialog" aria-modal="true" aria-labelledby="inspection-title" hidden>
     <section class="modal">
       <div class="modal-header"><div class="modal-emblem">🧼</div><div class="modal-eyebrow">BARANGAY HEALTH OFFICE</div><h2 id="inspection-title">Health Inspection</h2><p class="modal-description" id="inspection-description">Papasok ang inspector—ipakita ang kalinisan ng iyong kariton.</p></div>
@@ -939,8 +1066,10 @@
 
       const STORAGE_KEY = "kainanSim.pinoyStreetFood.v1";
       const LEGACY_STORAGE_KEY = "kainanSim_saveData";
+      const EQUIPPED_COSMETICS_KEY = "kainanSim_equipped_cosmetics";
       const BGM_VOLUME_KEY = "kainanSim_volume_bgm";
       const SFX_VOLUME_KEY = "kainanSim_volume_sfx";
+      const PWA_INSTALLED_KEY = "pwa_installed";
       const MAX_LEVEL = 6;
       const MAX_TRAY_ITEMS = 12;
       const ORDER_DURATION = 75;
@@ -1138,6 +1267,8 @@
       let rushSeconds = 0;
       let questAfterServe = null;
       let pendingCredit = null;
+      let shopEquipmentChanged = false;
+      let deferredInstallPrompt = null;
       let customerMood = "waiting";
       let shopCategory = "upgrades";
       let drinkPanelAutoOpened = false;
@@ -1340,6 +1471,10 @@
           const serialized = JSON.stringify(state);
           window.localStorage.setItem(STORAGE_KEY, serialized);
           window.localStorage.setItem(LEGACY_STORAGE_KEY, serialized);
+          window.localStorage.setItem(EQUIPPED_COSMETICS_KEY, JSON.stringify({
+            owned: state.cosmetics,
+            equipped: state.equippedCosmetic
+          }));
           window.localStorage.setItem(BGM_VOLUME_KEY, String(bgmVolume));
           window.localStorage.setItem(SFX_VOLUME_KEY, String(sfxVolume));
           savedProgressExists = hasSavedGame();
@@ -1360,6 +1495,69 @@
           : (state.language === "tl" ? "WALANG SAVE" : "NO SAVE");
       }
 
+      function isInstalledApp() {
+        return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+      }
+
+      function updateInstallButton() {
+        let savedInstalled = false;
+        try {
+          savedInstalled = window.localStorage.getItem(PWA_INSTALLED_KEY) === "true";
+        } catch (error) {
+          console.error("Unable to read Kainan Sim installation status.", error);
+        }
+        $("install-app-button").hidden = savedInstalled || isInstalledApp();
+      }
+
+      function rememberInstalledApp() {
+        try {
+          window.localStorage.setItem(PWA_INSTALLED_KEY, "true");
+        } catch (error) {
+          console.error("Unable to save Kainan Sim installation status.", error);
+        }
+        updateInstallButton();
+      }
+
+      function isIosInstallPlatform() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+          navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+      }
+
+      function showInstallHelp() {
+        const isTl = state.language === "tl";
+        const instructions = isIosInstallPlatform()
+          ? (isTl
+            ? "Sa iPhone o iPad: pindutin ang Share icon 📤 sa Safari, pagkatapos piliin ang “Add to Home Screen” ➕."
+            : "On iPhone or iPad: tap the Share icon 📤 in Safari, then choose “Add to Home Screen” ➕.")
+          : (isTl
+            ? "Sa desktop, piliin ang install icon sa address bar o “Install Kainan Sim” sa menu ng browser. Sa Android, buksan ang menu ng browser at piliin ang “Install app” o “Add to Home screen”."
+            : "On desktop, choose the install icon in the address bar or “Install Kainan Sim” in the browser menu. On Android, open the browser menu and choose “Install app” or “Add to Home screen”.");
+        $("install-instructions").textContent = instructions;
+        $("install-help-modal").hidden = false;
+      }
+
+      async function installApp() {
+        if (isInstalledApp()) {
+          rememberInstalledApp();
+          return;
+        }
+        if (!deferredInstallPrompt) {
+          showInstallHelp();
+          return;
+        }
+        const installPrompt = deferredInstallPrompt;
+        deferredInstallPrompt = null;
+        try {
+          await installPrompt.prompt();
+          const choice = await installPrompt.userChoice;
+          if (choice?.outcome === "accepted") rememberInstalledApp();
+        } catch (error) {
+          console.error("Unable to open the Kainan Sim installation prompt.", error);
+          showInstallHelp();
+        }
+        updateInstallButton();
+      }
+
       function setLanguage(language) {
         state.language = language === "tl" ? "tl" : "en";
         const isTl = state.language === "tl";
@@ -1377,6 +1575,7 @@
           ["#new-game-button", "🎮 START NEW GAME", "🎮 BAGONG LARO"],
           ["#continue-button", "⏯️ CONTINUE", "⏯️ IPAGPATULOY"],
           ["#home-settings-button", "⚙️ SETTINGS", "⚙️ MGA SETTING"],
+          ["#install-app-button", "📲 Install App Now", "📲 I-install ang App"],
           ["#audio-controls-label", "🔊 Volume", "🔊 Lakas ng Tunog"],
           ["#header-bgm-label", "🎵 Music", "🎵 Musika"],
           ["#header-sfx-label", "🔔 Effects", "🔔 Epekto"],
@@ -1411,6 +1610,7 @@
           ["#reset-progress-button", "🗑️ Reset Progress", "🗑️ I-reset ang Progress"],
           ["#setup-submit", "Start my business! →", "Simulan ang negosyo! →"],
           ["#setup-cancel", "Back to the game", "Bumalik sa laro"],
+          ["#setup-home-button", "🏠 Back to Main Menu", "🏠 Bumalik sa Homescreen"],
           ["#level-description", "Great work! You're the talk of the neighborhood!", "Ang galing mo! Usap-usapan ka na sa buong barangay!"],
           ["#level-dismiss", "Keep the cart rolling! →", "Tuloy ang negosyo! →"],
           ["#quests-title", "Daily Quests", "Mga Misyon Ngayon"],
@@ -1425,6 +1625,9 @@
           ["#credit-accept", "Sure, put it on my list!", "Sige, ilista mo!"],
           ["#home-settings-title", "Settings", "Mga Setting"],
           ["#home-settings-description", "Customize game sound and language.", "I-personalize ang tunog at wika ng laro."],
+          ["#install-title", "Install Kainan Sim", "I-install ang Kainan Sim"],
+          ["#install-description", "Install this game for quick access and offline play.", "I-install ang laro para madaling buksan at malaro kahit offline."],
+          ["[data-close-modal='install-help-modal']", "Close", "Isara"],
           ["#settings-bgm-label", "🔊 Background Music (BGM)", "🔊 Musikang Panglikod (BGM)"],
           ["#settings-sfx-label", "🔔 Sound Effects (SFX)", "🔔 Mga Epekto ng Tunog (SFX)"],
           ["label[for='language-select'] span", "🌐 Language", "🌐 Wika"],
@@ -1534,6 +1737,7 @@
         renderQuests();
         if (state.dayClosed) renderDayReport();
         if (!$("shop-modal").hidden) renderShop();
+        if (!$("install-help-modal").hidden) showInstallHelp();
         updateHomeSave();
         persist();
       }
@@ -1558,6 +1762,22 @@
           });
           const isProgress = candidate => candidate.setupComplete || candidate.served > 0 || candidate.level > 1 || candidate.coins > 0;
           const loaded = loadedCandidates.find(isProgress) || loadedCandidates[0] || initialState();
+          try {
+            const equipment = JSON.parse(window.localStorage.getItem(EQUIPPED_COSMETICS_KEY) || "null");
+            if (equipment && typeof equipment === "object" && !Array.isArray(equipment)) {
+              const validCosmetics = new Set(["classic", ...COSMETICS.map(item => item.id)]);
+              if (Array.isArray(equipment.owned)) {
+                loaded.cosmetics = [...new Set(["classic", ...equipment.owned.filter(id => validCosmetics.has(id))])];
+              }
+              if (typeof equipment.equipped === "string" &&
+                  loaded.cosmetics.includes(equipment.equipped) &&
+                  (equipment.equipped === "classic" || COSMETICS.some(item => item.id === equipment.equipped))) {
+                loaded.equippedCosmetic = equipment.equipped;
+              }
+            }
+          } catch (error) {
+            console.error("Unable to read saved Kainan Sim cosmetic equipment.", error);
+          }
           state = loaded;
           savedProgressExists = isProgress(loaded);
           return loaded;
@@ -1657,7 +1877,7 @@
         if (category === "cosmetics") return COSMETICS.map(item => {
           const owned = state.cosmetics.includes(item.id);
           const vendorName = item.vendor ? VENDORS[item.vendor].name : "All vendors";
-          return { ...item, detail: `${item.detail} · ${vendorName}`, owned, action: () => { state.cosmetics.push(item.id); state.equippedCosmetic = item.id; } };
+          return { ...item, detail: `${item.detail} · ${vendorName}`, owned, action: () => { state.cosmetics.push(item.id); } };
         });
         if (category === "vehicles") return VEHICLES.map((item, index) => {
           const owned = item.tier <= ownedVehicleTier();
@@ -1726,7 +1946,10 @@
                 : owned ? (equipped ? (isTl ? "✓ Suot/Gamit" : "✓ Equipped") : ["pan", "fryer", "security"].includes(product.id) ? (isTl ? "✓ Pag-aari" : "✓ Owned") : (isTl ? "Gamitin" : "Equip"))
                   : `${isTl ? "Bumili" : "Buy"} ₱${product.cost}`;
           const vendorLocked = Boolean(product.vendor && product.vendor !== state.vendor);
-          const disabled = product.disabled || vendorLocked || owned && !["cosmetics", "vehicles", "locations"].includes(shopCategory) || product.id === "time" && state.upgrades.timeCharges >= 99;
+          const disabled = product.disabled || vendorLocked ||
+            owned && !["cosmetics", "vehicles", "locations"].includes(shopCategory) ||
+            shopCategory === "cosmetics" && equipped ||
+            product.id === "time" && state.upgrades.timeCharges >= 99;
           const detail = vendorLocked
             ? (isTl ? `Para kay ${VENDORS[product.vendor].name} lamang. Palitan ang tindero sa Settings para mabili ito.` : `Vendor-specific style for ${VENDORS[product.vendor].name}. Change vendors in Settings to buy it.`)
             : (productDetails[product.id]?.[isTl ? 1 : 0] || product.detail);
@@ -1744,7 +1967,11 @@
         const product = shopProducts(shopCategory).find(item => item.id === id);
         if (!product || product.disabled) return;
         if (product.owned) {
-          if (shopCategory === "cosmetics") state.equippedCosmetic = id;
+          if (shopCategory === "cosmetics") {
+            if (state.equippedCosmetic === id || product.vendor && product.vendor !== state.vendor) return;
+            state.equippedCosmetic = id;
+            shopEquipmentChanged = true;
+          }
           else if (shopCategory === "vehicles") {
             if (VEHICLES.findIndex(item => item.id === id) <= ownedVehicleTier()) state.vehicle = id;
           } else if (shopCategory === "locations" && availableLocation(id)) state.location = id;
@@ -1813,6 +2040,17 @@
         return VENDORS[state.vendor].name;
       }
 
+      function closeShopModal() {
+        $("shop-modal").hidden = true;
+        if (!shopEquipmentChanged) return;
+        shopEquipmentChanged = false;
+        const vendor = $("vendor-person");
+        vendor.classList.remove("sparkle");
+        void vendor.offsetWidth;
+        vendor.classList.add("sparkle");
+        window.setTimeout(() => vendor.classList.remove("sparkle"), 1000);
+      }
+
       function renderHeader() {
         const required = levelRequirement();
         $("level-display").textContent = `${state.language === "tl" ? "Antas" : "Level"} ${state.level}`;
@@ -1823,6 +2061,12 @@
         $("xp-track").setAttribute("aria-valuenow", String(state.xp));
         const cosmetic = COSMETICS.find(item => item.id === state.equippedCosmetic);
         $("vendor-badge").textContent = `${cosmetic?.emoji || VENDORS[state.vendor].emoji} ${vendorDisplayName().toLocaleUpperCase("en")}`;
+        const vendorAvatar = { jun: "avatar-manong", manong: "avatar-manong", bebang: "avatar-bebang", bossing: "avatar-bossing" }[state.vendor];
+        $("vendor-avatar-use").setAttribute("href", `#${vendorAvatar}`);
+        const activeCosmetic = cosmetic && (!cosmetic.vendor || cosmetic.vendor === state.vendor) ? cosmetic.id : "classic";
+        $("vendor-person").dataset.cosmetic = activeCosmetic;
+        $("scene-sign").classList.toggle("neon-equipped", state.equippedCosmetic === "neon-sign");
+        $("scene-sign").setAttribute("aria-label", state.cartName);
         document.title = `${state.cartName} — Kainan Sim`;
         $("header-language-select").value = state.language;
         syncVolumeControls();
@@ -2870,6 +3114,7 @@
           : (isTl ? 'Simulan ang negosyo! <span aria-hidden="true">→</span>' : 'Start my business! <span aria-hidden="true">→</span>');
         $("setup-submit").classList.toggle("green-submit", editing);
         $("setup-cancel").hidden = !editing;
+        $("setup-home-button").hidden = !editing;
         $("reset-progress-button").hidden = !editing;
         $("vendor-name-input").value = editing ? state.cartName : "";
         selectVendor(editing ? state.vendor : state.vendor);
@@ -2910,6 +3155,32 @@
         if (!order && $("home-screen").hidden) nextCustomer();
       }
 
+      function returnHomeFromSetup() {
+        const name = $("vendor-name-input").value.trim().slice(0, 36);
+        const selectedVendor = document.querySelector(".vendor-option.selected")?.dataset.vendor;
+        const validVendor = selectedVendor && Object.hasOwn(VENDORS, selectedVendor);
+        const setupChanged = name !== state.cartName || validVendor && selectedVendor !== state.vendor;
+        if (setupChanged && !window.confirm(state.language === "tl"
+          ? "Bumalik sa Homescreen? Mare-save ang kasalukuyang progress at pagbabago sa kariton."
+          : "Return to the Main Menu? Your current progress and cart changes will be saved.")) return;
+
+        if (name) state.cartName = name;
+        if (validVendor) state.vendor = selectedVendor;
+        if (!persist()) return;
+
+        isSetupEditing = false;
+        $("setup-modal").hidden = true;
+        renderAll();
+        updateHomeSave();
+        const home = $("home-screen");
+        home.classList.remove("is-leaving");
+        home.hidden = false;
+        void home.offsetWidth;
+        home.classList.add("is-arriving");
+        window.setTimeout(() => home.classList.remove("is-arriving"), 400);
+        setLanguage(state.language);
+      }
+
       function resetProgress() {
         const confirmed = window.confirm(state.language === "tl"
           ? "Sigurado ka bang i-reset ang lahat ng progress, barya, level, at settings ng tindero? Hindi na ito maibabalik."
@@ -2917,6 +3188,7 @@
         if (!confirmed) return;
         window.localStorage.removeItem(STORAGE_KEY);
         window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
         savedProgressExists = false;
         state = initialState();
         window.clearTimeout(bgmTimer);
@@ -2961,6 +3233,7 @@
           : "Start again at Level 1? Your previous save will be deleted.")) return;
         window.localStorage.removeItem(STORAGE_KEY);
         window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
         savedProgressExists = false;
         window.clearTimeout(arrivalTimer);
         window.clearTimeout(customerTransitionTimer);
@@ -3019,6 +3292,7 @@
           : "Are you sure you want to erase your entire save and start over? This cannot be undone.")) return;
         window.localStorage.removeItem(STORAGE_KEY);
         window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
         savedProgressExists = false;
         window.clearTimeout(arrivalTimer);
         window.clearTimeout(customerTransitionTimer);
@@ -3047,6 +3321,7 @@
         setLanguage(state.language);
         window.localStorage.removeItem(STORAGE_KEY);
         window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
         savedProgressExists = false;
         updateHomeSave();
         announce("Na-reset na ang lahat. Handa ka nang magsimula ulit.", "info");
@@ -3093,6 +3368,7 @@
         $("settings-button").addEventListener("click", () => openSetup(true));
         $("new-game-button").addEventListener("click", startNewGame);
         $("continue-button").addEventListener("click", continueGame);
+        $("install-app-button").addEventListener("click", installApp);
         $("home-settings-button").addEventListener("click", openHomeSettings);
         $("language-select").addEventListener("change", event => setLanguage(event.target.value));
         $("header-language-select").addEventListener("change", event => setLanguage(event.target.value));
@@ -3118,6 +3394,7 @@
           $("quests-modal").hidden = false;
         });
         $("shop-button").addEventListener("click", () => {
+          shopEquipmentChanged = false;
           renderShop();
           $("shop-modal").hidden = false;
         });
@@ -3183,13 +3460,24 @@
           completeServe(true);
         });
         document.querySelectorAll("[data-close-modal]").forEach(button => button.addEventListener("click", () => {
-          $(button.dataset.closeModal).hidden = true;
+          if (button.dataset.closeModal === "shop-modal") closeShopModal();
+          else $(button.dataset.closeModal).hidden = true;
         }));
         $("setup-submit").addEventListener("click", saveSetup);
+        $("setup-home-button").addEventListener("click", returnHomeFromSetup);
         $("reset-progress-button").addEventListener("click", resetProgress);
         $("setup-cancel").addEventListener("click", () => {
           $("setup-modal").hidden = true;
           isSetupEditing = false;
+        });
+        window.addEventListener("beforeinstallprompt", event => {
+          event.preventDefault();
+          deferredInstallPrompt = event;
+          updateInstallButton();
+        });
+        window.addEventListener("appinstalled", () => {
+          deferredInstallPrompt = null;
+          rememberInstalledApp();
         });
         $("vendor-options").addEventListener("click", event => {
           const button = event.target.closest("button[data-vendor]");
@@ -3209,7 +3497,8 @@
           if (event.key !== "Escape") return;
           for (const id of ["level-modal", "quests-modal", "shop-modal", "credit-modal"]) {
             if (!$(`${id}`).hidden) {
-              $(`${id}`).hidden = true;
+              if (id === "shop-modal") closeShopModal();
+              else $(`${id}`).hidden = true;
               return;
             }
           }
@@ -3262,6 +3551,7 @@
         renderQuests();
         $("home-screen").hidden = false;
         $("game-screen").classList.remove("game-enter");
+        updateInstallButton();
         window.setInterval(tick, 1000);
         setLanguage(state.language);
       }
