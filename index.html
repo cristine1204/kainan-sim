@@ -197,6 +197,7 @@
     .food-art::before { position: absolute; right: 0; bottom: 12px; left: 0; height: 8px; border-radius: 50%; background: #bd8755; content: ""; }
     .food-art::after { position: absolute; right: 7px; bottom: 9px; left: 7px; height: 4px; border-radius: 50%; background: #815139; content: ""; }
     .food-art .food-emoji { position: relative; z-index: 1; font-size: 42px; filter: drop-shadow(0 4px 2px rgb(90 54 24 / 17%)); transition: transform .18s; }
+    .food-art .food-image { position: relative; z-index: 1; display: block; width: 100%; max-width: 100%; height: 100%; object-fit: contain; }
     .food-card:not(.locked):hover .food-emoji { transform: translateY(-3px) scale(1.06); }
     .food-lock-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(60 46 36 / 49%); color: white; font-size: 25px; }
     .unlock-chip { position: absolute; z-index: 2; top: 7px; right: 7px; padding: 4px 6px; border-radius: 99px; background: #eef8ed; color: #27733d; font-size: 8px; font-weight: 900; }
@@ -428,6 +429,7 @@
     .drink-topline { min-height: 76px; display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; gap: 3px; text-align: center; }
     .drink-name { font-size: 9px; font-weight: 900; }
     .drink-emoji { font-size: 54px; line-height: 1; }
+    .drink-image { display: block; width: 56px; height: 56px; object-fit: contain; }
     .drink-price { color: #368053; font-size: 8px; font-weight: 900; }
     .drink-note { margin-top: 3px; color: var(--muted); font-size: 7px; }
     .drink-control { display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-top: 7px; }
@@ -745,6 +747,7 @@
       .drink-topline { min-height: 77px; }
       .drink-name { width: 100%; font-size: 10px; line-height: 1.25; white-space: normal; overflow-wrap: anywhere; }
       .drink-emoji { font-size: 50px; }
+      .drink-image { width: 50px; height: 50px; }
       .drink-price { font-size: 9px; white-space: normal; }
       .drink-control { flex-wrap: wrap; }
       .drink-lock { font-size: 8px; white-space: normal; }
@@ -838,6 +841,7 @@
       .drink-card { min-height: 46px; padding: 3px 2px; }
       .drink-topline { min-height: 28px; flex-direction: column-reverse; gap: 0; text-align: center; }
       .drink-emoji { font-size: 22px; }
+      .drink-image { width: 22px; height: 22px; }
       .drink-name { font-size: 6px; line-height: 1.05; }
       .drink-price, .drink-control, .drink-lock { display: none; }
       .order-station { justify-content: flex-start; }
@@ -868,6 +872,7 @@
       .food-art { height: 20px; }
       .drink-panel { max-height: 72px; }
       .drink-emoji { font-size: 17px; }
+      .drink-image { width: 17px; height: 17px; }
       .sauce-button { min-height: 29px; }
       .sauce-button > span:first-child { font-size: 14px; }
       .serve-button { min-height: 34px; }
@@ -946,6 +951,7 @@
       .drink-topline { min-height: 77px; }
       .drink-name { width: 100%; font-size: 10px; line-height: 1.25; white-space: normal; overflow-wrap: anywhere; }
       .drink-emoji { font-size: 42px; }
+      .drink-image { width: 42px; height: 42px; }
       .drink-price, .drink-lock { display: block; }
       .drink-control { display: flex; }
       .drink-price, .drink-lock { font-size: 9px; white-space: normal; }
@@ -1085,6 +1091,7 @@
       .drink-card { min-width: 0; min-height: 45px; padding: 3px 2px; }
       .drink-topline { min-height: 28px; flex-direction: column-reverse; gap: 0; text-align: center; }
       .drink-emoji { font-size: 22px; }
+      .drink-image { width: 22px; height: 22px; }
       .drink-name { font-size: 6px; line-height: 1.05; white-space: normal; }
       .drink-price, .drink-control, .drink-lock { display: none; }
       .sauce-panel { grid-column: 1; grid-row: 2; }
@@ -1129,6 +1136,7 @@
       .drink-panel { max-height: 62px; }
       .drink-card { min-height: 35px; }
       .drink-emoji { font-size: 17px; }
+      .drink-image { width: 17px; height: 17px; }
       .sauce-button { min-height: 30px; }
       .sauce-button > span:first-child { font-size: 14px; }
       .serve-button { min-height: 32px; }
@@ -1148,7 +1156,7 @@
       .food-art::before, .food-art::after { display: none; }
       .food-lock-overlay { display: none; }
       .food-art .food-emoji { grid-row: 1; place-self: center; width: 26px; height: 26px; max-height: 26px; font-size: 26px; line-height: 1; object-fit: contain; }
-      .food-art img { grid-row: 1; place-self: center; width: 26px; max-width: 26px; height: 26px; object-fit: contain; }
+      .food-art .food-image { grid-row: 1; place-self: center; width: 26px; max-width: 26px; height: 26px; object-fit: contain; }
       .food-name { grid-row: 2; min-width: 0; align-self: center; padding: 0 1px; font-size: 7px; line-height: 9px; text-align: center; white-space: nowrap; }
       .food-price { display: block; grid-row: 3; align-self: center; font-size: 6px; line-height: 8px; text-align: center; }
       .food-art .unlock-chip { position: static; grid-row: 4; justify-self: center; align-self: center; max-width: calc(100% - 2px); overflow: hidden; padding: 0 3px; font-size: 6px; line-height: 7px; text-overflow: ellipsis; }
@@ -1170,7 +1178,7 @@
       .food-panel .subhead-row { margin-bottom: 2px; }
       .food-grid { height: 116px; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(2, 56px); grid-auto-rows: 56px; gap: 4px; }
       .food-card { height: 56px; min-height: 56px; padding: 2px 4px; }
-      .food-art .food-emoji, .food-art img { width: 26px; height: 26px; max-height: 26px; font-size: 26px; }
+      .food-art .food-emoji, .food-art .food-image { width: 26px; height: 26px; max-height: 26px; font-size: 26px; }
       #drink-widget { display: none; }
       .sauce-panel { grid-column: 1; grid-row: 2; padding: 3px; }
       .sauce-panel .subhead-row, .tray-panel .subhead-row { display: none; }
@@ -1582,19 +1590,19 @@
         bossing: { name: "Bossing", emoji: "😎", cart: "Bossing's Tusok-Tusok Cart" }
       };
       const FOODS = [
-        { id: "fishball", name: "Fishball", emoji: "🍡", unlock: 1, price: 5, note: "Malutong sa labas, juicy sa loob." },
+        { id: "fishball", name: "Fishball", emoji: "🍡", image: "assets/foods/fishball.png", unlock: 1, price: 5, note: "Malutong sa labas, juicy sa loob." },
         { id: "kwek", name: "Kwek-Kwek", emoji: "🥚", unlock: 2, price: 8, note: "Quail egg na may crispy coating." },
-        { id: "hotdog", name: "Hotdog", emoji: "🌭", unlock: 2, price: 12, note: "Juicy hotdog, paborito ng bata." },
-        { id: "day-old", name: "Day Old", emoji: "🍗", unlock: 3, price: 10, note: "Sulit at malutong na paborito." },
-        { id: "fried-siomai", name: "Fried Siomai", emoji: "🥟", unlock: 3, price: 10, note: "Mainit-init na fried siomai." },
-        { id: "kikiam", name: "Kikiam", emoji: "🥖", unlock: 4, price: 7, note: "Classic na sawsaw-sarap!" },
-        { id: "lumpia", name: "Lumpia", emoji: "🌯", unlock: 4, price: 8, note: "Crispy lumpia, bagong luto." },
-        { id: "calamares", name: "Calamares", emoji: "🦑", unlock: 5, price: 10, note: "Crispy at fresh, paborito ng lahat." }
+        { id: "hotdog", name: "Hotdog", emoji: "🌭", image: "assets/foods/hotdog.png", unlock: 2, price: 12, note: "Juicy hotdog, paborito ng bata." },
+        { id: "day-old", name: "Day Old", emoji: "🍗", image: "assets/foods/day-old.png", unlock: 3, price: 10, note: "Sulit at malutong na paborito." },
+        { id: "fried-siomai", name: "Fried Siomai", emoji: "🥟", image: "assets/foods/fried-siomai.png", unlock: 3, price: 10, note: "Mainit-init na fried siomai." },
+        { id: "kikiam", name: "Kikiam", emoji: "🥖", image: "assets/foods/kikiam.png", unlock: 4, price: 7, note: "Classic na sawsaw-sarap!" },
+        { id: "lumpia", name: "Lumpia", emoji: "🌯", image: "assets/foods/lumpia.png", unlock: 4, price: 8, note: "Crispy lumpia, bagong luto." },
+        { id: "calamares", name: "Calamares", emoji: "🦑", image: "assets/foods/calamares.png", unlock: 5, price: 10, note: "Crispy at fresh, paborito ng lahat." }
       ];
       const DRINKS = [
-        { id: "sago", name: "Sago't Gulaman", emoji: "🧋", unlock: 3, price: 18 },
-        { id: "buko", name: "Buko Juice", emoji: "🥥", unlock: 4, price: 22 },
-        { id: "melon", name: "Melon Drink", emoji: "🍈", unlock: 5, price: 20 }
+        { id: "sago", name: "Sago't Gulaman", emoji: "🧋", image: "assets/drinks/sago-gulaman.png", unlock: 3, price: 18 },
+        { id: "buko", name: "Buko Juice", emoji: "🥥", image: "assets/drinks/buko-juice.png", unlock: 4, price: 22 },
+        { id: "melon", name: "Melon Drink", emoji: "🍈", image: "assets/drinks/melon-juice.png", unlock: 5, price: 20 }
       ];
       const SAUCES = [
         { id: "sweet", name: "Sweet & Sour", emoji: "🍯", unlock: 1 },
@@ -2724,7 +2732,7 @@
             : `${item.name}. 🔒 ${state.language === "tl" ? "Mabubuksan sa Antas" : "Unlocks at Level"} ${item.unlock}`);
           card.innerHTML = `
             <div class="food-art">
-              <span class="food-emoji" aria-hidden="true">${item.emoji}</span>
+              ${item.image ? `<img class="food-image" src="${item.image}" alt="" loading="lazy" decoding="async">` : `<span class="food-emoji" aria-hidden="true">${item.emoji}</span>`}
               ${unlocked ? `<span class="unlock-chip">${state.language === "tl" ? "✓ BUKAS" : "✓ READY"}</span>` : `<span class="unlock-chip locked-level" title="${unlockLabel}"><span class="unlock-label-full">${unlockLabel}</span><span class="unlock-label-compact" aria-hidden="true">${compactUnlockLabel}</span></span><div class="food-lock-overlay" aria-hidden="true">🔒</div>`}
             </div>
             <div class="food-info">
@@ -2790,10 +2798,14 @@
           const name = document.createElement("span");
           name.className = "drink-name";
           name.textContent = drink.name;
-          const emoji = document.createElement("span");
-          emoji.className = "drink-emoji";
-          emoji.textContent = drink.emoji;
-          top.append(name, emoji);
+          const image = document.createElement("img");
+          image.className = "drink-image";
+          image.src = drink.image;
+          image.alt = "";
+          image.loading = "lazy";
+          image.decoding = "async";
+          image.setAttribute("aria-hidden", "true");
+          top.append(name, image);
           const price = document.createElement("div");
           price.className = "drink-price";
           price.textContent = `₱${drink.price} / cup`;
