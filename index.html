@@ -1,0 +1,2513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#faf6f0">
+  <meta name="description" content="Build your Pinoy street food cart, serve tusok-tusok orders, and grow your neighborhood food business.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Kainan Sim">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <title>Kainan Sim — Pinoy Street Food Tycoon</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --terracotta: #c85a32;
+      --terracotta-dark: #a94625;
+      --gold: #e5a93c;
+      --green: #2b9348;
+      --green-dark: #22763a;
+      --cream: #faf6f0;
+      --ink: #302a26;
+      --muted: #887b72;
+      --line: #ede4d9;
+      --white: #fff;
+      --shadow: 0 10px 28px rgb(74 47 27 / 7%);
+      font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; min-height: 100vh; color: var(--ink); background: var(--cream); }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible { outline: 3px solid #e5a93c; outline-offset: 3px; }
+    .app { width: min(1440px, 100%); margin: auto; padding: 0 32px 36px; }
+
+    .topbar { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .brand-mark { width: 37px; height: 37px; display: grid; place-items: center; border-radius: 13px; background: var(--terracotta); color: white; font-size: 21px; box-shadow: 0 4px 10px rgb(200 90 50 / 20%); }
+    .brand-title { font-size: 16px; font-weight: 850; letter-spacing: -.45px; white-space: nowrap; }
+    .brand-title span { color: var(--terracotta); }
+    .brand-subtitle { margin-top: 2px; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .35px; }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .header-pill { display: flex; align-items: center; gap: 8px; min-height: 38px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--white); font-size: 12px; font-weight: 800; }
+    .level-pill { color: #755016; background: #fff3d6; border-color: #f2dfb6; }
+    .coin-pill { color: #855814; background: #fff8e9; border-color: #f1e4c6; font-variant-numeric: tabular-nums; }
+    .icon-button { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--white); cursor: pointer; font-size: 17px; transition: background .15s, transform .15s; }
+    .icon-button:hover { transform: translateY(-1px); background: #fffaf3; }
+    .sound-toggle { display: flex; align-items: center; gap: 5px; width: auto; padding: 0 10px; color: #645144; font-size: 10px; font-weight: 800; }
+    .game-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: -5px 0 16px; }
+    .tool-button, .weather-button, .location-select { min-height: 37px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 10px; background: white; color: #59483a; cursor: pointer; font-size: 10px; font-weight: 800; transition: border-color .15s, background .15s, transform .15s; }
+    .tool-button:hover, .weather-button:hover, .location-select:hover { transform: translateY(-1px); border-color: #e2b884; background: #fffaf4; }
+    .weather-button { color: #79532b; background: #fff7e8; }
+    .rush-live { color: #a94331; border-color: #edc5b3; background: #fff0e8; animation: rush-pulse 1s ease-in-out infinite alternate; }
+    .location-select { max-width: 180px; cursor: pointer; }
+    .tool-spacer { flex: 1; }
+
+    .progress-wrap { height: 49px; display: flex; align-items: center; gap: 13px; }
+    .progress-label { color: var(--muted); font-size: 10px; font-weight: 800; white-space: nowrap; }
+    .progress-track { height: 9px; flex: 1; overflow: hidden; border-radius: 99px; background: #e9e0d5; }
+    .progress-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #2b9348, #74ba66); transition: width .45s ease; }
+    .progress-count { min-width: 67px; color: var(--muted); text-align: right; font-size: 10px; font-weight: 750; font-variant-numeric: tabular-nums; }
+
+    .shift-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 5px 0 18px; padding: 12px 16px; border: 1px solid #f0dfc2; border-radius: 12px; background: #fff8ea; }
+    .shift-location { display: flex; align-items: center; gap: 8px; color: #79532b; font-size: 11px; font-weight: 750; }
+    .shift-status { display: flex; align-items: center; gap: 6px; color: var(--green-dark); font-size: 10px; font-weight: 800; white-space: nowrap; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #52ad65; box-shadow: 0 0 0 3px #e2f1df; }
+
+    .game-grid { display: grid; grid-template-columns: minmax(245px, 310px) minmax(0, 1fr); align-items: start; gap: 22px; }
+    .panel { border: 1px solid #f0e9df; border-radius: 17px; background: var(--white); box-shadow: var(--shadow); }
+    .customer-panel { overflow: hidden; }
+    .section-heading { display: flex; align-items: center; gap: 9px; margin: 0; font-size: 15px; font-weight: 850; letter-spacing: -.3px; }
+    .heading-number { display: grid; width: 23px; height: 23px; flex: 0 0 23px; place-items: center; border-radius: 8px; color: var(--terracotta); background: #fff0e8; font-size: 11px; font-weight: 900; }
+    .customer-heading { padding: 19px 19px 12px; }
+    .customer-heading small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; font-weight: 500; letter-spacing: 0; }
+    .customer-scene { position: relative; height: 235px; overflow: hidden; margin: 0 15px; border-radius: 13px; background: linear-gradient(165deg, #eac78f 0%, #f3d99f 37%, #b96a43 37%, #9e4a30 100%); }
+    .customer-scene::before { position: absolute; inset: 13px 0 auto; height: 6px; background: #713e34; content: ""; }
+    .lights { position: absolute; z-index: 1; top: 10px; left: 12px; display: flex; width: calc(100% - 24px); justify-content: space-around; }
+    .lights i { width: 8px; height: 8px; border-radius: 50%; background: #ffe58d; box-shadow: 0 0 9px #ffe58d; }
+    .scene-awning { position: absolute; top: 26px; left: 10px; display: flex; width: calc(100% - 20px); height: 21px; overflow: hidden; border-radius: 5px 5px 0 0; }
+    .scene-awning i { height: 100%; flex: 1; background: #d65e43; }
+    .scene-awning i:nth-child(even) { background: #ffe3ad; }
+    .scene-window { position: absolute; top: 48px; left: 16px; width: calc(100% - 32px); height: 105px; border: 4px solid #734538; border-radius: 3px; background: linear-gradient(135deg, #a9cbbd 0 42%, #d6e1bd 42%); }
+    .scene-window::before { position: absolute; top: 0; bottom: 0; left: 49%; border-left: 3px solid #734538; content: ""; }
+    .scene-window::after { position: absolute; top: 48%; right: 0; left: 0; border-top: 3px solid #734538; content: ""; }
+    .scene-counter { position: absolute; right: 0; bottom: 37px; left: 0; height: 33px; border-top: 5px solid #75402e; background: #cc8854; }
+    .scene-counter::after { position: absolute; right: 16%; bottom: -26px; left: 16%; height: 25px; background: #75402e; content: ""; }
+    .customer-person { position: absolute; z-index: 2; bottom: 54px; left: 50%; width: 109px; height: 160px; transform: translateX(-50%); }
+    .customer-person .hair { position: absolute; top: 1px; left: 27px; width: 56px; height: 53px; border: 3px solid #382620; border-radius: 48% 47% 30% 35%; background: #39251f; transform: rotate(-5deg); }
+    .customer-person .face { position: absolute; top: 14px; left: 35px; width: 45px; height: 51px; border-radius: 47% 47% 45% 45%; background: #d99466; }
+    .customer-person .face::before { position: absolute; top: 24px; left: 10px; width: 4px; height: 4px; border-radius: 50%; background: #382620; box-shadow: 17px 0 #382620; content: ""; }
+    .customer-person .face::after { position: absolute; right: 15px; bottom: 10px; width: 12px; height: 5px; border-bottom: 2px solid #873d38; border-radius: 0 0 50% 50%; content: ""; }
+    .customer-person .body { position: absolute; top: 56px; left: 17px; width: 83px; height: 99px; border: 3px solid #743936; border-radius: 42% 42% 12px 12px; background: #dd6552; }
+    .customer-person .body::after { position: absolute; top: 10px; left: 25px; width: 25px; height: 47px; border: 2px solid #f1c276; border-radius: 0 0 9px 9px; background: #f5ead0; content: ""; }
+    .scene-sign { position: absolute; z-index: 3; top: 4px; left: 50%; padding: 5px 10px; transform: translateX(-50%); border-radius: 6px; background: #fff5da; color: #8d482b; font-size: 9px; font-weight: 950; letter-spacing: 1.1px; white-space: nowrap; }
+    .customer-nametag { position: absolute; z-index: 3; bottom: 8px; left: 9px; padding: 5px 9px; border: 1px solid rgb(255 255 255 / 70%); border-radius: 99px; background: #fff; color: #705346; font-size: 9px; font-weight: 800; }
+    .order-card { margin: 12px 15px 0; padding: 13px; border: 1px solid #f2c6b7; border-radius: 12px; background: #fff8f5; }
+    .micro-label { color: #ab563e; font-size: 9px; font-weight: 900; letter-spacing: .55px; }
+    .order-text { margin-top: 5px; font-size: 12px; font-weight: 750; line-height: 1.55; }
+    .patience-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 16px 7px; color: var(--muted); font-size: 9px; font-weight: 750; }
+    .patience-value { color: var(--terracotta); font-variant-numeric: tabular-nums; }
+    .patience-track { height: 7px; margin: 0 16px; overflow: hidden; border-radius: 99px; background: #eee7de; }
+    .patience-fill { width: 100%; height: 100%; border-radius: inherit; background: #3a9a57; transition: width .5s linear, background .3s; }
+    .customer-footer { display: flex; align-items: center; gap: 7px; margin: 12px 15px 16px; padding: 9px 10px; border-radius: 9px; color: #267240; background: #eaf6eb; font-size: 10px; font-weight: 800; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 13px; }
+    .stat-card { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+    .stat-label { color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; }
+    .stat-value { margin-top: 5px; font-size: 19px; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .stat-value.streak { color: var(--terracotta); }
+
+    .workbench { display: grid; gap: 14px; min-width: 0; }
+    .station-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 54px; padding: 0 18px; border-radius: 15px; background: var(--terracotta); color: #fff; box-shadow: 0 5px 12px rgb(200 90 50 / 15%); }
+    .station-head .section-heading { font-size: 15px; }
+    .station-kicker { margin-top: 3px; color: rgb(255 255 255 / 75%); font-size: 9px; }
+    .shift-badge { padding: 6px 9px; border-radius: 99px; color: #80520e; background: #ffda87; font-size: 9px; font-weight: 900; white-space: nowrap; }
+    .food-panel { padding: 18px; }
+    .subhead-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .subhead-row .section-heading { font-size: 13px; }
+    .subhead-caption { color: var(--muted); font-size: 9px; text-align: right; }
+    .food-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .food-card { position: relative; min-width: 0; overflow: hidden; border: 1px solid #edddc5; border-radius: 13px; background: white; transition: transform .15s, box-shadow .15s, border-color .15s; }
+    .food-card:not(.locked):hover { transform: translateY(-2px); border-color: #e6b55c; box-shadow: 0 8px 17px rgb(135 92 38 / 10%); }
+    .food-card.prepping .food-art { animation: frying .38s ease-in-out; }
+    .food-card.locked { background: #fbfaf8; }
+    .food-art { position: relative; height: 87px; display: grid; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 50% 91%, #f1cd89 0 23%, transparent 24%), linear-gradient(135deg, #f4e4c2, #fff9eb); }
+    .food-art::before { position: absolute; right: 0; bottom: 12px; left: 0; height: 8px; border-radius: 50%; background: #bd8755; content: ""; }
+    .food-art::after { position: absolute; right: 7px; bottom: 9px; left: 7px; height: 4px; border-radius: 50%; background: #815139; content: ""; }
+    .food-art .food-emoji { position: relative; z-index: 1; font-size: 42px; filter: drop-shadow(0 4px 2px rgb(90 54 24 / 17%)); transition: transform .18s; }
+    .food-card:not(.locked):hover .food-emoji { transform: translateY(-3px) scale(1.06); }
+    .food-lock-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(60 46 36 / 43%); color: white; font-size: 22px; }
+    .unlock-chip { position: absolute; z-index: 2; top: 7px; right: 7px; padding: 4px 6px; border-radius: 99px; background: #eef8ed; color: #27733d; font-size: 8px; font-weight: 900; }
+    .locked .unlock-chip { color: #755c40; background: #f2eee8; }
+    .food-info { padding: 9px 10px 10px; }
+    .food-topline { display: flex; align-items: baseline; justify-content: space-between; gap: 4px; }
+    .food-name { overflow: hidden; font-size: 11px; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
+    .food-price { color: var(--terracotta); font-size: 9px; font-weight: 900; white-space: nowrap; }
+    .food-note { overflow: hidden; margin-top: 3px; color: var(--muted); font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+    .food-controls { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 8px; }
+    .qty-controls { display: flex; align-items: center; gap: 5px; }
+    .qty-button { display: grid; width: 24px; height: 24px; place-items: center; border: 1px solid #eadfd2; border-radius: 50%; background: #fff; cursor: pointer; font-size: 14px; font-weight: 750; transition: background .15s; }
+    .qty-button:hover:not(:disabled) { border-color: var(--terracotta); color: var(--terracotta); background: #fff4ef; }
+    .qty-button.add { border-color: var(--green); background: var(--green); color: white; }
+    .qty-button.add:hover:not(:disabled) { background: var(--green-dark); }
+    .qty-button:disabled { cursor: not-allowed; opacity: .37; }
+    .qty-number { min-width: 14px; text-align: center; font-size: 10px; font-weight: 900; }
+    .tap-hint { color: #9b8172; font-size: 8px; font-weight: 650; }
+
+    .tray-panel { padding: 17px 18px 18px; }
+    .tray-content { display: grid; grid-template-columns: minmax(115px, 170px) minmax(0, 1fr); align-items: center; gap: 15px; min-height: 110px; margin-top: 12px; padding: 12px; border-radius: 13px; background: #f5ece0; }
+    .cup-wrap { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 85px; }
+    .skewer { position: relative; display: grid; width: 30px; height: 67px; place-items: start center; padding-top: 6px; border-radius: 12px 12px 8px 8px; background: #fff9eb; box-shadow: inset 0 -5px 0 #e5d0ae, 0 2px 5px rgb(81 57 36 / 8%); }
+    .skewer::before { position: absolute; top: 8px; bottom: 9px; left: 50%; z-index: 0; border-left: 2px solid #ba7b42; content: ""; }
+    .skewer-emoji { z-index: 1; display: flex; flex-direction: column; gap: 0; font-size: 15px; line-height: 16px; filter: drop-shadow(0 1px 0 rgb(80 45 21 / 12%)); }
+    .cup-empty { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #9b8d7c; font-size: 9px; font-weight: 650; text-align: center; }
+    .cup-empty span:first-child { font-size: 26px; filter: grayscale(.15); }
+    .tray-details { min-width: 0; }
+    .tray-detail-title { color: #796757; font-size: 8px; font-weight: 900; letter-spacing: .6px; }
+    .tray-items { display: flex; flex-wrap: wrap; gap: 5px; min-height: 24px; margin-top: 6px; }
+    .tray-chip { padding: 5px 7px; border: 1px solid #ead8bf; border-radius: 99px; background: white; color: #594a3e; font-size: 8px; font-weight: 800; }
+    .tray-chip.sauce-chip { border-color: #f3bbc2; color: #b6324c; background: #fff1f3; }
+    .tray-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
+    .tray-total { color: #806d5d; font-size: 9px; font-weight: 750; }
+    .clear-button { padding: 6px 9px; border: 1px solid #e9ddd0; border-radius: 8px; background: white; color: #766659; cursor: pointer; font-size: 9px; font-weight: 750; }
+    .clear-button:hover:not(:disabled) { color: var(--terracotta); border-color: #e8b09c; }
+    .clear-button:disabled { cursor: not-allowed; opacity: .48; }
+
+    .sauce-panel { padding: 17px 18px; }
+    .sauce-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 11px; }
+    .sauce-button { min-height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 8px; border: 1px solid #eee5db; border-radius: 10px; background: #fbf8f4; cursor: pointer; font-size: 9px; font-weight: 800; transition: border .15s, background .15s, transform .15s; }
+    .sauce-button:hover:not(:disabled) { transform: translateY(-1px); border-color: #dfb884; }
+    .sauce-button.selected { border-color: #ec8795; color: #b6344b; background: #fff0f2; box-shadow: 0 0 0 2px rgb(224 100 119 / 10%); }
+    .sauce-button:disabled { cursor: not-allowed; opacity: .54; }
+    .sauce-locked { color: #8e837a; }
+
+    .serve-button { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; border: 0; border-radius: 11px; background: var(--green); color: white; box-shadow: 0 4px 9px rgb(43 147 72 / 16%); cursor: pointer; font-size: 13px; font-weight: 900; transition: transform .15s, background .15s, box-shadow .15s; }
+    .serve-button:hover { transform: translateY(-1px); background: var(--green-dark); box-shadow: 0 6px 13px rgb(43 147 72 / 22%); }
+    .serve-button:active { transform: translateY(0); }
+    .order-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 9px; color: var(--muted); font-size: 9px; font-weight: 700; }
+    .order-earnings { color: #397d45; text-align: right; }
+
+    .toast { position: fixed; z-index: 20; right: 22px; bottom: 22px; display: flex; align-items: center; gap: 9px; max-width: min(380px, calc(100vw - 32px)); padding: 13px 17px; transform: translateY(18px); border: 1px solid #e6dbcf; border-radius: 12px; background: white; box-shadow: 0 10px 35px rgb(44 31 22 / 16%); opacity: 0; pointer-events: none; font-size: 12px; font-weight: 750; transition: opacity .2s, transform .2s; }
+    .toast.visible { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: #c5e1c8; }
+    .toast.error { border-color: #efc9bd; }
+    .toast-icon { font-size: 16px; }
+    .modal-backdrop { position: fixed; z-index: 10; inset: 0; display: flex; align-items: center; justify-content: center; overflow-y: auto; padding: 18px; background: rgb(44 35 29 / 57%); backdrop-filter: blur(5px); }
+    #level-modal { z-index: 15; }
+    #credit-offer-modal { z-index: 16; }
+    .modal-backdrop[hidden] { display: none; }
+    .modal { width: min(540px, 100%); max-height: calc(100vh - 36px); overflow-y: auto; padding: 27px; border: 1px solid #eee2d3; border-radius: 19px; background: white; box-shadow: 0 25px 75px rgb(0 0 0 / 22%); }
+    .modal-header { text-align: center; }
+    .modal-emblem { width: 58px; height: 58px; display: grid; place-items: center; margin: 0 auto 12px; border-radius: 19px; background: #fff1df; font-size: 30px; }
+    .modal-eyebrow { color: var(--terracotta); font-size: 9px; font-weight: 900; letter-spacing: 1.3px; }
+    .modal h1, .modal h2 { margin: 6px 0 7px; font-size: clamp(21px, 5vw, 27px); font-weight: 900; letter-spacing: -.7px; }
+    .modal-description { margin: 0 auto; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .field-label { display: block; margin: 20px 0 7px; font-size: 11px; font-weight: 850; }
+    .name-input { width: 100%; height: 43px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: #fffdfb; color: var(--ink); font-size: 12px; }
+    .vendor-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; margin-top: 11px; }
+    .vendor-option { min-height: 112px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 11px 8px; border: 1px solid var(--line); border-radius: 12px; background: #fdfbf8; cursor: pointer; transition: border .15s, background .15s, transform .15s; }
+    .vendor-option:hover { transform: translateY(-1px); border-color: #e4b777; }
+    .vendor-option.selected { border-color: var(--terracotta); background: #fff4ed; box-shadow: 0 0 0 2px rgb(200 90 50 / 10%); }
+    .vendor-face { width: 49px; height: 49px; display: grid; place-items: center; border: 3px solid white; border-radius: 50%; background: #f5dfbd; box-shadow: 0 2px 7px rgb(70 44 24 / 12%); font-size: 29px; }
+    .vendor-option strong { font-size: 10px; font-weight: 900; }
+    .vendor-option small { color: var(--muted); font-size: 8px; text-align: center; }
+    .vendor-field-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 13px; }
+    .vendor-field-row .field-label { margin: 0; }
+    .settings-reset { padding: 7px 9px; border: 1px solid #efd8cf; border-radius: 8px; background: white; color: #a54a35; cursor: pointer; font-size: 9px; font-weight: 800; }
+    .settings-reset:hover { background: #fff5f1; }
+    .modal-submit { width: 100%; min-height: 45px; margin-top: 21px; border: 0; border-radius: 10px; background: var(--terracotta); color: white; cursor: pointer; font-size: 12px; font-weight: 900; transition: background .15s, transform .15s; }
+    .modal-submit:hover { transform: translateY(-1px); background: var(--terracotta-dark); }
+    .modal-submit.green-submit { background: var(--green); }
+    .modal-submit.green-submit:hover { background: var(--green-dark); }
+    .modal-cancel { display: block; margin: 10px auto 0; padding: 6px 12px; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 750; }
+    .modal-cancel[hidden] { display: none; }
+    .levelup-emblem { animation: bounce .6s ease infinite alternate; }
+    .unlock-list { display: grid; gap: 8px; margin-top: 16px; }
+    .unlock-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #ece5d8; border-radius: 10px; background: #fffcf7; }
+    .unlock-row > span:first-child { font-size: 21px; }
+    .unlock-row strong { display: block; font-size: 11px; }
+    .unlock-row small { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .nothing-new { margin-top: 15px; padding: 13px; border-radius: 10px; background: #fff8ea; color: #715630; font-size: 11px; text-align: center; line-height: 1.55; }
+    .feature-modal { width: min(650px, 100%); }
+    .feature-modal .modal-header { margin-bottom: 17px; }
+    .quest-list, .shop-list, .ledger-list { display: grid; gap: 9px; }
+    .quest-card, .shop-card, .ledger-card { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fffdf9; }
+    .quest-card-top, .shop-card-top, .ledger-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .quest-title, .shop-title { font-size: 11px; font-weight: 900; }
+    .quest-reward, .shop-cost { color: #8b601e; font-size: 9px; font-weight: 850; white-space: nowrap; }
+    .quest-progress-text, .shop-detail, .ledger-detail { margin-top: 5px; color: var(--muted); font-size: 9px; line-height: 1.45; }
+    .quest-meter { height: 7px; margin-top: 9px; overflow: hidden; border-radius: 99px; background: #eee6dc; }
+    .quest-meter-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--green), #78bd70); transition: width .25s; }
+    .quest-claim { min-height: 31px; margin-top: 9px; padding: 6px 10px; border: 1px solid #d8e3d3; border-radius: 8px; background: #f2f7ef; color: #557151; cursor: pointer; font-size: 9px; font-weight: 850; }
+    .quest-claim.ready { border-color: var(--green); background: var(--green); color: white; }
+    .quest-claim:disabled { cursor: default; opacity: .68; }
+    .shop-card { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .shop-buy { flex: 0 0 auto; min-width: 86px; min-height: 33px; padding: 6px 9px; border: 1px solid #ead9bd; border-radius: 8px; background: #fff5e1; color: #825719; cursor: pointer; font-size: 9px; font-weight: 900; }
+    .shop-buy:hover:not(:disabled) { border-color: var(--green); background: #edf7ed; color: var(--green-dark); }
+    .shop-buy:disabled { cursor: default; opacity: .62; }
+    .shop-tabs { display: flex; gap: 7px; margin: 0 0 11px; overflow-x: auto; }
+    .shop-tab { padding: 7px 10px; border: 1px solid var(--line); border-radius: 99px; background: white; color: var(--muted); cursor: pointer; font-size: 9px; font-weight: 850; white-space: nowrap; }
+    .shop-tab.active { border-color: #e4b389; background: #fff2e9; color: var(--terracotta); }
+    .feature-modal-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; color: var(--muted); font-size: 9px; }
+    .quest-refresh { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: white; color: var(--muted); cursor: pointer; font-size: 9px; font-weight: 750; }
+    .credit-balance { margin-bottom: 10px; padding: 11px 13px; border: 1px solid #f0dfc2; border-radius: 10px; background: #fff8ea; color: #73542d; font-size: 10px; font-weight: 800; }
+    .credit-actions { display: flex; gap: 8px; margin-top: 15px; }
+    .credit-actions .modal-submit { margin-top: 0; }
+    .modal-submit.secondary-submit { border: 1px solid var(--line); background: white; color: var(--ink); }
+    .modal-submit.secondary-submit:hover { background: #fffaf4; }
+    .vip-banner { display: inline-flex; align-items: center; gap: 5px; margin-top: 7px; padding: 4px 7px; border-radius: 99px; background: #fff1d5; color: #825a20; font-size: 8px; font-weight: 900; }
+    .preview-orders { display: grid; gap: 4px; margin: 9px 15px 0; padding: 9px; border: 1px solid #ead9bd; border-radius: 10px; background: #fffaf0; }
+    .preview-orders[hidden] { display: none; }
+    .preview-title { color: #8a6128; font-size: 8px; font-weight: 900; letter-spacing: .4px; }
+    .preview-line { color: #655547; font-size: 8px; line-height: 1.4; }
+    .modal-backdrop.home-screen { z-index: 30; padding: 0; overflow-y: auto; background: linear-gradient(155deg, #f9d696 0%, #fbe6bd 45%, #d98355 100%); backdrop-filter: none; }
+    #home-settings-modal { z-index: 40; }
+    .home-shell { position: relative; width: min(100%, 1100px); min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(270px, .88fr); align-items: center; gap: clamp(22px, 6vw, 72px); margin: auto; padding: clamp(24px, 6vw, 70px); overflow: hidden; }
+    .home-shell::before, .home-shell::after { position: absolute; z-index: 0; right: -60px; bottom: -160px; width: 410px; height: 410px; border: 2px solid rgb(255 255 255 / 35%); border-radius: 50%; content: ""; pointer-events: none; }
+    .home-shell::after { right: 90px; bottom: -235px; width: 410px; height: 410px; }
+    .home-copy, .home-art { position: relative; z-index: 1; }
+    .home-kicker { display: inline-flex; align-items: center; gap: 7px; padding: 7px 11px; border: 1px solid rgb(255 255 255 / 74%); border-radius: 99px; background: rgb(255 255 255 / 70%); color: #8b4c2d; font-size: 9px; font-weight: 950; letter-spacing: 1px; }
+    .home-title { max-width: 560px; margin: 19px 0 10px; color: #583224; font-size: clamp(38px, 7vw, 70px); font-weight: 1000; letter-spacing: -3px; line-height: .96; }
+    .home-title span { display: block; margin-top: 9px; color: var(--terracotta); font-size: clamp(18px, 3vw, 29px); letter-spacing: -.7px; line-height: 1.1; }
+    .home-description { max-width: 440px; margin: 14px 0 21px; color: #725747; font-size: 13px; line-height: 1.7; }
+    .home-actions { display: grid; gap: 10px; max-width: 400px; }
+    .home-button { min-height: 49px; display: flex; align-items: center; justify-content: center; gap: 9px; padding: 12px 16px; border: 1px solid transparent; border-radius: 12px; background: white; color: #604938; box-shadow: 0 5px 13px rgb(83 48 25 / 10%); cursor: pointer; font-size: 12px; font-weight: 950; transition: transform .16s, filter .16s, opacity .16s; }
+    .home-button:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.03); }
+    .home-button.primary { background: var(--terracotta); color: white; box-shadow: 0 8px 18px rgb(173 73 38 / 22%); }
+    .home-button.continue { border-color: rgb(255 255 255 / 85%); background: #fffdf8; }
+    .home-button:disabled { cursor: not-allowed; opacity: .53; filter: grayscale(.8); box-shadow: none; }
+    .save-badge { margin-left: auto; padding: 5px 8px; border-radius: 99px; background: #fff1d6; color: #795622; font-size: 8px; font-weight: 900; }
+    .home-settings-button { justify-self: start; min-height: 38px; padding: 8px 11px; border: 1px solid rgb(137 89 58 / 18%); border-radius: 10px; background: rgb(255 255 255 / 58%); color: #704b36; cursor: pointer; font-size: 10px; font-weight: 850; }
+    .home-art { min-height: 370px; display: flex; align-items: center; justify-content: center; }
+    .home-scene { position: relative; width: min(100%, 420px); height: 340px; overflow: hidden; border: 7px solid rgb(255 255 255 / 88%); border-radius: 25px; background: linear-gradient(180deg, #a9d4c4 0 37%, #e0ae70 37% 45%, #b75536 45% 100%); box-shadow: 0 24px 54px rgb(100 56 30 / 22%); transform: rotate(2deg); }
+    .home-scene::before { position: absolute; top: 27px; left: -3%; width: 106%; height: 57px; border-block: 8px solid #78402e; background: repeating-linear-gradient(90deg, #cf533c 0 48px, #fff0cb 48px 96px); content: ""; }
+    .home-scene::after { position: absolute; right: 0; bottom: 0; left: 0; height: 109px; background: repeating-linear-gradient(110deg, rgb(255 255 255 / 6%) 0 13px, transparent 13px 25px); content: ""; }
+    .home-scene-sign { position: absolute; z-index: 2; top: 96px; left: 50%; padding: 7px 14px; transform: translateX(-50%); border: 2px solid #75432f; border-radius: 8px; background: #fff2d4; color: #9b442e; font-size: 11px; font-weight: 1000; letter-spacing: 1.3px; white-space: nowrap; }
+    .home-counter { position: absolute; z-index: 1; right: 24px; bottom: 62px; left: 24px; height: 84px; border: 5px solid #794331; border-bottom-width: 12px; border-radius: 12px 12px 0 0; background: linear-gradient(180deg,#e7ad67 0 35%,#a85b38 36% 100%); }
+    .home-counter::before { position: absolute; top: -18px; left: 12%; width: 76%; height: 18px; border: 3px solid #794331; border-radius: 50%; background: #e1b272; content: ""; }
+    .home-pan-food { position: absolute; z-index: 3; top: -30px; left: 50%; display: flex; gap: 4px; transform: translateX(-50%); font-size: 22px; }
+    .home-vendor-avatars { position: absolute; z-index: 4; right: 0; bottom: 124px; left: 0; display: flex; align-items: end; justify-content: center; gap: 8px; }
+    .home-vendor { display: grid; justify-items: center; gap: 4px; color: white; font-size: 8px; font-weight: 900; text-shadow: 0 1px 4px #5c3125; }
+    .home-vendor-face { width: clamp(48px, 7vw, 69px); aspect-ratio: .82; display: grid; place-items: center; border: 3px solid #fff5db; border-radius: 46% 46% 22% 22%; background: radial-gradient(circle at 36% 30%, #fff0d0, #df9b65 85%); box-shadow: 0 5px 12px rgb(57 35 22 / 20%); overflow: hidden; }
+    .home-vendor:nth-child(2) .home-vendor-face { background: radial-gradient(circle at 36% 30%, #fff2cb, #e88467 85%); }
+    .home-vendor:nth-child(3) .home-vendor-face { background: radial-gradient(circle at 36% 30%, #ffeab9, #d49b67 85%); }
+    .home-vendor:nth-child(4) .home-vendor-face { background: radial-gradient(circle at 36% 30%, #fff2d7, #d99466 85%); }
+    .character-art { width: 100%; height: 100%; overflow: visible; }
+    .avatar-library { position: absolute; width: 0; height: 0; overflow: hidden; }
+    .setup-avatar { width: 42px; height: 48px; }
+    .home-street-note { position: absolute; z-index: 4; right: 11px; bottom: 10px; left: 11px; color: #fff6df; font-size: 8px; font-weight: 850; letter-spacing: .8px; text-align: center; }
+    .home-screen.is-leaving .home-shell { animation: home-slide-out .38s ease forwards; }
+    .game-enter { animation: game-fade-in .45s ease both; }
+    @keyframes home-slide-out { to { opacity: 0; transform: translateY(-14px) scale(.985); } }
+    @keyframes game-fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .drink-panel { padding: 17px 18px; }
+    .drink-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 11px; }
+    .drink-card { min-width: 0; padding: 9px; border: 1px solid #d9e8de; border-radius: 11px; background: linear-gradient(145deg, #f7fff7, #eef8ef); }
+    .drink-topline { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+    .drink-name { font-size: 9px; font-weight: 900; }
+    .drink-emoji { font-size: 21px; }
+    .drink-price { color: #368053; font-size: 8px; font-weight: 900; }
+    .drink-note { margin-top: 3px; color: var(--muted); font-size: 7px; }
+    .drink-control { display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-top: 7px; }
+    .drink-lock { color: #867a6e; font-size: 7px; font-weight: 800; }
+    .sanitation-panel { padding: 14px 18px; }
+    .sanitation-row { display: grid; grid-template-columns: 1fr auto; gap: 7px 10px; align-items: center; margin-top: 11px; }
+    .sanitation-label { color: #685547; font-size: 9px; font-weight: 850; }
+    .sanitation-value { color: var(--green-dark); font-size: 9px; font-weight: 900; }
+    .sanitation-meter { grid-column: 1 / -1; height: 7px; overflow: hidden; border-radius: 99px; background: #eee6dc; }
+    .sanitation-meter > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #48a65b, #91bd5c); transition: width .2s; }
+    .sanitation-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
+    .sanitation-actions button { min-height: 30px; padding: 5px 9px; border: 1px solid var(--line); border-radius: 8px; background: white; cursor: pointer; color: #695747; font-size: 8px; font-weight: 850; }
+    .sanitation-actions button.sealed { border-color: #b8d8bb; background: #eff8ef; color: #2d7841; }
+    .inspection-modal { text-align: left; }
+    .inspection-checks { display: grid; gap: 8px; margin-top: 14px; }
+    .inspection-check { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: #fffdf9; font-size: 10px; font-weight: 800; }
+    .inspection-check.pass { border-color: #cde1ca; background: #f1f8ee; }
+    .inspection-check.fail { border-color: #ecc8b9; background: #fff3ed; }
+    .health-seal { padding: 14px; border: 1px solid #d7c18f; border-radius: 12px; background: linear-gradient(135deg,#fff5d7,#f7e6ad); color: #79581e; font-size: 11px; font-weight: 850; line-height: 1.5; text-align: center; }
+    .language-setting { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 13px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 11px; font-weight: 800; }
+    .language-setting select { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: white; color: var(--ink); font-size: 10px; }
+    .home-settings { display: grid; gap: 9px; margin-top: 15px; }
+    .home-setting-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #fffdf9; font-size: 11px; font-weight: 850; }
+    .home-setting-toggle button { min-width: 72px; padding: 7px 9px; border: 1px solid #d8e5d3; border-radius: 99px; background: #f0f7ed; color: #3f7745; cursor: pointer; font-size: 9px; font-weight: 900; }
+    .home-setting-toggle button[aria-pressed="false"] { border-color: var(--line); background: #f7f4f0; color: var(--muted); }
+    @keyframes rush-pulse { from { box-shadow: 0 0 0 0 rgb(200 90 50 / 8%); } to { box-shadow: 0 0 0 4px rgb(200 90 50 / 12%); } }
+    .mobile-tip { display: none; }
+    @keyframes bounce { from { transform: rotate(-8deg) scale(.96); } to { transform: rotate(8deg) scale(1.06); } }
+    @keyframes frying { 0%, 100% { filter: brightness(1); } 40% { filter: brightness(1.12); } 70% { filter: brightness(.97); } }
+
+    @media (min-width: 1240px) {
+      .app { padding-right: 40px; padding-left: 40px; }
+      .game-grid { grid-template-columns: 310px minmax(0, 1fr); gap: 24px; }
+      .customer-scene { height: 260px; }
+      .food-art { height: 105px; }
+    }
+    @media (max-width: 850px) {
+      .app { padding-right: 18px; padding-left: 18px; }
+      .game-grid { grid-template-columns: 245px minmax(0, 1fr); gap: 15px; }
+      .customer-scene { height: 200px; }
+      .food-panel, .tray-panel, .sauce-panel { padding-right: 13px; padding-left: 13px; }
+      .food-grid { gap: 8px; }
+      .food-info { padding-right: 8px; padding-left: 8px; }
+      .food-name { font-size: 10px; }
+      .sauce-button { gap: 4px; font-size: 8px; }
+      .tray-content { grid-template-columns: 115px minmax(0, 1fr); gap: 9px; }
+    }
+    @media (max-width: 640px) {
+      .app { padding: 0 13px 28px; }
+      .topbar { min-height: 65px; flex-wrap: wrap; gap: 7px; padding: 9px 0; }
+      .brand { gap: 7px; }
+      .brand-mark { width: 34px; height: 34px; font-size: 19px; }
+      .brand-title { font-size: 13px; letter-spacing: -.35px; }
+      .brand-subtitle { font-size: 8px; }
+      .header-actions { width: 100%; justify-content: space-between; gap: 5px; }
+      .header-pill { min-height: 34px; gap: 5px; padding: 5px 8px; border-radius: 10px; font-size: 10px; }
+      .icon-button { width: 34px; height: 34px; }
+      .sound-toggle { width: 34px; padding: 0; justify-content: center; font-size: 15px; }
+      .sound-toggle span { display: none; }
+      .progress-wrap { height: 43px; gap: 9px; }
+      .progress-label, .progress-count { font-size: 9px; }
+      .progress-count { min-width: 57px; }
+      .shift-banner { margin: 3px 0 12px; padding: 9px 11px; }
+      .shift-location { font-size: 9px; }
+      .shift-status { font-size: 9px; }
+      .game-tools { gap: 6px; margin: -3px 0 11px; }
+      .tool-button, .weather-button, .location-select { min-height: 34px; padding: 6px 8px; font-size: 9px; }
+      .location-select { max-width: 145px; }
+      .game-grid { grid-template-columns: 1fr; gap: 12px; }
+      .customer-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(125px, .9fr); align-items: start; }
+      .customer-heading { grid-column: 1 / -1; padding: 13px 13px 8px; }
+      .customer-heading .section-heading { font-size: 13px; }
+      .customer-heading small { font-size: 9px; }
+      .customer-scene { grid-row: 2 / span 2; height: 154px; margin: 0 0 12px 12px; }
+      .scene-window { top: 38px; height: 76px; }
+      .scene-awning { top: 21px; height: 17px; }
+      .scene-counter { bottom: 26px; height: 25px; }
+      .scene-counter::after { bottom: -17px; height: 17px; }
+      .customer-person { bottom: 32px; transform: translateX(-50%) scale(.77); transform-origin: bottom center; }
+      .scene-sign { top: 1px; font-size: 7px; }
+      .lights { top: 8px; }
+      .lights i { width: 6px; height: 6px; }
+      .customer-nametag { bottom: 5px; left: 5px; padding: 4px 6px; font-size: 7px; }
+      .order-card { align-self: end; margin: 0 10px 0 10px; padding: 9px; }
+      .order-text { font-size: 10px; }
+      .micro-label { font-size: 8px; }
+      .patience-row { grid-column: 2; margin: 8px 11px 5px 10px; font-size: 8px; }
+      .patience-track { grid-column: 2; height: 6px; margin: 0 11px 0 10px; }
+      .customer-footer { grid-column: 1 / -1; margin: 0 11px 11px; padding: 8px; font-size: 9px; }
+      .stats-grid { margin-top: 10px; gap: 7px; }
+      .stat-card { padding: 9px; }
+      .stat-label { font-size: 8px; }
+      .stat-value { font-size: 16px; }
+      .workbench { gap: 10px; }
+      .station-head { min-height: 47px; padding: 0 13px; }
+      .station-head .section-heading { font-size: 13px; }
+      .station-kicker { font-size: 8px; }
+      .shift-badge { padding: 5px 7px; font-size: 8px; }
+      .food-panel, .tray-panel, .sauce-panel { padding: 13px; }
+      .subhead-row { margin-bottom: 9px; }
+      .subhead-row .section-heading { font-size: 11px; }
+      .subhead-caption { font-size: 8px; }
+      .food-grid { gap: 8px; }
+      .food-art { height: 77px; }
+      .food-art .food-emoji { font-size: 35px; }
+      .food-info { padding: 8px; }
+      .food-note, .tap-hint { font-size: 7px; }
+      .qty-button { width: 23px; height: 23px; }
+      .tray-content { grid-template-columns: 100px minmax(0, 1fr); gap: 8px; min-height: 96px; padding: 9px; }
+      .skewer { width: 27px; height: 59px; }
+      .skewer-emoji { font-size: 13px; line-height: 14px; }
+      .sauce-grid { gap: 6px; }
+      .sauce-button { min-height: 36px; padding: 6px 4px; font-size: 8px; }
+      .serve-button { min-height: 45px; font-size: 12px; }
+      .mobile-tip { display: inline; }
+      .modal { padding: 22px 18px; }
+      .vendor-options { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+      .vendor-option { min-height: 101px; padding: 8px 4px; }
+      .vendor-option small { font-size: 7px; }
+      .feature-modal { padding: 20px 14px; }
+      .shop-card { align-items: flex-start; }
+      .home-shell { min-height: 100svh; grid-template-columns: 1fr; gap: 7px; padding: 30px 23px 24px; }
+      .home-title { margin-top: 13px; font-size: clamp(37px, 12vw, 55px); }
+      .home-description { margin: 9px 0 13px; font-size: 11px; }
+      .home-actions { gap: 7px; }
+      .home-button { min-height: 44px; font-size: 11px; }
+      .home-art { min-height: 190px; }
+      .home-scene { width: min(90%, 330px); height: 193px; border-width: 5px; border-radius: 18px; }
+      .home-scene::before { top: 15px; height: 37px; border-block-width: 5px; background: repeating-linear-gradient(90deg, #cf533c 0 32px, #fff0cb 32px 64px); }
+      .home-scene-sign { top: 61px; padding: 5px 9px; font-size: 8px; }
+      .home-counter { right: 17px; bottom: 34px; left: 17px; height: 54px; border-width: 3px; border-bottom-width: 8px; }
+      .home-counter::before { top: -13px; height: 13px; border-width: 2px; }
+      .home-pan-food { top: -23px; font-size: 16px; }
+      .home-vendor-avatars { bottom: 75px; gap: 5px; }
+      .home-vendor { font-size: 7px; }
+      .home-vendor-face { width: clamp(39px, 11vw, 49px); border-width: 2px; }
+      .home-street-note { bottom: 5px; font-size: 6px; }
+      .drink-panel, .sanitation-panel { padding: 12px; }
+      .drink-grid { gap: 5px; }
+      .drink-card { padding: 7px 5px; }
+      .drink-name { font-size: 8px; }
+      .drink-emoji { font-size: 18px; }
+    }
+    @media (max-width: 370px) {
+      .brand-title { font-size: 11px; }
+      .header-pill { padding-right: 6px; padding-left: 6px; font-size: 9px; }
+      .customer-panel { grid-template-columns: minmax(0, 1fr) minmax(115px, .9fr); }
+      .tray-content { grid-template-columns: 81px minmax(0, 1fr); gap: 5px; padding: 7px; }
+      .sauce-grid { grid-template-columns: 1fr; }
+      .sauce-button { min-height: 33px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="modal-backdrop home-screen" id="home-screen" role="dialog" aria-modal="true" aria-labelledby="home-title" hidden>
+      <div class="home-shell">
+        <section class="home-copy">
+          <span class="home-kicker">🇵🇭 YOUR LITTLE CORNER OF MANILA</span>
+          <h1 class="home-title" id="home-title">KAINAN<br>SIM<span>Pinoy Street Food Tycoon</span></h1>
+          <p class="home-description" id="home-description">Tusok-tusok, palamig, at diskarte! Buksan ang iyong kariton at maging paboritong suki ng buong barangay.</p>
+          <div class="home-actions">
+            <button class="home-button primary" id="new-game-button" type="button">🎮 START NEW GAME</button>
+            <button class="home-button continue" id="continue-button" type="button" disabled>⏯️ CONTINUE <span class="save-badge" id="save-badge">NO SAVE</span></button>
+            <button class="home-settings-button" id="home-settings-button" type="button">⚙️ SETTINGS / SETTINGS</button>
+          </div>
+        </section>
+        <div class="home-art" aria-label="Illustrated Filipino street-food cart and vendors">
+          <div class="home-scene"><div class="home-scene-sign">KAINAN SIM • TUSOK-TUSOK</div><div class="home-vendor-avatars">
+            <div class="home-vendor"><span class="home-vendor-face"><svg class="character-art" viewBox="0 0 100 120" role="img" aria-label="Manong Boy, classic tusok-tusok vendor"><use href="#avatar-manong" width="100" height="120"></use></svg></span><span>MANONG BOY</span></div>
+            <div class="home-vendor"><span class="home-vendor-face"><svg class="character-art" viewBox="0 0 100 120" role="img" aria-label="Ate Bebang, energetic street-food vendor"><use href="#avatar-bebang" width="100" height="120"></use></svg></span><span>ATE BEBANG</span></div>
+            <div class="home-vendor"><span class="home-vendor-face"><svg class="character-art" viewBox="0 0 100 120" role="img" aria-label="Bossing, cool street-food vendor"><use href="#avatar-bossing" width="100" height="120"></use></svg></span><span>BOSSING</span></div>
+            <div class="home-vendor"><span class="home-vendor-face"><svg class="character-art" viewBox="0 0 100 120" role="img" aria-label="Aling Nena, neighborhood suki"><use href="#avatar-marites" width="100" height="120"></use></svg></span><span>ALING NENA</span></div>
+          </div><div class="home-counter"><div class="home-pan-food" aria-hidden="true">🍡 🥚 🥖 🦑</div></div><span class="home-street-note">MAINET NA STREET FOOD · PRESKONG PALAMIG</span></div>
+        </div>
+      </div>
+    </div>
+    <svg class="avatar-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="skinShade" x2="0" y2="1"><stop stop-color="#f2bc87"/><stop offset="1" stop-color="#c77c52"/></linearGradient>
+        <linearGradient id="apronBlue" x2="0" y2="1"><stop stop-color="#5186a7"/><stop offset="1" stop-color="#28556e"/></linearGradient>
+        <linearGradient id="apronRed" x2="0" y2="1"><stop stop-color="#f05843"/><stop offset="1" stop-color="#bb3434"/></linearGradient>
+      </defs>
+      <symbol id="avatar-manong" viewBox="0 0 100 120">
+        <path d="M12 119V98q3-13 24-17h28q21 4 24 17v21" fill="#f8f0dd" stroke="#624338" stroke-width="2.5"/>
+        <path d="M32 81v38h38V81l-9-4H40z" fill="url(#apronBlue)" stroke="#244c64" stroke-width="2"/>
+        <path d="M39 86h22v17H39z" fill="#416d83" stroke="#d4a86c" stroke-width="2"/>
+        <path d="M16 82q-9 2-7 13l7 7 7-6-3-12m64-2q9 2 7 13l-7 7-7-6 3-12" fill="#fff4de" stroke="#d9ccb7" stroke-width="2"/>
+        <path d="M25 37q0-24 25-25 25 1 25 25v18q-1 22-25 24-24-2-25-24z" fill="url(#skinShade)" stroke="#764536" stroke-width="2"/>
+        <path d="M24 42q-6-23 9-32 14-9 34-1 13 6 12 23l-6 5-4-13q-19 7-38 2l-3 17z" fill="#34231f" stroke="#382621" stroke-width="2"/>
+        <path d="M21 24q8-17 27-18l24 8-4 7-27-5-14 12z" fill="#397394" stroke="#24516a" stroke-width="3"/>
+        <path d="M64 15q11 0 15 8l-8 5-9-5z" fill="#f5b844" stroke="#8c5529" stroke-width="2"/>
+        <path d="M34 43l10-2m12 0 10 2" fill="none" stroke="#513026" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="40" cy="48" rx="2.7" ry="3.3" fill="#34231f"/><ellipse cx="60" cy="48" rx="2.7" ry="3.3" fill="#34231f"/>
+        <path d="M46 56q4 3 8 0m-12 9q8 9 17 0" fill="none" stroke="#934339" stroke-width="2.8" stroke-linecap="round"/>
+        <path d="M35 77q-10 4-17 15l8 9 14-12m25-12q10 4 17 15l-8 9-14-12" fill="none" stroke="#fff5e2" stroke-width="6" stroke-linecap="round"/>
+        <path d="M51 83l-2 18m7-18 3 18" stroke="#e9bd80" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M47 94v15m8-15v15" stroke="#b87a3e" stroke-width="2"/>
+        <path d="M40 89v11h18V89" fill="none" stroke="#ecc57e" stroke-width="2"/>
+      </symbol>
+      <symbol id="avatar-bebang" viewBox="0 0 100 120">
+        <path d="M14 120V99q4-17 28-19h18q24 2 28 19v21" fill="#f6d3a7" stroke="#713e36" stroke-width="2.5"/>
+        <path d="M27 89h47l8 31H19z" fill="url(#apronRed)" stroke="#a82d32" stroke-width="2"/>
+        <path d="M31 91h39l5 7H26z" fill="#ffdc73"/>
+        <path d="M22 78q-11-7-10 7l5 12 9-4m50-15q11-7 12 7l-5 12-9-4" fill="#f7e7cc" stroke="#cbb99e" stroke-width="2"/>
+        <path d="M24 35q0-23 26-24 26 1 26 24v20q-1 23-26 25-25-2-26-25z" fill="url(#skinShade)" stroke="#764536" stroke-width="2"/>
+        <path d="M26 42Q14 19 32 11q-1-13 12-9l8 8Q69-4 76 10q16 7 2 37l-8-13-5-13q-20 13-37 8z" fill="#39231f" stroke="#39231f" stroke-width="2"/>
+        <path d="M48 4q-4-6 2-8 7 2 4 9" fill="none" stroke="#ed5261" stroke-width="5" stroke-linecap="round"/>
+        <path d="M33 43l10-3m14 0 10 3" stroke="#502e26" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="40" cy="49" rx="3" ry="4" fill="#35231f"/><ellipse cx="61" cy="49" rx="3" ry="4" fill="#35231f"/>
+        <circle cx="31" cy="58" r="5" fill="#e98473" opacity=".7"/><circle cx="69" cy="58" r="5" fill="#e98473" opacity=".7"/>
+        <path d="M42 63q8 12 17 0" fill="none" stroke="#a33f38" stroke-width="3" stroke-linecap="round"/>
+        <path d="M35 82v8m30-8v8" stroke="#f3c96a" stroke-width="3"/>
+        <rect x="41" y="100" width="21" height="12" rx="4" fill="#936041" stroke="#f2ca72" stroke-width="2"/>
+        <circle cx="51" cy="105" r="2" fill="#f9da8b"/>
+      </symbol>
+      <symbol id="avatar-bossing" viewBox="0 0 100 120">
+        <path d="M12 120V99q4-17 27-19h22q23 2 27 19v21" fill="#25262d" stroke="#35333a" stroke-width="2.5"/>
+        <path d="M27 85h47l9 35H18z" fill="#20232b" stroke="#12151a" stroke-width="2"/>
+        <path d="M34 88l16 12 16-12" fill="none" stroke="#d6ac48" stroke-width="2"/>
+        <path d="M26 35q0-24 24-25 24 1 24 25v20q-1 23-24 25-23-2-24-25z" fill="url(#skinShade)" stroke="#654034" stroke-width="2"/>
+        <path d="M25 41q-3-26 10-31 16-9 34 1 9 6 8 25l-7-9-5-13Q49 24 29 20z" fill="#29201e"/>
+        <path d="M31 12l19-8 22 9-5 6-33-1z" fill="#f2a93d" stroke="#523f30" stroke-width="2"/>
+        <path d="M29 43q9-7 20 0l-2 9H32zm22 0q10-7 20 0l-2 9H53z" fill="#292831" stroke="#f0bc65" stroke-width="2"/>
+        <path d="M48 47h6" stroke="#624138" stroke-width="2"/>
+        <path d="M48 59l5 1" stroke="#9e613e" stroke-width="2"/>
+        <path d="M50 66q9 6 17-1" fill="none" stroke="#67332e" stroke-width="2.8" stroke-linecap="round"/>
+        <path d="M39 80l12 19 12-19" fill="none" stroke="#e1b74d" stroke-width="2"/>
+        <rect x="63" y="93" width="20" height="13" rx="4" fill="#d1a239" stroke="#805c27" stroke-width="2" transform="rotate(-20 63 93)"/>
+        <path d="M80 91l11 4m-14 1 11 4" stroke="#a8bcc6" stroke-width="2"/>
+      </symbol>
+      <symbol id="avatar-marites" viewBox="0 0 100 120">
+        <path d="M14 120V98q4-16 27-18h20q23 2 27 18v22" fill="#e08b71" stroke="#804438" stroke-width="2.5"/>
+        <path d="M20 87h61l7 33H13z" fill="#e4736a" stroke="#ae4b4e" stroke-width="2"/>
+        <path d="M23 94l8 5-8 5 8 5m39-15-8 5 8 5-8 5" fill="none" stroke="#f5d181" stroke-width="3"/>
+        <path d="M25 35q0-23 25-24 25 1 25 24v19q-1 24-25 26-24-2-25-26z" fill="url(#skinShade)" stroke="#764536" stroke-width="2"/>
+        <path d="M24 41Q16 18 30 14l2-9 8 7 6-11 8 11 7-9 5 10q16 7 6 32l-7-17-12-6-20 8z" fill="#3b2928"/>
+        <circle cx="31" cy="12" r="6" fill="#f5c2a0" stroke="#9b5d47" stroke-width="2"/><circle cx="70" cy="14" r="5" fill="#f5c2a0" stroke="#9b5d47" stroke-width="2"/>
+        <path d="M34 43l9-2m14 0 9 2" stroke="#4c3028" stroke-width="3.5" stroke-linecap="round"/>
+        <ellipse cx="40" cy="49" rx="2.7" ry="3.3" fill="#34231f"/><ellipse cx="61" cy="49" rx="2.7" ry="3.3" fill="#34231f"/>
+        <path d="M43 63q8 5 15 0" fill="none" stroke="#914237" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M32 47q8-8 16 0v7H32zm18 0q9-8 18 0v7H50z" fill="none" stroke="#603f43" stroke-width="3"/>
+        <path d="M49 50h3m-11 29v10h19V79" fill="none" stroke="#f4d18a" stroke-width="3"/>
+        <path d="M34 89q4-8 10-3t-1 10q-7 2-9-7" fill="#f3cf69" stroke="#9c6838" stroke-width="2"/>
+        <path d="M73 92h11l-2 20H71z" fill="#e3f3ee" stroke="#5b7c73" stroke-width="2"/><path d="M73 97h10" stroke="#d87c58" stroke-width="4"/>
+      </symbol>
+    </svg>
+    <div id="game-screen">
+    <header class="topbar">
+      <div class="brand" aria-label="Kainan Sim street food tycoon">
+        <span class="brand-mark" aria-hidden="true">🍡</span>
+        <div><div class="brand-title">Kainan Sim <span>✦</span></div><div class="brand-subtitle">PINOY STREET FOOD TYCOON</div></div>
+      </div>
+      <div class="header-actions">
+        <div class="header-pill level-pill" aria-label="Player level"><span aria-hidden="true">🏅</span> <span id="level-display">Level 1</span></div>
+        <div class="header-pill coin-pill" aria-label="Total coins"><span aria-hidden="true">🪙</span> <span id="coin-display">₱ 0</span></div>
+        <button class="icon-button sound-toggle" id="bgm-toggle" type="button" aria-pressed="false" aria-label="Turn background music on" title="Background music"><span aria-hidden="true">🔇</span><span>BGM Off</span></button>
+        <button class="icon-button sound-toggle" id="sfx-toggle" type="button" aria-pressed="true" aria-label="Turn sound effects off" title="Sound effects"><span aria-hidden="true">🔔</span><span>SFX On</span></button>
+        <button class="icon-button" id="settings-button" type="button" aria-label="Open vendor settings" title="Vendor settings">⚙</button>
+      </div>
+    </header>
+    <section class="shift-banner" id="health-seal-banner" hidden><div class="shift-location">🏅 <span id="health-seal-label">OFFICIAL HEALTH SEAL · +15% MENU PRICES</span></div><div class="shift-status">CLEAN CART, TRUSTED SUKI!</div></section>
+    <div class="progress-wrap" role="group" aria-label="Experience progress">
+      <span class="progress-label">LEVEL UP</span>
+      <div class="progress-track" id="xp-track" role="progressbar" aria-label="Experience points" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="xp-fill"></div></div>
+      <span class="progress-count" id="xp-count">0 / 100 XP</span>
+    </div>
+
+    <div class="shift-banner">
+      <div class="shift-location"><span aria-hidden="true">📍</span><span id="location-display">QUIAPO • Manila Street Market</span></div>
+      <div class="shift-status"><span class="status-dot"></span> OPEN FOR BUSINESS <span id="weather-status"></span></div>
+    </div>
+    <nav class="game-tools" aria-label="Cart management">
+      <button class="tool-button" id="quests-button" type="button">📋 Daily Quests</button>
+      <button class="tool-button" id="shop-button" type="button">🛒 Cart Shop</button>
+      <button class="tool-button" id="credit-button" type="button">📒 Lista <span id="credit-badge"></span></button>
+      <span class="tool-spacer"></span>
+      <select class="location-select" id="location-select" aria-label="Change cart location"></select>
+      <button class="weather-button" id="weather-button" type="button" aria-label="Current weather and rush event">☀️ Sunny</button>
+      <button class="weather-button" id="rush-extension" type="button" hidden>⏱️ +10s Rush (<span id="extension-count">0</span>)</button>
+    </nav>
+
+    <div class="game-grid">
+      <aside>
+        <section class="panel customer-panel" aria-labelledby="customer-title">
+          <div class="customer-heading"><h1 class="section-heading" id="customer-title"><span class="heading-number">01</span><span>May order ka!<small>Heto na ang susunod mong suki.</small></span></h1></div>
+          <div class="customer-scene" role="img" aria-label="A friendly customer waiting at a colorful Manila street food stall">
+            <div class="lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="scene-awning" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="scene-window" aria-hidden="true"></div>
+            <span class="scene-sign" aria-hidden="true">TUSOK-TUSOK</span>
+            <div class="customer-person" aria-hidden="true"><div class="hair"></div><div class="face"></div><div class="body"></div></div>
+            <div class="scene-counter" aria-hidden="true"></div>
+            <span class="customer-nametag" id="customer-name">Your new suki</span>
+          </div>
+          <div class="order-card"><div class="micro-label">ORDER NI SUKI</div><div class="order-text" id="order-description" aria-live="polite">Loading your next order...</div></div>
+          <div class="vip-banner" id="vip-banner" hidden></div>
+          <div class="preview-orders" id="preview-orders" hidden></div>
+          <div class="patience-row"><span>INGATAN ANG PASENSYA</span><span class="patience-value" id="patience-label">100%</span></div>
+          <div class="patience-track" id="patience-track" role="progressbar" aria-label="Customer patience" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div class="patience-fill" id="patience-fill"></div></div>
+          <div class="customer-footer" id="customer-footer" aria-live="polite"><span aria-hidden="true">💚</span><span>Perfect order = bonus tip!</span></div>
+        </section>
+        <div class="stats-grid" aria-label="Shift statistics">
+          <div class="stat-card"><div class="stat-label">Orders served</div><div class="stat-value" id="served-display">0</div></div>
+          <div class="stat-card"><div class="stat-label">Suki streak</div><div class="stat-value streak" id="streak-display">0 🔥</div></div>
+        </div>
+      </aside>
+
+      <section class="workbench" aria-label="Street food cart workbench">
+        <div class="station-head"><div><h2 class="section-heading">Lutuan ng order</h2><div class="station-kicker">Fresh sa kawali, para sa iyong suki</div></div><div class="shift-badge" id="vendor-badge">🌟 KUYA JUN</div></div>
+        <section class="panel food-panel" aria-labelledby="food-title">
+          <div class="subhead-row"><h2 class="section-heading" id="food-title"><span class="heading-number">02</span>Pumili ng tusok-tusok</h2><span class="subhead-caption">Tap + para idagdag sa cup</span></div>
+          <div class="food-grid" id="food-grid"></div>
+        </section>
+        <section class="panel drink-panel" aria-labelledby="drink-title">
+          <div class="subhead-row"><h2 class="section-heading" id="drink-title"><span class="heading-number">🧋</span>Palamig &amp; Street Drinks</h2><span class="subhead-caption">Combo meal? Dagdag palamig!</span></div>
+          <div class="drink-grid" id="drink-grid"></div>
+        </section>
+        <section class="panel tray-panel" aria-labelledby="tray-title">
+          <div class="subhead-row"><h2 class="section-heading" id="tray-title"><span class="heading-number">03</span>Ayusin sa order tray</h2><span class="subhead-caption">Dito mapupunta ang laman</span></div>
+          <div class="tray-content">
+            <div class="cup-wrap" id="cup-preview" aria-label="Your prepared order"></div>
+            <div class="tray-details">
+              <div class="tray-detail-title">KASALUKUYANG ORDER</div>
+              <div class="tray-items" id="tray-items" aria-live="polite"></div>
+              <div class="tray-actions"><span class="tray-total" id="tray-total">Wala pang laman ang cup</span><button class="clear-button" id="clear-button" type="button" disabled>↺ Tapon Laman</button></div>
+            </div>
+          </div>
+        </section>
+        <section class="panel sauce-panel" aria-labelledby="sauce-title">
+          <div class="subhead-row"><h2 class="section-heading" id="sauce-title"><span class="heading-number">04</span>Piliin ang sawsawan</h2><span class="subhead-caption">Isa lang ang pipiliin</span></div>
+          <div class="sauce-grid" id="sauce-grid"></div>
+        </section>
+        <section class="panel sanitation-panel" aria-labelledby="sanitation-title">
+          <div class="subhead-row"><h2 class="section-heading" id="sanitation-title">🧼 Kalinisan ng Kariton</h2><span class="subhead-caption" id="seal-pricing-note">Clean cart, happy inspector!</span></div>
+          <div class="sanitation-row"><span class="sanitation-label">Clean Oil Gauge</span><span class="sanitation-value" id="sanitation-value">100%</span><div class="sanitation-meter" id="oil-meter" role="progressbar" aria-label="Clean cooking oil" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span id="oil-meter-fill"></span></div></div>
+          <div class="sanitation-actions"><button id="clean-oil-button" type="button">🧽 Clean Oil</button><button id="jar-cover-button" type="button">🫙 Jar Covered ✓</button><button id="inspection-button" type="button">🧼 Random Inspection</button></div>
+        </section>
+        <div>
+          <button class="serve-button" id="serve-button" type="button"><span aria-hidden="true">🍡</span><span>Ihain na sa customer!</span><span aria-hidden="true">➜</span></button>
+          <div class="order-summary"><span id="order-summary-text">Handa ka na? Ihambing ang order bago ihain.</span><span class="order-earnings" id="earnings-preview">Suki tip hanggang ₱8</span></div>
+        </div>
+      </section>
+    </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-icon" id="toast-icon">✨</span><span id="toast-message"></span></div>
+
+  <div class="modal-backdrop" id="setup-modal" role="dialog" aria-modal="true" aria-labelledby="setup-title" hidden>
+    <section class="modal">
+      <div class="modal-header"><div class="modal-emblem" aria-hidden="true">🛺</div><div class="modal-eyebrow">WELCOME SA KAINAN SIM</div><h1 id="setup-title">Bukas na ang iyong kariton!</h1><p class="modal-description" id="setup-description">Pumili ng pangalan at tindero. Simulan na natin ang iyong Pinoy street food adventure!</p></div>
+      <label class="field-label" for="vendor-name-input">Pangalan ng iyong kariton</label>
+      <input class="name-input" id="vendor-name-input" maxlength="36" autocomplete="organization" placeholder="Kuya Jun's Tusok-Tusok Cart">
+      <span class="field-label">Pumili ng tindero</span>
+      <div class="vendor-options" id="vendor-options">
+        <button class="vendor-option" type="button" data-vendor="manong" aria-pressed="false"><span class="vendor-face"><svg class="setup-avatar" viewBox="0 0 100 120" role="img" aria-label="Manong Boy wearing his blue apron and pamunas"><use href="#avatar-manong" width="100" height="120"></use></svg></span><strong>Manong Boy</strong><small>Classic tusok-tusok uncle</small></button>
+        <button class="vendor-option selected" type="button" data-vendor="jun" aria-pressed="true"><span class="vendor-face"><svg class="setup-avatar" viewBox="0 0 100 120" role="img" aria-label="Kuya Jun, friendly street-food vendor"><use href="#avatar-manong" width="100" height="120"></use></svg></span><strong>Kuya Jun</strong><small>Classic na tusok-tusok kuya</small></button>
+        <button class="vendor-option" type="button" data-vendor="bebang" aria-pressed="false"><span class="vendor-face"><svg class="setup-avatar" viewBox="0 0 100 120" role="img" aria-label="Ate Bebang in her red apron"><use href="#avatar-bebang" width="100" height="120"></use></svg></span><strong>Ate Bebang</strong><small>Masayahing street-food ate</small></button>
+        <button class="vendor-option" type="button" data-vendor="bossing" aria-pressed="false"><span class="vendor-face"><svg class="setup-avatar" viewBox="0 0 100 120" role="img" aria-label="Bossing wearing shades and a black apron"><use href="#avatar-bossing" width="100" height="120"></use></svg></span><strong>Bossing</strong><small>Cool at astig na vendor</small></button>
+      </div>
+      <div class="vendor-field-row"><span></span><button class="settings-reset" id="reset-progress-button" type="button" hidden>🗑️ Reset Progress</button></div>
+      <button class="modal-submit" id="setup-submit" type="button">Simulan ang negosyo! <span aria-hidden="true">→</span></button>
+      <button class="modal-cancel" id="setup-cancel" type="button" hidden>Bumalik sa laro</button>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="level-modal" role="dialog" aria-modal="true" aria-labelledby="level-title" hidden>
+    <section class="modal">
+      <div class="modal-header"><div class="modal-emblem levelup-emblem" aria-hidden="true">🎉</div><div class="modal-eyebrow">SANA ALL, UMAANGAT!</div><h2 id="level-title">Level up!</h2><p class="modal-description" id="level-description">Ang galing mo, suki ka na ng buong kanto!</p></div>
+      <div class="unlock-list" id="unlock-list"></div>
+      <button class="modal-submit green-submit" id="level-dismiss" type="button">Tuloy ang negosyo! <span aria-hidden="true">→</span></button>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="quests-modal" role="dialog" aria-modal="true" aria-labelledby="quests-title" hidden>
+    <section class="modal feature-modal">
+      <div class="modal-header"><div class="modal-emblem" aria-hidden="true">📋</div><div class="modal-eyebrow">BAGONG ARAW, BAGONG DISKARTE</div><h2 id="quests-title">Daily Quests</h2><p class="modal-description">Tapusin ang mga hamon ngayong araw at kunin ang iyong bonus!</p></div>
+      <div class="quest-list" id="quest-list"></div>
+      <div class="feature-modal-footer"><span id="quest-day"></span><button class="quest-refresh" id="quests-refresh" type="button">↻ New Quests (test)</button></div>
+      <button class="modal-submit green-submit" data-close-modal="quests-modal" type="button">Tuloy ang laro</button>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="shop-modal" role="dialog" aria-modal="true" aria-labelledby="shop-title" hidden>
+    <section class="modal feature-modal">
+      <div class="modal-header"><div class="modal-emblem" aria-hidden="true">🛒</div><div class="modal-eyebrow">INVEST SA IYONG KARITON</div><h2 id="shop-title">Cart Shop</h2><p class="modal-description">I-upgrade ang gamit, bihisan ang tindero, at humanap ng bagong pwesto!</p></div>
+      <div class="feature-modal-footer"><span>Coins mo ngayon</span><strong id="shop-balance">₱0</strong></div>
+      <div class="shop-tabs" id="shop-tabs" role="tablist" aria-label="Shop categories">
+        <button class="shop-tab active" data-category="upgrades" role="tab" aria-selected="true" type="button">⚙️ Upgrades</button>
+        <button class="shop-tab" data-category="cosmetics" role="tab" aria-selected="false" type="button">🧢 Cosmetics</button>
+        <button class="shop-tab" data-category="vehicles" role="tab" aria-selected="false" type="button">🛺 Rides</button>
+        <button class="shop-tab" data-category="locations" role="tab" aria-selected="false" type="button">📍 Locations</button>
+      </div>
+      <div class="shop-list" id="shop-list"></div>
+      <button class="modal-submit" data-close-modal="shop-modal" type="button">Back sa kariton</button>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="credit-modal" role="dialog" aria-modal="true" aria-labelledby="credit-title" hidden>
+    <section class="modal feature-modal">
+      <div class="modal-header"><div class="modal-emblem" aria-hidden="true">📒</div><div class="modal-eyebrow">KAPITBAHAY NA TIWALA</div><h2 id="credit-title">Lista sa Listahan</h2><p class="modal-description">Utang ngayon, bayad bukas. Bisitahin muli ang mga suki para paalalahanan sila.</p></div>
+      <div class="credit-balance" id="credit-goodwill"></div>
+      <div class="ledger-list" id="ledger-list"></div>
+      <button class="modal-submit" data-close-modal="credit-modal" type="button">Tuloy ang negosyo</button>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="credit-offer-modal" role="dialog" aria-modal="true" aria-labelledby="credit-offer-title" hidden>
+    <section class="modal">
+      <div class="modal-header"><div class="modal-emblem" aria-hidden="true">📝</div><div class="modal-eyebrow">REGULAR NA SUKI</div><h2 id="credit-offer-title">Lista sa Listahan?</h2><p class="modal-description" id="credit-offer-description">Maaari kang pagkatiwalaan ng kapitbahay na ito.</p></div>
+      <div class="credit-actions"><button class="modal-submit secondary-submit" id="credit-decline" type="button">Bayad ngayon</button><button class="modal-submit green-submit" id="credit-accept" type="button">Sige, lista mo!</button></div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="home-settings-modal" role="dialog" aria-modal="true" aria-labelledby="home-settings-title" hidden>
+    <section class="modal">
+      <div class="modal-header"><div class="modal-emblem">⚙️</div><div class="modal-eyebrow">AYUSIN ANG IYONG LARO</div><h2 id="home-settings-title">Settings</h2><p class="modal-description">I-personalize ang tunog at wika ng Kainan Sim.</p></div>
+      <div class="home-settings">
+        <div class="home-setting-toggle"><span>🔊 Background Music (BGM)</span><button id="settings-bgm-toggle" type="button" aria-pressed="false">OFF</button></div>
+        <div class="home-setting-toggle"><span>🔔 Sound Effects (SFX)</span><button id="settings-sfx-toggle" type="button" aria-pressed="true">ON</button></div>
+      </div>
+      <label class="language-setting" for="language-select"><span>🌐 Language / Wika</span><select id="language-select"><option value="en">English</option><option value="tl">Tagalog</option></select></label>
+      <button class="settings-reset" id="home-reset-button" type="button" style="margin-top:14px">🗑️ Reset Game Progress</button>
+      <button class="modal-submit" data-close-modal="home-settings-modal" type="button">✖ Close Settings</button>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="inspection-modal" role="dialog" aria-modal="true" aria-labelledby="inspection-title" hidden>
+    <section class="modal">
+      <div class="modal-header"><div class="modal-emblem">🧼</div><div class="modal-eyebrow">BARANGAY HEALTH OFFICE</div><h2 id="inspection-title">Health Inspection</h2><p class="modal-description" id="inspection-description">Papasok ang inspector—ipakita ang kalinisan ng iyong kariton.</p></div>
+      <div class="inspection-checks" id="inspection-checks"></div>
+      <div class="unlock-list" id="inspection-result"></div>
+      <button class="modal-submit green-submit" id="inspection-dismiss" type="button">Ayos, balik sa benta!</button>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "kainanSim.pinoyStreetFood.v1";
+      const LEGACY_STORAGE_KEY = "kainanSim_saveData";
+      const MAX_LEVEL = 6;
+      const MAX_TRAY_ITEMS = 12;
+      const ORDER_DURATION = 75;
+      const VENDORS = {
+        jun: { name: "Kuya Jun", emoji: "👨🏽‍🍳", cart: "Kuya Jun's Tusok-Tusok Cart" },
+        manong: { name: "Manong Boy", emoji: "👨🏽‍🍳", cart: "Manong Boy's Tusok-Tusok Cart" },
+        bebang: { name: "Ate Bebang", emoji: "👩🏽‍🍳", cart: "Ate Bebang's Tusok-Tusok Cart" },
+        bossing: { name: "Bossing", emoji: "😎", cart: "Bossing's Tusok-Tusok Cart" }
+      };
+      const FOODS = [
+        { id: "fishball", name: "Fishball", emoji: "🍡", unlock: 1, price: 5, note: "Malutong sa labas, juicy sa loob." },
+        { id: "kwek", name: "Kwek-Kwek", emoji: "🥚", unlock: 2, price: 8, note: "Quail egg na may crispy coating." },
+        { id: "kikiam", name: "Kikiam", emoji: "🥖", unlock: 4, price: 7, note: "Classic na sawsaw-sarap!" },
+        { id: "calamares", name: "Calamares", emoji: "🦑", unlock: 5, price: 10, note: "Crispy at fresh, paborito ng lahat." }
+      ];
+      const DRINKS = [
+        { id: "sago", name: "Sago't Gulaman", emoji: "🧋", unlock: 3, price: 18 },
+        { id: "buko", name: "Buko Juice", emoji: "🥥", unlock: 4, price: 22 },
+        { id: "melon", name: "Melon Drink", emoji: "🍈", unlock: 5, price: 20 }
+      ];
+      const SAUCES = [
+        { id: "sweet", name: "Sweet & Sour", emoji: "🍯", unlock: 1 },
+        { id: "spicy", name: "Spicy Sauce", emoji: "🌶️", unlock: 3 },
+        { id: "vinegar", name: "Special Vinegar", emoji: "🧅", unlock: 6 }
+      ];
+      const CUSTOMER_NAMES = ["Aling Nena", "Jun-jun", "Maya", "Manong Boy", "Tita Leni", "Carlo", "Bebeng", "Ate Mercy", "Mang Tonyo", "Mika"];
+      const QUEST_DEFINITIONS = [
+        { id: "fishballs", title: "Serve 10 Fishballs", detail: "Fishballs na naihain ngayong araw", target: 10, rewardCoins: 50, rewardXp: 30 },
+        { id: "spicy", title: "Suki at Spicy", detail: "Serve 5 customers with Spicy Sauce", target: 5, rewardCoins: 75, rewardXp: 50 },
+        { id: "streak", title: "Sunod-sunod na Suki", detail: "Makamit ang 5-customer streak without mistakes", target: 5, rewardCoins: 100, rewardXp: 100 },
+        { id: "earnings", title: "Kita sa Kanto", detail: "Kumita ng ₱500 sa isang araw", target: 500, rewardCoins: 150, rewardXp: 150 }
+      ];
+      const LOCATIONS = [
+        { id: "quiapo", name: "Quiapo Market", emoji: "🏘️", cost: 0, vehicle: "pedal-trike", tipBonus: 1, volume: "Balanced na benta" },
+        { id: "plaza", name: "Town Plaza", emoji: "🏞️", cost: 0, vehicle: "pedal-trike", tipBonus: 1, volume: "Steady na suki" },
+        { id: "school", name: "School Gates", emoji: "🏫", cost: 150, vehicle: "ebike", tipBonus: .9, volume: "Maraming estudyante" },
+        { id: "terminal", name: "Jeepney Terminal", emoji: "🚏", cost: 250, vehicle: "sidecar", tipBonus: 1.4, volume: "Mas malalaking tips" }
+      ];
+      const VEHICLES = [
+        { id: "pedal-trike", name: "Pedal Trike", emoji: "🚲", cost: 0, tier: 0, detail: "Ang original na pang-kanto." },
+        { id: "ebike", name: "E-Bike", emoji: "🔋", cost: 600, tier: 1, detail: "Buksan ang School Gates at terminal." },
+        { id: "sidecar", name: "Motorized Sidecar", emoji: "🛺", cost: 1200, tier: 2, detail: "Bukas na ang lahat ng pwesto!" }
+      ];
+      const COSMETICS = [
+        { id: "jun-apron", name: "Kuya Jun's Best Apron", emoji: "🧑🏽‍🍳", cost: 150, vendor: "jun", detail: "Bagong linis, bagong dating." },
+        { id: "bebang-hat", name: "Ate Bebang's Chef Hat", emoji: "👩🏽‍🍳", cost: 250, vendor: "bebang", detail: "Chef ng buong kanto!" },
+        { id: "bossing-shades", name: "Bossing's Neon Shades", emoji: "🕶️", cost: 350, vendor: "bossing", detail: "Astig mula umaga hanggang gabi." },
+        { id: "neon-sign", name: "Neon Tusok-Tusok Sign", emoji: "💡", cost: 500, vendor: null, detail: "Kita ang kariton kahit sa malayo." }
+      ];
+      const todayKey = () => {
+        const date = new Date();
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      };
+      const defaultQuests = day => ({ day, fishballs: 0, spicy: 0, streak: 0, earnings: 0, claimed: [] });
+      const initialState = () => ({
+        level: 1, xp: 0, coins: 0, unlockedItems: ["fishball"],
+        unlockedSauces: ["sweet"], vendor: "jun",
+        cartName: VENDORS.jun.cart, setupComplete: false,
+        served: 0, streak: 0,
+        unlockedDrinks: [],
+        sanitation: 100, jarCovered: true, healthSeal: false,
+        language: "en",
+        sound: { bgm: false, sfx: true },
+        upgrades: { pan: false, fryer: false, security: false, timeCharges: 0, training: 0 },
+        cosmetics: ["classic"], equippedCosmetic: "classic",
+        vehicle: "pedal-trike", vehicleTier: 0, locations: ["quiapo", "plaza"], location: "quiapo",
+        quests: defaultQuests(todayKey()),
+        goodwill: 0, credits: []
+      });
+      function normalizeState(value) {
+        if (!value || typeof value !== "object" || Array.isArray(value)) return initialState();
+        if (value.progress && typeof value.progress === "object") value = { ...value.progress, ...value };
+        value = {
+          ...value,
+          level: value.level ?? value.currentLevel,
+          coins: value.coins ?? value.totalCoins,
+          unlockedItems: value.unlockedItems ?? value.unlockedFoods,
+          vendor: value.vendor ?? value.selectedVendor
+        };
+        const base = initialState();
+        if (typeof value.vendor === "string" && !Object.hasOwn(VENDORS, value.vendor)) {
+          const vendorKey = Object.keys(VENDORS).find(key => VENDORS[key].name.toLowerCase() === value.vendor.toLowerCase());
+          if (vendorKey) value.vendor = vendorKey;
+        }
+        const level = Number.isInteger(value.level) ? Math.min(100, Math.max(1, value.level)) : 1;
+        const needed = level * 100;
+        const rawXp = Number.isFinite(value.xp) ? Math.max(0, Math.floor(value.xp)) : 0;
+        const validFoods = new Set(FOODS.map(item => item.id));
+        const validDrinks = new Set(DRINKS.map(item => item.id));
+        const validSauces = new Set(SAUCES.map(item => item.id));
+        const storedFoods = Array.isArray(value.unlockedItems) ? value.unlockedItems.filter(id => validFoods.has(id)) : [];
+        const storedDrinks = Array.isArray(value.unlockedDrinks) ? value.unlockedDrinks.filter(id => validDrinks.has(id)) : [];
+        const storedSauces = Array.isArray(value.unlockedSauces) ? value.unlockedSauces.filter(id => validSauces.has(id)) : [];
+        const vendor = Object.hasOwn(VENDORS, value.vendor) ? value.vendor : base.vendor;
+        const sound = value.sound && typeof value.sound === "object" ? value.sound : {};
+        const oldUpgrades = value.upgrades && typeof value.upgrades === "object" ? value.upgrades : {};
+        const cosmetics = Array.isArray(value.cosmetics) ? value.cosmetics.filter(id => ["classic", ...COSMETICS.map(item => item.id)].includes(id)) : ["classic"];
+        const vehicle = VEHICLES.some(item => item.id === value.vehicle) ? value.vehicle : "pedal-trike";
+        const vehicleTier = Math.max(VEHICLES.find(item => item.id === vehicle).tier,
+          Number.isInteger(value.vehicleTier) ? Math.min(2, Math.max(0, value.vehicleTier)) : 0);
+        const validLocationIds = new Set(LOCATIONS.filter(item => vehicleTier >= VEHICLES.find(vehicleItem => vehicleItem.id === item.vehicle).tier).map(item => item.id));
+        const locations = [...new Set(["quiapo", "plaza", ...(Array.isArray(value.locations) ? value.locations.filter(id => validLocationIds.has(id)) : [])])];
+        const location = locations.includes(value.location) ? value.location : "quiapo";
+        const today = todayKey();
+        const savedQuests = value.quests && typeof value.quests === "object" && value.quests.day === today ? value.quests : defaultQuests(today);
+        const maxQuestProgress = id => Math.min(QUEST_DEFINITIONS.find(item => item.id === id).target,
+          Number.isFinite(savedQuests[id]) ? Math.max(0, Math.floor(savedQuests[id])) : 0);
+        const validClaims = Array.isArray(savedQuests.claimed) ? savedQuests.claimed.filter(id => QUEST_DEFINITIONS.some(item => item.id === id)) : [];
+        const credits = Array.isArray(value.credits) ? value.credits.filter(item =>
+          item && typeof item === "object" && typeof item.customer === "string" &&
+          Number.isSafeInteger(item.amount) && item.amount > 0 && Number.isFinite(item.dueAt)
+        ).slice(-100).map(item => ({
+          ...item,
+          id: typeof item.id === "string" ? item.id.slice(0, 80) : `${item.dueAt}-${item.amount}`,
+          customer: item.customer.slice(0, 60),
+          createdDay: typeof item.createdDay === "string" ? item.createdDay.slice(0, 10) : "",
+          reminded: item.reminded === true,
+          forgotten: item.forgotten === true
+        })) : [];
+        return {
+          level,
+          xp: Math.min(rawXp, Math.max(0, needed - 1)),
+          coins: Number.isSafeInteger(value.coins) ? Math.min(999999999, Math.max(0, value.coins)) : 0,
+          unlockedItems: [...new Set([...storedFoods, ...FOODS.filter(item => item.unlock <= level).map(item => item.id)])],
+          unlockedDrinks: [...new Set([...storedDrinks, ...DRINKS.filter(item => item.unlock <= level).map(item => item.id)])],
+          unlockedSauces: [...new Set([...storedSauces, ...SAUCES.filter(item => item.unlock <= level).map(item => item.id)])],
+          vendor,
+          cartName: typeof value.cartName === "string" && value.cartName.trim()
+            ? value.cartName.trim().slice(0, 36)
+            : VENDORS[vendor].cart,
+          setupComplete: value.setupComplete === true,
+          served: Number.isSafeInteger(value.served) ? Math.max(0, value.served) : 0,
+          streak: Number.isSafeInteger(value.streak) ? Math.max(0, value.streak) : 0,
+          sanitation: Number.isFinite(value.sanitation) ? Math.max(0, Math.min(100, value.sanitation)) : 100,
+          jarCovered: value.jarCovered !== false,
+          healthSeal: value.healthSeal === true,
+          language: value.language === "tl" ? "tl" : "en",
+          sound: { bgm: sound.bgm === true, sfx: sound.sfx !== false },
+          upgrades: {
+            pan: oldUpgrades.pan === true,
+            fryer: oldUpgrades.fryer === true,
+            security: oldUpgrades.security === true,
+            timeCharges: Number.isSafeInteger(oldUpgrades.timeCharges) ? Math.max(0, Math.min(99, oldUpgrades.timeCharges)) : 0,
+            training: Number.isSafeInteger(oldUpgrades.training) ? Math.max(0, Math.min(99, oldUpgrades.training)) : 0
+          },
+          cosmetics: [...new Set(["classic", ...cosmetics])],
+          equippedCosmetic: cosmetics.includes(value.equippedCosmetic) ? value.equippedCosmetic : "classic",
+          vehicle,
+          vehicleTier,
+          locations,
+          location,
+          quests: {
+            day: today,
+            fishballs: maxQuestProgress("fishballs"),
+            spicy: maxQuestProgress("spicy"),
+            streak: maxQuestProgress("streak"),
+            earnings: maxQuestProgress("earnings"),
+            claimed: validClaims
+          },
+          goodwill: Number.isFinite(value.goodwill) ? Math.max(0, Math.min(100, value.goodwill)) : 0,
+          credits
+        };
+      }
+
+      let state = initialState();
+      let order = null;
+      let tray = {};
+      let trayDrink = null;
+      let selectedSauce = null;
+      let patience = ORDER_DURATION;
+      let patienceMax = ORDER_DURATION;
+      let served = 0;
+      let streak = 0;
+      let toastTimer = null;
+      let setupFocus = "vendor-name-input";
+      let isSetupEditing = false;
+      let currentWeather = "sunny";
+      let weatherSeconds = 60;
+      let rushSeconds = 0;
+      let questAfterServe = null;
+      let pendingCredit = null;
+      let shopCategory = "upgrades";
+      let discoveredOrders = [];
+      let nextOrders = [];
+      let arrivalTimer = null;
+      let repayNoticeDay = "";
+      let audioContext = null;
+      let bgmTimer = null;
+      let musicStep = 0;
+      let savedProgressExists = false;
+
+      const $ = id => document.getElementById(id);
+
+      function announce(message, kind = "success") {
+        const toast = $("toast");
+        $("toast-message").textContent = message;
+        $("toast-icon").textContent = kind === "error" ? "⚠️" : kind === "success" ? "✨" : "ℹ️";
+        toast.className = `toast visible ${kind}`;
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => { toast.classList.remove("visible"); }, 3400);
+      }
+
+      function getAudioContext() {
+        if (!audioContext) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextClass) {
+            announce("Hindi suportado ng browser na ito ang Web Audio.", "error");
+            return null;
+          }
+          audioContext = new AudioContextClass();
+        }
+        if (audioContext.state === "suspended") void audioContext.resume();
+        return audioContext;
+      }
+
+      function tone(frequency, duration, options = {}) {
+        if (!state.sound.sfx && !options.music) return;
+        const context = getAudioContext();
+        if (!context) return;
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        const start = context.currentTime + (options.delay || 0);
+        const volume = options.volume ?? 0.045;
+        oscillator.type = options.type || "sine";
+        oscillator.frequency.setValueAtTime(frequency, start);
+        if (options.endFrequency) oscillator.frequency.exponentialRampToValueAtTime(options.endFrequency, start + duration);
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(volume, start + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+        oscillator.start(start);
+        oscillator.stop(start + duration + 0.02);
+      }
+
+      function playSfx(kind) {
+        if (!state.sound.sfx) return;
+        const notes = {
+          click: [[520, .055, { type: "triangle", volume: .035 }]],
+          fry: [[180, .16, { type: "sawtooth", endFrequency: 105, volume: .018 }]],
+          splash: [[680, .09, { type: "sine", endFrequency: 390, volume: .04 }], [930, .06, { type: "sine", delay: .04, volume: .022 }]],
+          error: [[205, .18, { type: "triangle", endFrequency: 150, volume: .04 }]],
+          clear: [[280, .12, { type: "triangle", endFrequency: 185, volume: .035 }]],
+          cash: [[660, .11, { type: "triangle", volume: .045 }], [880, .12, { type: "triangle", delay: .075, volume: .04 }], [1180, .17, { type: "sine", delay: .15, volume: .035 }]],
+          claim: [[660, .1, { type: "sine", volume: .04 }], [880, .1, { type: "sine", delay: .08, volume: .04 }], [1100, .18, { type: "sine", delay: .16, volume: .04 }]],
+          level: [[523, .15, { type: "triangle", volume: .045 }], [659, .15, { type: "triangle", delay: .13, volume: .045 }], [784, .15, { type: "triangle", delay: .26, volume: .045 }], [1047, .32, { type: "sine", delay: .39, volume: .05 }]]
+        };
+        (notes[kind] || []).forEach(([frequency, duration, options]) => tone(frequency, duration, options));
+      }
+
+      function playMusicNote() {
+        if (!state.sound.bgm) return;
+        const melody = [523, 659, 784, 659, 587, 698, 880, 698, 523, 659, 784, 988, 880, 784, 659, 587];
+        const note = melody[musicStep % melody.length];
+        tone(note, .18, { type: "triangle", volume: .018, music: true });
+        if (musicStep % 4 === 0) tone(note / 2, .24, { type: "sine", volume: .012, music: true });
+        musicStep += 1;
+        bgmTimer = window.setTimeout(playMusicNote, 245);
+      }
+
+      function toggleAudio(kind) {
+        state.sound[kind] = !state.sound[kind];
+        const button = $(`${kind}-toggle`);
+        const enabled = state.sound[kind];
+        button.setAttribute("aria-pressed", String(enabled));
+        button.setAttribute("aria-label", `Turn ${kind === "bgm" ? "background music" : "sound effects"} ${enabled ? "off" : "on"}`);
+        button.innerHTML = `<span aria-hidden="true">${kind === "bgm" ? enabled ? "🔊" : "🔇" : enabled ? "🔔" : "🔕"}</span><span>${kind === "bgm" ? `BGM ${enabled ? "On" : "Off"}` : `SFX ${enabled ? "On" : "Off"}`}</span>`;
+        if (kind === "bgm") {
+          window.clearTimeout(bgmTimer);
+          if (enabled) {
+            getAudioContext();
+            playMusicNote();
+          }
+        } else if (enabled) {
+          getAudioContext();
+          playSfx("click");
+        }
+        persist();
+      }
+
+      function persist() {
+        try {
+          const serialized = JSON.stringify(state);
+          window.localStorage.setItem(STORAGE_KEY, serialized);
+          window.localStorage.setItem(LEGACY_STORAGE_KEY, serialized);
+          savedProgressExists = hasSavedGame();
+          if ($("continue-button")) updateHomeSave();
+          return true;
+        } catch (error) {
+          console.error("Unable to save Kainan Sim progress.", error);
+          announce("Hindi na-save ang progress mo. Pakitingnan ang browser storage settings.", "error");
+          return false;
+        }
+      }
+
+      function updateHomeSave() {
+        const exists = savedProgressExists || hasSavedGame();
+        $("continue-button").disabled = !exists;
+        $("save-badge").textContent = exists ? `Level ${state.level} · ₱${state.coins.toLocaleString("en-PH")}` : "NO SAVE";
+      }
+
+      function setLanguage(language) {
+        state.language = language === "tl" ? "tl" : "en";
+        document.documentElement.lang = state.language === "tl" ? "tl" : "en";
+        $("language-select").value = state.language;
+        const labels = state.language === "tl" ? {
+          "new-game-button": "🎮 BAGONG LARO",
+          "continue-button": "⏯️ IPAGPATULOY",
+          "home-settings-button": "⚙️ MGA SETTING",
+          "quests-button": "📋 Mga Quest",
+          "shop-button": "🛒 Tindahan",
+          "credit-button": "📒 Lista",
+          "food-title": "Pumili ng tusok-tusok",
+          "drink-title": "Palamig at Inumin",
+          "tray-title": "Ayusin sa order tray",
+          "sauce-title": "Piliin ang sawsawan",
+          "serve-button": "🍡 Ihain na sa customer! ➜",
+          "settings": "Mga Setting"
+        } : {
+          "new-game-button": "🎮 START NEW GAME",
+          "continue-button": "⏯️ CONTINUE",
+          "home-settings-button": "⚙️ SETTINGS",
+          "quests-button": "📋 Daily Quests",
+          "shop-button": "🛒 Cart Shop",
+          "credit-button": "📒 Lista",
+          "food-title": "Pumili ng tusok-tusok",
+          "drink-title": "Palamig & Street Drinks",
+          "tray-title": "Ayusin sa order tray",
+          "sauce-title": "Piliin ang sawsawan",
+          "serve-button": "🍡 Ihain na sa customer! ➜",
+          "settings": "Settings"
+        };
+        $("new-game-button").textContent = labels["new-game-button"];
+        $("continue-button").firstChild.textContent = `${labels["continue-button"]} `;
+        $("home-settings-button").textContent = labels["home-settings-button"];
+        $("quests-button").textContent = labels["quests-button"];
+        $("shop-button").textContent = labels["shop-button"];
+        $("credit-button").firstChild.textContent = `${labels["credit-button"]} `;
+        ["food-title", "drink-title", "tray-title", "sauce-title"].forEach(id => {
+          const heading = $(id);
+          heading.lastChild.textContent = labels[id];
+        });
+        $("serve-button").querySelector("span:nth-child(2)").textContent = state.language === "tl" ? "Ihain na sa suki!" : "Ihain na sa customer!";
+        $("home-settings-title").textContent = labels.settings;
+        $("home-description").textContent = state.language === "tl"
+          ? "Tusok-tusok, palamig, at diskarte! Buksan ang iyong kariton at maging paboritong tindahan ng buong barangay."
+          : "Serve tusok-tusok, pour fresh palamig, and become the neighborhood's favorite street cart.";
+        $("settings-bgm-toggle").textContent = state.sound.bgm ? "ON" : "OFF";
+        $("settings-bgm-toggle").setAttribute("aria-pressed", String(state.sound.bgm));
+        $("settings-sfx-toggle").textContent = state.sound.sfx ? "ON" : "OFF";
+        $("settings-sfx-toggle").setAttribute("aria-pressed", String(state.sound.sfx));
+        updateHomeSave();
+        persist();
+      }
+
+      function loadProgress() {
+        try {
+          const savedCandidates = [
+            window.localStorage.getItem(STORAGE_KEY),
+            window.localStorage.getItem(LEGACY_STORAGE_KEY)
+          ].filter(Boolean);
+          if (!savedCandidates.length) {
+            savedProgressExists = false;
+            return initialState();
+          }
+          const loadedCandidates = [];
+          savedCandidates.forEach(serialized => {
+            try {
+              loadedCandidates.push(normalizeState(JSON.parse(serialized)));
+            } catch (error) {
+              console.error("Unable to parse a saved Kainan Sim profile.", error);
+            }
+          });
+          const isProgress = candidate => candidate.setupComplete || candidate.served > 0 || candidate.level > 1 || candidate.coins > 0;
+          const loaded = loadedCandidates.find(isProgress) || loadedCandidates[0] || initialState();
+          state = loaded;
+          savedProgressExists = isProgress(loaded);
+          return loaded;
+        } catch (error) {
+          console.error("Unable to load Kainan Sim progress.", error);
+          announce("Hindi mabasa ang saved progress. Bagong laro ang sisimulan.", "error");
+          return initialState();
+        }
+      }
+
+      function ensureQuestDay() {
+        const today = todayKey();
+        if (state.quests.day === today) return false;
+        state.quests = defaultQuests(today);
+        state.streak = 0;
+        streak = 0;
+        persist();
+        return true;
+      }
+
+      function questProgress(id) {
+        return Math.min(QUEST_DEFINITIONS.find(item => item.id === id).target, state.quests[id] || 0);
+      }
+
+      function updateQuestProgress(id, amount) {
+        ensureQuestDay();
+        const definition = QUEST_DEFINITIONS.find(item => item.id === id);
+        state.quests[id] = Math.min(definition.target, (state.quests[id] || 0) + amount);
+      }
+
+      function isQuestClaimable(quest) {
+        return questProgress(quest.id) >= quest.target && !state.quests.claimed.includes(quest.id);
+      }
+
+      function renderQuests() {
+        ensureQuestDay();
+        const list = $("quest-list");
+        list.replaceChildren();
+        QUEST_DEFINITIONS.forEach(quest => {
+          const progress = questProgress(quest.id);
+          const claimed = state.quests.claimed.includes(quest.id);
+          const card = document.createElement("article");
+          card.className = "quest-card";
+          card.innerHTML = `
+            <div class="quest-card-top"><strong class="quest-title">${quest.title}</strong><span class="quest-reward">₱${quest.rewardCoins} + ${quest.rewardXp} XP</span></div>
+            <div class="quest-progress-text">${quest.detail} · ${progress.toLocaleString("en-PH")}/${quest.target.toLocaleString("en-PH")}</div>
+            <div class="quest-meter" role="progressbar" aria-label="${quest.title}" aria-valuemin="0" aria-valuemax="${quest.target}" aria-valuenow="${progress}"><div class="quest-meter-fill" style="width:${progress / quest.target * 100}%"></div></div>
+            <button class="quest-claim${isQuestClaimable(quest) ? " ready" : ""}" type="button" data-claim="${quest.id}" ${claimed ? "disabled" : ""}>${claimed ? "✅ Done" : isQuestClaimable(quest) ? "Claim Reward" : "In Progress"}</button>`;
+          list.append(card);
+        });
+        $("quest-day").textContent = `Daily reset: ${state.quests.day}`;
+      }
+
+      function claimQuest(id) {
+        const quest = QUEST_DEFINITIONS.find(item => item.id === id);
+        if (!quest || !isQuestClaimable(quest)) return;
+        state.quests.claimed.push(id);
+        state.coins += quest.rewardCoins;
+        const previousLevel = state.level;
+        const unlocks = awardXp(quest.rewardXp);
+        persist();
+        playSfx("claim");
+        renderAll();
+        renderQuests();
+        announce(`Quest kumpleto! +₱${quest.rewardCoins} at +${quest.rewardXp} XP!`);
+        if (state.level > previousLevel) showLevelUp(unlocks);
+      }
+
+      function availableLocation(locationId) {
+        return state.locations.includes(locationId);
+      }
+
+      function ownedVehicleTier() {
+        return state.vehicleTier;
+      }
+
+      function shopProducts(category) {
+        if (category === "upgrades") return [
+          { id: "pan", name: "Frying Pan Capacity", emoji: "🍳", cost: 200, detail: `Capacity: ${trayCapacity()} items${state.upgrades.pan ? " (upgraded)" : ""}`, owned: state.upgrades.pan, action: () => { state.upgrades.pan = true; } },
+          { id: "fryer", name: "Speed Fryer Booster", emoji: "⚡", cost: 350, detail: "20% faster prep animations and 15 extra seconds of patience.", owned: state.upgrades.fryer, action: () => { state.upgrades.fryer = true; } },
+          { id: "security", name: "Cart Security Guard", emoji: "🛡️", cost: 300, detail: "Keep food safe from buraut habang abala ka.", owned: state.upgrades.security, action: () => { state.upgrades.security = true; } },
+          { id: "time", name: "Rush Hour Time Extension", emoji: "⏱️", cost: 100, detail: `${state.upgrades.timeCharges} extra 10-second rush-hour extension(s).`, consumable: true },
+          { id: "training", name: "Vendor Skills Workshop", emoji: "📚", cost: 120, detail: `${state.upgrades.training} workshop(s) completed · +25 XP per workshop.`, consumable: true }
+        ];
+        if (category === "cosmetics") return COSMETICS.map(item => {
+          const owned = state.cosmetics.includes(item.id);
+          const vendorName = item.vendor ? VENDORS[item.vendor].name : "All vendors";
+          return { ...item, detail: `${item.detail} · ${vendorName}`, owned, action: () => { state.cosmetics.push(item.id); state.equippedCosmetic = item.id; } };
+        });
+        if (category === "vehicles") return VEHICLES.map((item, index) => {
+          const owned = item.tier <= ownedVehicleTier();
+          return { ...item, owned, disabled: index > ownedVehicleTier() + 1, detail: `${item.detail}${index > ownedVehicleTier() + 1 ? " Buy the previous ride first." : ""}`, action: () => {
+            state.vehicle = item.id;
+            state.vehicleTier = Math.max(state.vehicleTier, item.tier);
+            LOCATIONS.filter(location => item.tier >= VEHICLES.find(vehicle => vehicle.id === location.vehicle).tier).forEach(location => {
+              if (!state.locations.includes(location.id) && location.cost === 0) state.locations.push(location.id);
+            });
+          } };
+        });
+        return LOCATIONS.map(item => {
+          const owned = availableLocation(item.id);
+          const lockedByVehicle = ownedVehicleTier() < VEHICLES.find(vehicle => vehicle.id === item.vehicle).tier;
+          return { ...item, owned, disabled: lockedByVehicle, detail: `${item.volume} · ${lockedByVehicle ? `Requires ${VEHICLES.find(vehicle => vehicle.id === item.vehicle).name}` : `${Math.round(item.tipBonus * 100)}% tip rate`}`, action: () => { state.locations.push(item.id); } };
+        });
+      }
+
+      function renderShop() {
+        $("shop-balance").textContent = `₱${state.coins.toLocaleString("en-PH")}`;
+        const list = $("shop-list");
+        list.replaceChildren();
+        shopProducts(shopCategory).forEach(product => {
+          const equipped = product.id === state.equippedCosmetic || product.id === state.vehicle || product.id === state.location;
+          const owned = Boolean(product.owned);
+          const buttonLabel = product.id === "time" ? "Buy +1" : product.id === "training" ? "Buy workshop" : product.disabled ? "Locked" : owned ? (equipped ? "✓ Equipped" : product.id === "pan" || product.id === "fryer" || product.id === "security" ? "✓ Owned" : "Equip") : `Buy ₱${product.cost}`;
+          const vendorLocked = Boolean(product.vendor && product.vendor !== state.vendor);
+          const disabled = product.disabled || vendorLocked || owned && !["cosmetics", "vehicles", "locations"].includes(shopCategory) || product.id === "time" && state.upgrades.timeCharges >= 99;
+          const detail = vendorLocked ? `Vendor-specific look for ${VENDORS[product.vendor].name}. Change vendors in Settings to buy it.` : product.detail;
+          const card = document.createElement("article");
+          card.className = "shop-card";
+          card.innerHTML = `
+              <div><div class="shop-card-top"><strong class="shop-title">${product.emoji} ${product.name}</strong><span class="shop-cost">${owned ? "Ready" : `₱${product.cost.toLocaleString("en-PH")}`}</span></div><div class="shop-detail">${detail}</div></div>
+              <button class="shop-buy" type="button" data-product="${product.id}" ${disabled ? "disabled" : ""}>${vendorLocked ? "Locked" : buttonLabel}</button>`;
+          list.append(card);
+        });
+      }
+
+      function purchaseShopItem(id) {
+        const product = shopProducts(shopCategory).find(item => item.id === id);
+        if (!product || product.disabled) return;
+        if (product.owned) {
+          if (shopCategory === "cosmetics") state.equippedCosmetic = id;
+          else if (shopCategory === "vehicles") {
+            if (VEHICLES.findIndex(item => item.id === id) <= ownedVehicleTier()) state.vehicle = id;
+          } else if (shopCategory === "locations" && availableLocation(id)) state.location = id;
+          else return;
+          persist();
+          renderAll();
+          renderShop();
+          announce(`${product.name} is ready!`);
+          return;
+        }
+        if (state.coins < product.cost) {
+          announce(`Kulang ang coins mo. Kailangan ng ₱${product.cost}.`, "error");
+          return;
+        }
+        state.coins -= product.cost;
+        if (id === "time") state.upgrades.timeCharges += 1;
+        else if (id === "training") {
+          state.upgrades.training += 1;
+          const before = state.level;
+          const unlocks = awardXp(25);
+          persist();
+          renderAll();
+          renderShop();
+          announce("Tapos ang workshop! +25 XP.");
+          if (state.level > before) showLevelUp(unlocks);
+          return;
+        } else product.action();
+        persist();
+        renderAll();
+        renderShop();
+        announce(`${product.name} nabili na!`);
+      }
+
+      function availableFoods() {
+        return FOODS.filter(item => state.unlockedItems.includes(item.id));
+      }
+      function availableSauces() {
+        return SAUCES.filter(item => state.unlockedSauces.includes(item.id));
+      }
+      function trayCapacity() {
+        return state.upgrades.pan ? 18 : MAX_TRAY_ITEMS;
+      }
+      function orderDuration() {
+        const weatherBase = currentWeather === "rush" ? 55 : currentWeather === "rainy" ? 90 : ORDER_DURATION;
+        return weatherBase + (state.upgrades.fryer ? 15 : 0);
+      }
+      function levelRequirement() {
+        return state.level * 100;
+      }
+      function orderTotal() {
+        return Object.values(order?.items || {}).reduce((sum, quantity) => sum + quantity, 0);
+      }
+      function trayTotal() {
+        return Object.values(tray).reduce((sum, quantity) => sum + quantity, 0);
+      }
+      function foodFor(id) {
+        return FOODS.find(item => item.id === id);
+      }
+      function drinkFor(id) {
+        return DRINKS.find(item => item.id === id);
+      }
+      function preparedTotal() {
+        return trayTotal() + (trayDrink ? 1 : 0);
+      }
+      function vendorDisplayName() {
+        return VENDORS[state.vendor].name;
+      }
+
+      function renderHeader() {
+        const required = levelRequirement();
+        $("level-display").textContent = `Level ${state.level}`;
+        $("coin-display").textContent = `₱ ${state.coins.toLocaleString("en-PH")}`;
+        $("xp-fill").style.width = `${Math.min(100, state.xp / required * 100)}%`;
+        $("xp-count").textContent = `${state.xp} / ${required} XP`;
+        $("xp-track").setAttribute("aria-valuemax", String(required));
+        $("xp-track").setAttribute("aria-valuenow", String(state.xp));
+        const cosmetic = COSMETICS.find(item => item.id === state.equippedCosmetic);
+        $("vendor-badge").textContent = `${cosmetic?.emoji || VENDORS[state.vendor].emoji} ${vendorDisplayName().toLocaleUpperCase("en")}`;
+        document.title = `${state.cartName} — Kainan Sim`;
+        const bgm = $("bgm-toggle");
+        bgm.setAttribute("aria-pressed", String(state.sound.bgm));
+        bgm.setAttribute("aria-label", `Turn background music ${state.sound.bgm ? "off" : "on"}`);
+        bgm.innerHTML = `<span aria-hidden="true">${state.sound.bgm ? "🔊" : "🔇"}</span><span>BGM ${state.sound.bgm ? "On" : "Off"}</span>`;
+        const sfx = $("sfx-toggle");
+        sfx.setAttribute("aria-pressed", String(state.sound.sfx));
+        sfx.setAttribute("aria-label", `Turn sound effects ${state.sound.sfx ? "off" : "on"}`);
+        sfx.innerHTML = `<span aria-hidden="true">${state.sound.sfx ? "🔔" : "🔕"}</span><span>SFX ${state.sound.sfx ? "On" : "Off"}</span>`;
+        $("location-display").textContent = `${LOCATIONS.find(item => item.id === state.location)?.name.toLocaleUpperCase("en") || "QUIAPO MARKET"} • Manila Street Market`;
+        const locationSelect = $("location-select");
+        const currentLocation = state.location;
+        locationSelect.replaceChildren(...LOCATIONS.map(location => {
+          const option = document.createElement("option");
+          option.value = location.id;
+          option.textContent = `${location.emoji} ${location.name}${availableLocation(location.id) ? "" : " 🔒"}`;
+          option.disabled = !availableLocation(location.id);
+          option.selected = location.id === currentLocation;
+          return option;
+        }));
+        $("weather-status").textContent = currentWeather === "rush" ? ` · STUDENT RUSH ${rushSeconds}s` : ` · ${currentWeather === "rainy" ? "RAINY" : "SUNNY"} ${weatherSeconds}s`;
+        const weatherButton = $("weather-button");
+        const weatherName = { sunny: "☀️ Sunny", rainy: "🌧️ Rainy", rush: `🔔 Rush ${rushSeconds}s` }[currentWeather];
+        weatherButton.textContent = weatherName;
+        weatherButton.classList.toggle("rush-live", currentWeather === "rush");
+        weatherButton.setAttribute("aria-label", `${weatherName}. Tap to cycle weather and rush events.`);
+        $("rush-extension").hidden = currentWeather !== "rush" || state.upgrades.timeCharges < 1;
+        $("extension-count").textContent = String(state.upgrades.timeCharges);
+        $("credit-badge").textContent = state.credits.length ? `(${state.credits.length})` : "";
+        $("health-seal-banner").hidden = !state.healthSeal;
+        $("seal-pricing-note").textContent = state.healthSeal ? "Official seal: +15% selling prices" : "Clean cart, happy inspector!";
+        updateHomeSave();
+      }
+
+      function renderCustomer() {
+        if (!order) {
+          $("customer-name").textContent = "Heto na ang susunod na suki...";
+          $("order-description").textContent = "Sandali lang, naghahanda na ang susunod mong customer.";
+          $("vip-banner").hidden = true;
+          return;
+        }
+        $("customer-name").textContent = order.customer;
+        const requirements = Object.entries(order.items).map(([id, quantity]) => {
+          const item = foodFor(id);
+          return `${quantity} ${item.name}${quantity > 1 ? "s" : ""}`;
+        });
+        const sauce = SAUCES.find(item => item.id === order.sauce);
+        const orderPhrase = requirements.join(" + ");
+        $("order-description").textContent = `${orderPhrase}${order.drink ? ` + 1 ${drinkFor(order.drink).name}` : ""} with ${sauce.name} ${sauce.emoji}`;
+        $("customer-footer").innerHTML = `<span aria-hidden="true">💚</span><span>Perfect order = bonus tip!</span>`;
+        const vip = order.vip;
+        $("vip-banner").hidden = !vip;
+        if (vip) $("vip-banner").textContent = `${vip.emoji} ${vip.name} · ${vip.perk}`;
+        const preview = $("preview-orders");
+        preview.hidden = !discoveredOrders.length;
+        preview.replaceChildren();
+        if (discoveredOrders.length) {
+          const heading = document.createElement("div");
+          heading.className = "preview-title";
+          heading.textContent = "🔮 MARITES' TSISMIS: SUSUNOD NA 3 ORDER";
+          preview.append(heading);
+          discoveredOrders.forEach((next, index) => {
+            const line = document.createElement("div");
+            line.className = "preview-line";
+            const items = Object.entries(next.items).map(([id, count]) => `${count} ${foodFor(id).name}`).join(" + ");
+            const drink = next.drink ? ` + ${drinkFor(next.drink).name}` : "";
+            line.textContent = `${index + 1}. ${next.customer}: ${items}${drink} w/ ${SAUCES.find(item => item.id === next.sauce).name}`;
+            preview.append(line);
+          });
+        }
+        $("patience-track").setAttribute("aria-valuenow", String(Math.ceil(patience / patienceMax * 100)));
+        renderPatience();
+      }
+
+      function renderPatience() {
+        const percent = Math.max(0, patience / patienceMax * 100);
+        $("patience-label").textContent = `${Math.ceil(percent)}%`;
+        $("patience-fill").style.width = `${percent}%`;
+        $("patience-fill").style.background = percent < 27 ? "#cb4b3b" : percent < 55 ? "#e6a333" : "#3a9a57";
+        $("patience-track").setAttribute("aria-valuenow", String(Math.ceil(percent)));
+      }
+
+      function renderFood() {
+        const grid = $("food-grid");
+        grid.replaceChildren();
+        FOODS.forEach(item => {
+          const unlocked = state.unlockedItems.includes(item.id);
+          const count = tray[item.id] || 0;
+          const card = document.createElement("article");
+          card.className = `food-card${unlocked ? "" : " locked"}`;
+          card.innerHTML = `
+            <div class="food-art">
+              <span class="food-emoji" aria-hidden="true">${item.emoji}</span>
+              ${unlocked ? '<span class="unlock-chip">✓ READY</span>' : '<div class="food-lock-overlay" aria-label="Locked">🔒</div>'}
+            </div>
+            <div class="food-info">
+              <div class="food-topline"><span class="food-name">${item.name}</span><span class="food-price">₱${Math.ceil(item.price * (state.healthSeal ? 1.15 : 1))} / pc</span></div>
+              <div class="food-note">${unlocked ? item.note : `Unlocks at Level ${item.unlock}`}</div>
+              <div class="food-controls">
+                <span class="tap-hint">${unlocked ? "Tusok-tusok!" : "Sarado pa"}</span>
+                <div class="qty-controls">
+                  <button class="qty-button" type="button" data-food="${item.id}" data-change="-1" aria-label="Remove one ${item.name}" ${!unlocked || !count ? "disabled" : ""}>−</button>
+                  <span class="qty-number" aria-label="${count} in cup">${count}</span>
+                  <button class="qty-button add" type="button" data-food="${item.id}" data-change="1" aria-label="Add one ${item.name} to the cup" ${!unlocked || preparedTotal() >= trayCapacity() || count >= 9 ? "disabled" : ""}>+</button>
+                </div>
+              </div>
+            </div>`;
+          grid.append(card);
+        });
+      }
+
+      function renderSauces() {
+        const grid = $("sauce-grid");
+        grid.replaceChildren();
+        SAUCES.forEach(sauce => {
+          const unlocked = state.unlockedSauces.includes(sauce.id);
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `sauce-button${selectedSauce === sauce.id ? " selected" : ""}${unlocked ? "" : " sauce-locked"}`;
+          button.disabled = !unlocked;
+          button.setAttribute("aria-pressed", String(selectedSauce === sauce.id));
+          button.setAttribute("aria-label", unlocked ? `${sauce.name}${selectedSauce === sauce.id ? ", selected" : ""}` : `${sauce.name}, unlocks at level ${sauce.unlock}`);
+          button.innerHTML = unlocked
+            ? `<span aria-hidden="true">${sauce.emoji}</span><span>${sauce.name}</span>`
+            : `<span aria-hidden="true">🔒</span><span>Level ${sauce.unlock}</span>`;
+          if (unlocked) button.dataset.sauce = sauce.id;
+          grid.append(button);
+        });
+      }
+
+      function renderDrinks() {
+        const grid = $("drink-grid");
+        if (!grid) return;
+        grid.replaceChildren();
+        DRINKS.forEach(drink => {
+          const unlocked = state.unlockedDrinks.includes(drink.id);
+          const selected = trayDrink === drink.id;
+          const card = document.createElement("article");
+          card.className = `drink-card${unlocked ? "" : " locked"}`;
+          const top = document.createElement("div");
+          top.className = "drink-topline";
+          const name = document.createElement("span");
+          name.className = "drink-name";
+          name.textContent = drink.name;
+          const emoji = document.createElement("span");
+          emoji.className = "drink-emoji";
+          emoji.textContent = drink.emoji;
+          top.append(name, emoji);
+          const price = document.createElement("div");
+          price.className = "drink-price";
+          price.textContent = `₱${drink.price} / cup`;
+          const control = document.createElement("div");
+          control.className = "drink-control";
+          const lock = document.createElement("span");
+          lock.className = "drink-lock";
+          lock.textContent = unlocked ? (selected ? "In the combo ✓" : "Palamig") : `🔒 Level ${drink.unlock}`;
+          const button = document.createElement("button");
+          button.className = `qty-button${selected ? " add" : ""}`;
+          button.type = "button";
+          button.textContent = selected ? "✓" : "+";
+          button.disabled = !unlocked || (!selected && preparedTotal() >= trayCapacity());
+          button.setAttribute("aria-label", unlocked ? `${selected ? "Remove" : "Add"} ${drink.name}` : `${drink.name} unlocks at level ${drink.unlock}`);
+          if (unlocked) button.dataset.drink = drink.id;
+          control.append(lock, button);
+          card.append(top, price, control);
+          grid.append(card);
+        });
+      }
+
+      function renderSanitation() {
+        if (!$("sanitation-value")) return;
+        const oil = Math.round(state.sanitation);
+        $("sanitation-value").textContent = `${oil}%`;
+        $("oil-meter").setAttribute("aria-valuenow", String(oil));
+        $("oil-meter-fill").style.width = `${oil}%`;
+        $("oil-meter-fill").style.background = oil < 45 ? "#cb4b3b" : oil < 70 ? "#e6a333" : "linear-gradient(90deg, #48a65b, #91bd5c)";
+        $("jar-cover-button").classList.toggle("sealed", state.jarCovered);
+        $("jar-cover-button").textContent = state.jarCovered ? "🫙 Jar Covered ✓" : "🫙 Cover Sauce Jars";
+        $("health-seal-banner").hidden = !state.healthSeal;
+        $("inspection-button").textContent = state.healthSeal ? "🏅 Health Seal Active" : "🧼 Random Inspection";
+        $("inspection-button").classList.toggle("sealed", state.healthSeal);
+        $("clean-oil-button").disabled = state.sanitation >= 100;
+        $("clean-oil-button").textContent = state.sanitation >= 100 ? "✨ Oil is Clean" : "🧽 Clean Oil";
+      }
+
+      function renderTray() {
+        const contents = $("tray-items");
+        contents.replaceChildren();
+        const total = trayTotal();
+        Object.entries(tray).forEach(([id, quantity]) => {
+          if (quantity < 1) return;
+          const item = foodFor(id);
+          const chip = document.createElement("span");
+          chip.className = "tray-chip";
+          chip.textContent = `${item.emoji} ${quantity} ${item.name}${quantity > 1 ? "s" : ""}`;
+          contents.append(chip);
+        });
+        if (selectedSauce) {
+          const sauce = SAUCES.find(item => item.id === selectedSauce);
+          const chip = document.createElement("span");
+          chip.className = "tray-chip sauce-chip";
+          chip.textContent = `${sauce.emoji} ${sauce.name}`;
+          contents.append(chip);
+        }
+        if (trayDrink) {
+          const drink = drinkFor(trayDrink);
+          const chip = document.createElement("span");
+          chip.className = "tray-chip drink-chip";
+          chip.textContent = `${drink.emoji} ${drink.name}`;
+          contents.append(chip);
+        }
+        const preview = $("cup-preview");
+        preview.replaceChildren();
+        if (total === 0 && trayDrink) {
+          const drink = drinkFor(trayDrink);
+          const cup = document.createElement("div");
+          cup.className = "cup-empty";
+          const emoji = document.createElement("span");
+          emoji.textContent = drink.emoji;
+          emoji.setAttribute("aria-hidden", "true");
+          const name = document.createElement("span");
+          name.textContent = drink.name;
+          cup.append(emoji, name);
+          preview.append(cup);
+        } else if (total === 0) {
+          const empty = document.createElement("div");
+          empty.className = "cup-empty";
+          empty.innerHTML = '<span aria-hidden="true">🥡</span><span>Walang laman pa ang cup</span>';
+          preview.append(empty);
+        } else {
+          Object.entries(tray).forEach(([id, quantity]) => {
+            const food = foodFor(id);
+            for (let index = 0; index < Math.min(quantity, 3); index += 1) {
+              const skewer = document.createElement("div");
+              skewer.className = "skewer";
+              skewer.setAttribute("aria-hidden", "true");
+              const emoji = document.createElement("span");
+              emoji.className = "skewer-emoji";
+              emoji.textContent = food.emoji;
+              skewer.append(emoji);
+              preview.append(skewer);
+            }
+          });
+        }
+        $("tray-total").textContent = preparedTotal()
+          ? `${preparedTotal()} item${preparedTotal() === 1 ? "" : "s"} ${preparedTotal() >= trayCapacity() ? "• punô na!" : ""}`
+          : "Wala pang laman ang cup";
+        $("clear-button").disabled = total === 0 && !selectedSauce && !trayDrink;
+        $("order-summary-text").textContent = order
+          ? `${orderTotal()} piraso${order.drink ? ` + 1 ${drinkFor(order.drink).name}` : ""} • ${SAUCES.find(sauce => sauce.id === order.sauce).name}`
+          : "Handa ka na? Ihambing ang order bago ihain.";
+        $("earnings-preview").textContent = `Suki tip hanggang ₱${order ? 8 : 0}`;
+      }
+
+      function renderStats() {
+        $("served-display").textContent = String(state.served);
+        $("streak-display").textContent = `${state.streak} 🔥`;
+      }
+
+      function renderAll() {
+        renderHeader();
+        renderCustomer();
+        renderFood();
+        renderDrinks();
+        renderSauces();
+        renderTray();
+        renderSanitation();
+        renderStats();
+      }
+
+      function generateOrder() {
+        const foods = availableFoods();
+        const location = LOCATIONS.find(item => item.id === state.location);
+        const twoItemChance = location?.id === "school" ? .5 : location?.id === "terminal" ? .46 : .36;
+        const requestedCount = Math.random() < twoItemChance && foods.length > 1 ? 2 : 1;
+        let shuffled = [...foods].sort(() => Math.random() - .5);
+        const eligibleVips = [
+          ...(state.level >= 2 ? [{ id: "marites", name: "Tsismosa Marites", emoji: "💬", perk: "Perfect order reveals 3 orders ahead" }] : []),
+          ...(state.level >= 3 ? [{ id: "tanod", name: "Barangay Tanod", emoji: "🛡️", perk: "Keeps buraut away habang nandito" }] : []),
+          ...(state.level >= 4 ? [{ id: "rich", name: "Rich Suki", emoji: "💎", perk: "Doble ang bayad sa premium tusok-tusok" }] : [])
+        ];
+        const vipChance = Math.min(.32, eligibleVips.length * .04 + Math.max(0, state.level - 4) * .02);
+        const vipRoll = Math.random();
+        let vip = null;
+        if (vipChance > 0 && vipRoll < vipChance) vip = eligibleVips[Math.floor(Math.random() * eligibleVips.length)];
+        if (vip?.id === "rich" && foods.some(item => item.id === "kikiam" || item.id === "calamares")) {
+          const premium = foods.filter(item => item.id === "kikiam" || item.id === "calamares");
+          shuffled = [...premium, ...shuffled.filter(item => !premium.includes(item))];
+        }
+        const items = {};
+        for (let index = 0; index < requestedCount; index += 1) {
+          items[shuffled[index].id] = 1 + Math.floor(Math.random() * 3);
+        }
+        let drink = null;
+        const unlockedDrinks = DRINKS.filter(item => state.unlockedDrinks.includes(item.id));
+        if (unlockedDrinks.length && Math.random() < .32) {
+          drink = unlockedDrinks[Math.floor(Math.random() * unlockedDrinks.length)].id;
+        }
+        const sauces = availableSauces();
+        return {
+          customer: vip?.name || CUSTOMER_NAMES[Math.floor(Math.random() * CUSTOMER_NAMES.length)],
+          items,
+          drink,
+          sauce: sauces[Math.floor(Math.random() * sauces.length)].id,
+          vip,
+          creditOffer: !vip && Math.random() < .18
+        };
+      }
+
+      function nextCustomer() {
+        window.clearTimeout(arrivalTimer);
+        order = null;
+        tray = {};
+        trayDrink = null;
+        selectedSauce = null;
+        renderAll();
+        const spawnRate = currentWeather === "rainy" ? 1250 : currentWeather === "rush" ? 800 : 1000;
+        arrivalTimer = window.setTimeout(() => {
+          order = nextOrders.length ? nextOrders.shift() : generateOrder();
+          patienceMax = orderDuration();
+          patience = patienceMax;
+          renderAll();
+        }, spawnRate);
+      }
+
+      function advancePreview() {
+        if (!discoveredOrders.length) return;
+        discoveredOrders.shift();
+        while (nextOrders.length < 3) nextOrders.push(generateOrder());
+        discoveredOrders = nextOrders.slice(0, 3);
+      }
+
+      function changeFood(id, change) {
+        const item = foodFor(id);
+        if (!item || !state.unlockedItems.includes(id)) return;
+        const next = (tray[id] || 0) + change;
+        if (next > 0 && change > 0 && preparedTotal() >= trayCapacity()) {
+          announce(`Kasya lang ang ${trayCapacity()} piraso sa cup.`, "error");
+          return;
+        }
+        if (next > 9) {
+          announce("Hanggang 9 piraso lang ng bawat pagkain sa isang cup.", "error");
+          return;
+        }
+        if (next > 0) tray[id] = next;
+        else delete tray[id];
+        if (change > 0) {
+          playSfx("fry");
+          if (!state.upgrades.security && order.vip?.id !== "tanod" && trayTotal() > 0 && Math.random() < .018) {
+            const stolen = Object.keys(tray).find(foodId => tray[foodId] > 0);
+            if (stolen) {
+              tray[stolen] -= 1;
+              if (!tray[stolen]) delete tray[stolen];
+              announce("Ay! May buraut na dumukot sa cup! Mag-ingat sa kariton.", "error");
+              playSfx("error");
+            }
+          }
+        }
+        renderFood();
+        renderTray();
+        if (change > 0) {
+          const card = $("food-grid").querySelector(`[data-food="${id}"][data-change="1"]`)?.closest(".food-card");
+          if (card) {
+            card.classList.add("prepping");
+            window.setTimeout(() => card.classList.remove("prepping"), state.upgrades.fryer ? 320 : 400);
+          }
+        }
+      }
+
+      function changeDrink(id) {
+        if (!state.unlockedDrinks.includes(id)) return;
+        trayDrink = trayDrink === id ? null : id;
+        playSfx("splash");
+        renderDrinks();
+        renderTray();
+      }
+
+      function clearTray() {
+        tray = {};
+        trayDrink = null;
+        selectedSauce = null;
+        renderFood();
+        renderDrinks();
+        renderSauces();
+        renderTray();
+        playSfx("clear");
+        announce("Na-clear na ang order tray.", "info");
+      }
+
+      function isOrderCorrect() {
+        if (selectedSauce !== order.sauce || trayDrink !== (order.drink || null)) return false;
+        const orderedIds = Object.keys(order.items);
+        const preparedIds = Object.keys(tray).filter(id => tray[id] > 0);
+        return orderedIds.length === preparedIds.length
+          && orderedIds.every(id => tray[id] === order.items[id]);
+      }
+
+      function awardXp(amount) {
+        const unlocked = [];
+        state.xp += amount;
+        while (state.xp >= levelRequirement()) {
+          state.xp -= levelRequirement();
+          state.level += 1;
+          if (state.level <= MAX_LEVEL) {
+            FOODS.filter(item => item.unlock === state.level).forEach(item => {
+              if (!state.unlockedItems.includes(item.id)) {
+                state.unlockedItems.push(item.id);
+                unlocked.push({ emoji: item.emoji, name: item.name, detail: `${item.name} is now on your menu!` });
+              }
+            });
+            SAUCES.filter(sauce => sauce.unlock === state.level).forEach(sauce => {
+              if (!state.unlockedSauces.includes(sauce.id)) {
+                state.unlockedSauces.push(sauce.id);
+                unlocked.push({ emoji: sauce.emoji, name: sauce.name, detail: `${sauce.name} is now available for your suki!` });
+              }
+            });
+            DRINKS.filter(drink => drink.unlock === state.level).forEach(drink => {
+              if (!state.unlockedDrinks.includes(drink.id)) {
+                state.unlockedDrinks.push(drink.id);
+                unlocked.push({ emoji: drink.emoji, name: drink.name, detail: `${drink.name} palamig is now on your combo menu!` });
+              }
+            });
+            const vipUnlocks = {
+              2: { emoji: "💬", name: "Tsismosa Marites", detail: "May tsismis na ang susunod na 3 customer orders!" },
+              3: { emoji: "🛡️", name: "Barangay Tanod", detail: "May security boost ang kariton kapag bumisita si Tanod!" },
+              4: { emoji: "💎", name: "Rich Suki", detail: "May premium buyer ka na—double coins sa Kikiam at Calamares!" }
+            };
+            if (vipUnlocks[state.level]) unlocked.push(vipUnlocks[state.level]);
+          }
+        }
+        return unlocked;
+      }
+
+      function showLevelUp(unlocks) {
+        $("level-title").textContent = `Level ${state.level}! 🎊`;
+        $("level-description").textContent = `Ang galing, ${vendorDisplayName()}! Mas sumisikat na ang iyong kariton.`;
+        const list = $("unlock-list");
+        list.replaceChildren();
+        if (!unlocks.length) {
+          const message = document.createElement("div");
+          message.className = "nothing-new";
+          message.textContent = "Mas marami ka pang suki, mas marami ka pang kita! Tuloy ang sipag at benta.";
+          list.append(message);
+        } else {
+          unlocks.forEach(item => {
+            const row = document.createElement("div");
+            row.className = "unlock-row";
+            row.innerHTML = `<span aria-hidden="true">${item.emoji}</span><span><strong>${item.name}</strong><small>${item.detail}</small></span>`;
+            list.append(row);
+          });
+        }
+        $("level-modal").hidden = false;
+        playSfx("level");
+        $("level-dismiss").focus();
+      }
+
+      function completeServe(onCredit = false) {
+        const previousLevel = state.level;
+        const itemsCount = orderTotal();
+        const baseCoins = Object.entries(order.items).reduce((sum, [id, quantity]) => {
+          const premiumDouble = order.vip?.id === "rich" && (id === "kikiam" || id === "calamares");
+          const price = Math.ceil(foodFor(id).price * (state.healthSeal ? 1.15 : 1));
+          return sum + price * quantity * (premiumDouble ? 2 : 1);
+        }, 0);
+        const drinkPrice = order.drink ? Math.ceil(drinkFor(order.drink).price * (state.healthSeal ? 1.15 : 1)) : 0;
+        const comboBonus = order.drink ? 12 : 0;
+        const quickTip = patience >= patienceMax * .55 ? 8 : patience >= patienceMax * .25 ? 4 : 0;
+        const locationBonus = LOCATIONS.find(item => item.id === state.location)?.tipBonus || 1;
+        const tip = Math.round(quickTip * locationBonus);
+        const spicyRainBonus = currentWeather === "rainy" && order.sauce === "spicy" ? Math.round(baseCoins * .5) : 0;
+        const earnedCoins = baseCoins + drinkPrice + comboBonus + tip + spicyRainBonus;
+        const earnedXp = 35 + (order.drink ? 10 : 0);
+
+        if (onCredit) {
+          const bill = baseCoins + drinkPrice + comboBonus;
+          state.goodwill = Math.min(100, state.goodwill + 10);
+          state.credits.push({
+            id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            customer: order.customer,
+            amount: bill,
+            createdDay: todayKey(),
+            dueAt: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1).getTime(),
+            reminded: false
+          });
+        } else {
+          state.coins += earnedCoins;
+          updateQuestProgress("earnings", earnedCoins);
+        }
+
+        updateQuestProgress("fishballs", order.items.fishball || 0);
+        if (order.sauce === "spicy") updateQuestProgress("spicy", 1);
+        state.served += 1;
+        state.streak += 1;
+        state.sanitation = Math.max(0, state.sanitation - itemsCount * 3);
+        served = state.served;
+        streak = state.streak;
+        updateQuestProgress("streak", state.streak);
+
+        if (order.vip?.id === "marites") {
+          nextOrders = [generateOrder(), generateOrder(), generateOrder()];
+          discoveredOrders = nextOrders.slice();
+        } else if (discoveredOrders.length) {
+          advancePreview();
+        }
+
+        const unlocks = awardXp(earnedXp);
+        persist();
+        renderAll();
+        if (state.level > previousLevel) showLevelUp(unlocks);
+        if (!onCredit) playSfx("cash");
+        const tipMessage = tip ? ` (may ₱${tip} tip!)` : "";
+        const weatherMessage = spicyRainBonus ? ` +₱${spicyRainBonus} rainy spicy bonus!` : "";
+        announce(onCredit
+          ? `Naka-lista kay ${order.customer}! +10 goodwill at +${earnedXp} XP.`
+          : `Ayos! ₱${earnedCoins}${tipMessage}${weatherMessage} at +${earnedXp} XP. Salamat, suki!`);
+        nextCustomer();
+        if ($("quests-modal").hidden === false) renderQuests();
+        if ($("shop-modal").hidden === false) renderShop();
+        renderSanitation();
+        if (Math.random() < .12) {
+          window.setTimeout(() => {
+            if ($("home-screen").hidden && $("level-modal").hidden && $("credit-offer-modal").hidden) inspectCart();
+          }, 450);
+        }
+      }
+
+      function serveOrder() {
+        if (!trayTotal()) {
+          announce("Pumili muna ng tusok-tusok para sa order!", "error");
+          return;
+        }
+        if (!selectedSauce) {
+          announce("Piliin muna ang tamang sawsawan para sa suki.", "error");
+          return;
+        }
+        if (!isOrderCorrect()) {
+          streak = 0;
+          state.streak = 0;
+          state.quests.streak = 0;
+          persist();
+          patience = Math.max(0, patience - 12);
+          $("customer-footer").innerHTML = '<span aria-hidden="true">🤔</span><span>Hindi ito ang order ko, kuya! Pakitingnan ulit.</span>';
+          renderPatience();
+          renderStats();
+          renderQuests();
+          playSfx("error");
+          announce("Hindi tugma ang pagkain o sawsawan. Ayusin muna ang order!", "error");
+          return;
+        }
+        if (order.creditOffer) {
+          pendingCredit = true;
+          const estimate = Object.entries(order.items).reduce((sum, [id, count]) => sum + foodFor(id).price * count, 0);
+          $("credit-offer-description").textContent = `${order.customer} is a regular suki. Ililista ang ₱${estimate} at dagdag +10 neighborhood goodwill. Babayaran ito bukas, plus tip.`;
+          $("credit-offer-modal").hidden = false;
+          $("credit-accept").focus();
+          return;
+        }
+        completeServe(false);
+      }
+
+      function advanceWeather() {
+        const previousWeather = currentWeather;
+        currentWeather = currentWeather === "sunny" ? "rainy" : currentWeather === "rainy" ? "rush" : "sunny";
+        weatherSeconds = currentWeather === "rush" ? 0 : 60;
+        rushSeconds = currentWeather === "rush" ? 45 : 0;
+        applyWeatherChange(previousWeather);
+        announce(currentWeather === "rush" ? "🔔 Student rush! Customer timer is faster for 45 seconds!" : currentWeather === "rainy" ? "🌧️ Umuulan! Mas mahaba ang customer patience, at bonus ang spicy orders." : "☀️ Maaraw sa Quiapo! Tara, benta na!", "info");
+      }
+
+      function applyWeatherChange(previousWeather) {
+        if (previousWeather === currentWeather) return;
+        if (order) {
+          if (currentWeather === "rainy" && previousWeather !== "rainy") patience += Math.round(patienceMax * .2);
+          patienceMax = orderDuration();
+          patience = Math.min(patience, patienceMax);
+        }
+        renderHeader();
+        renderPatience();
+      }
+
+      function useRushExtension() {
+        if (currentWeather !== "rush" || state.upgrades.timeCharges < 1) return;
+        state.upgrades.timeCharges -= 1;
+        patience += 10;
+        patienceMax += 10;
+        persist();
+        renderHeader();
+        renderPatience();
+        announce("Rush extension activated! +10 segundo para sa order na ito.");
+      }
+
+      function processDueCredits() {
+        const day = todayKey();
+        const remaining = [];
+        state.credits.forEach(credit => {
+          if (credit.createdDay === day || credit.dueAt > Date.now() || credit.reminded || credit.forgotten) {
+            remaining.push(credit);
+            return;
+          }
+          if (Math.random() < .1) {
+            credit.reminded = false;
+            credit.forgotten = true;
+            remaining.push(credit);
+            return;
+          }
+          const repayment = credit.amount + Math.max(1, Math.round(credit.amount * .1));
+          state.coins += repayment;
+          state.quests.earnings = Math.min(QUEST_DEFINITIONS.find(quest => quest.id === "earnings").target, state.quests.earnings + repayment);
+        });
+        state.credits = remaining;
+        if (state.credits.some(credit => credit.dueAt <= Date.now())) announce("May utang nang due. Buksan ang Lista at paalalahanan ang suki!", "info");
+        persist();
+      }
+
+      function renderCredits() {
+        $("credit-goodwill").textContent = `Neighborhood goodwill: ${state.goodwill}% · ${state.credits.length} unpaid ${state.credits.length === 1 ? "bill" : "bills"}`;
+        const list = $("ledger-list");
+        list.replaceChildren();
+        if (!state.credits.length) {
+          const empty = document.createElement("div");
+          empty.className = "nothing-new";
+          empty.textContent = "Wala pang utang sa listahan. Alagaan ang mga suki mo!";
+          list.append(empty);
+          return;
+        }
+        state.credits.forEach(credit => {
+          const card = document.createElement("article");
+          card.className = "ledger-card";
+          const due = credit.dueAt <= Date.now() ? "Bayaran na" : `Due ${new Date(credit.dueAt).toLocaleDateString()}`;
+          const forgot = credit.forgotten ? " · Nakalimot ang suki—paalalahanan para makabawi." : "";
+          const heading = document.createElement("div");
+          heading.className = "ledger-top";
+          const customer = document.createElement("strong");
+          customer.className = "shop-title";
+          customer.textContent = `📝 ${credit.customer}`;
+          const amount = document.createElement("strong");
+          amount.className = "shop-cost";
+          amount.textContent = `₱${credit.amount}`;
+          heading.append(customer, amount);
+          const details = document.createElement("div");
+          details.className = "ledger-detail";
+          details.textContent = `${due}${forgot} · Bayaran plus 10% tip.`;
+          const remind = document.createElement("button");
+          remind.className = "shop-buy ledger-remind";
+          remind.type = "button";
+          remind.dataset.remind = credit.id;
+          remind.textContent = "Paalalahanan at singilin";
+          card.append(heading, details, remind);
+          list.append(card);
+        });
+      }
+
+      function remindCredit(id) {
+        const index = state.credits.findIndex(credit => credit.id === id);
+        if (index < 0) return;
+        const [credit] = state.credits.splice(index, 1);
+        const repayment = credit.amount + Math.max(1, Math.round(credit.amount * .1));
+        state.coins += repayment;
+        state.quests.earnings = Math.min(QUEST_DEFINITIONS.find(quest => quest.id === "earnings").target, state.quests.earnings + repayment);
+        persist();
+        renderAll();
+        renderCredits();
+        announce(`${credit.customer} paid ₱${repayment}, kasama na ang tip!`);
+        playSfx("cash");
+      }
+
+      function inspectCart() {
+        if (!$("inspection-modal").hidden) return;
+        const oilClean = state.sanitation >= 70;
+        const sauceCovered = state.jarCovered;
+        const passed = oilClean && sauceCovered;
+        const checks = $("inspection-checks");
+        checks.replaceChildren();
+        [
+          { label: "Clean Oil Gauge", pass: oilClean, detail: `${Math.round(state.sanitation)}% clean (70% required)` },
+          { label: "Covered Sauce Jars", pass: sauceCovered, detail: sauceCovered ? "Sawsawan are covered and protected." : "Cover your sauce jars before inspection." }
+        ].forEach(check => {
+          const row = document.createElement("div");
+          row.className = `inspection-check ${check.pass ? "pass" : "fail"}`;
+          const label = document.createElement("span");
+          label.textContent = check.label;
+          const result = document.createElement("span");
+          result.textContent = `${check.pass ? "✅ PASS" : "❌ FAIL"} · ${check.detail}`;
+          row.append(label, result);
+          checks.append(row);
+        });
+        const result = $("inspection-result");
+        result.replaceChildren();
+        $("inspection-description").textContent = passed
+          ? "Malinis na malinis ang iyong kariton! May opisyal ka nang Health Seal."
+          : "Hindi pa pumapasa ang kariton. Linisin ang mantika at takpan ang mga garapon, saka subukan ulit.";
+        if (passed && !state.healthSeal) {
+          state.healthSeal = true;
+          const seal = document.createElement("div");
+          seal.className = "health-seal";
+          seal.textContent = "🏅 OFFICIAL BARANGAY HEALTH SEAL! Permanenteng +15% selling price sa lahat ng pagkain at palamig.";
+          result.append(seal);
+          persist();
+          renderAll();
+          announce("Pumasa sa health inspection! +15% selling prices permanently!");
+          playSfx("claim");
+        } else if (passed) {
+          const seal = document.createElement("div");
+          seal.className = "health-seal";
+          seal.textContent = "🏅 May Health Seal ka na! +15% selling prices ay active na.";
+          result.append(seal);
+        } else {
+          playSfx("error");
+        }
+        $("inspection-modal").hidden = false;
+        $("inspection-dismiss").focus();
+      }
+
+      function cleanOil() {
+        if (state.sanitation >= 100) return;
+        state.sanitation = Math.min(100, state.sanitation + 35);
+        persist();
+        renderSanitation();
+        announce("Malinis na ulit ang mantika. Salamat sa pag-aalaga ng kariton!");
+      }
+
+      function homeSettingsToggle(kind) {
+        toggleAudio(kind);
+        openHomeSettings();
+      }
+
+      function restoreSavedSettings() {
+        $("settings-bgm-toggle").textContent = state.sound.bgm ? "ON" : "OFF";
+        $("settings-bgm-toggle").setAttribute("aria-pressed", String(state.sound.bgm));
+        $("settings-sfx-toggle").textContent = state.sound.sfx ? "ON" : "OFF";
+        $("settings-sfx-toggle").setAttribute("aria-pressed", String(state.sound.sfx));
+        $("language-select").value = state.language;
+      }
+
+      function tick() {
+        if (ensureQuestDay()) {
+          renderQuests();
+          processDueCredits();
+        }
+        if (!$("home-screen").hidden) return;
+        const previousWeather = currentWeather;
+        if (currentWeather === "rush") {
+          rushSeconds -= 1;
+          if (rushSeconds <= 0) {
+            currentWeather = "sunny";
+            weatherSeconds = 60;
+            applyWeatherChange(previousWeather);
+          } else {
+            renderHeader();
+          }
+        } else {
+          weatherSeconds -= 1;
+          if (weatherSeconds <= 0) advanceWeather();
+        }
+        if (!order || ["setup-modal", "level-modal", "quests-modal", "shop-modal", "credit-modal", "credit-offer-modal"].some(id => !$(id).hidden)) return;
+        patience -= 1;
+        renderPatience();
+        if (!state.upgrades.security && order.vip?.id !== "tanod" && trayTotal() > 0 && Math.random() < .0015) {
+          const stolen = Object.keys(tray).find(id => tray[id] > 0);
+          if (stolen) {
+            tray[stolen] -= 1;
+            if (tray[stolen] <= 0) delete tray[stolen];
+            renderFood();
+            renderTray();
+            announce("May buraut! Nawala ang isang tusok-tusok sa cup.", "error");
+            playSfx("error");
+          }
+        }
+        if (patience <= 0) {
+          streak = 0;
+          state.streak = 0;
+          state.quests.streak = 0;
+          advancePreview();
+          state.coins = Math.max(0, state.coins - 5);
+          persist();
+          renderHeader();
+          renderStats();
+          renderQuests();
+          playSfx("error");
+          announce("Nainip ang suki! Nawalan ka ng ₱5. Bilisan natin ang susunod!", "error");
+          nextCustomer();
+        }
+      }
+
+      function openSetup(editing) {
+        isSetupEditing = editing;
+        $("setup-description").textContent = editing
+          ? "I-update ang iyong pangalan at tindero. Maaari mo ring i-reset ang iyong negosyo."
+          : "Pumili ng pangalan at tindero. Simulan na natin ang iyong Pinoy street food adventure!";
+        $("setup-submit").innerHTML = editing
+          ? "I-save ang pagbabago <span aria-hidden=\"true\">→</span>"
+          : 'Simulan ang negosyo! <span aria-hidden="true">→</span>';
+        $("setup-submit").classList.toggle("green-submit", editing);
+        $("setup-cancel").hidden = !editing;
+        $("reset-progress-button").hidden = !editing;
+        $("vendor-name-input").value = editing ? state.cartName : "";
+        selectVendor(editing ? state.vendor : state.vendor);
+        $("setup-modal").hidden = false;
+        window.setTimeout(() => $(setupFocus).focus(), 0);
+      }
+
+      function selectVendor(vendor) {
+        if (!Object.hasOwn(VENDORS, vendor)) return;
+        document.querySelectorAll(".vendor-option").forEach(button => {
+          const selected = button.dataset.vendor === vendor;
+          button.classList.toggle("selected", selected);
+          button.setAttribute("aria-pressed", String(selected));
+        });
+      }
+
+      function saveSetup() {
+        const name = $("vendor-name-input").value.trim();
+        if (!name) {
+          announce("Ilagay muna ang pangalan ng iyong kariton.", "error");
+          $("vendor-name-input").focus();
+          return;
+        }
+        const selected = document.querySelector(".vendor-option.selected");
+        const vendor = selected?.dataset.vendor;
+        if (!vendor || !Object.hasOwn(VENDORS, vendor)) {
+          announce("Pumili muna ng tindero para sa iyong kariton.", "error");
+          return;
+        }
+        state.cartName = name.slice(0, 36);
+        state.vendor = vendor;
+        state.setupComplete = true;
+        if (!persist()) return;
+        $("setup-modal").hidden = true;
+        renderHeader();
+        if (!isSetupEditing) announce(`Mabuhay! Welcome sa ${state.cartName}!`);
+        isSetupEditing = false;
+        if (!order && $("home-screen").hidden) nextCustomer();
+      }
+
+      function resetProgress() {
+        const confirmed = window.confirm("Sigurado ka bang gusto mong i-reset ang lahat ng progress, coins, level, at vendor settings? Hindi na ito maibabalik.");
+        if (!confirmed) return;
+        window.localStorage.removeItem(STORAGE_KEY);
+        window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        savedProgressExists = false;
+        state = initialState();
+        window.clearTimeout(bgmTimer);
+        bgmTimer = null;
+        currentWeather = "sunny";
+        weatherSeconds = 60;
+        rushSeconds = 0;
+        nextOrders = [];
+        discoveredOrders = [];
+        served = 0;
+        streak = 0;
+        order = null;
+        tray = {};
+        trayDrink = null;
+        selectedSauce = null;
+        renderAll();
+        updateHomeSave();
+        $("setup-modal").hidden = true;
+        announce("Na-reset na ang progress mo. Pumili ng bagong vendor para magsimula ulit.", "info");
+        openSetup(false);
+      }
+
+      function hasSavedGame() {
+        return state.setupComplete || state.served > 0 || state.level > 1 || state.coins > 0;
+      }
+
+      function leaveHome(startNew) {
+        const home = $("home-screen");
+        home.classList.add("is-leaving");
+        window.setTimeout(() => {
+          home.hidden = true;
+          home.classList.remove("is-leaving");
+          $("game-screen").classList.remove("game-enter");
+          void $("game-screen").offsetWidth;
+          $("game-screen").classList.add("game-enter");
+          if (startNew) openSetup(false);
+        }, 360);
+      }
+
+      function startNewGame() {
+        if ((savedProgressExists || hasSavedGame()) && !window.confirm("Magsisimula ka ba sa Level 1? Mabubura ang lumang save file.")) return;
+        window.localStorage.removeItem(STORAGE_KEY);
+        window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        savedProgressExists = false;
+        window.clearTimeout(arrivalTimer);
+        window.clearTimeout(bgmTimer);
+        bgmTimer = null;
+        state = initialState();
+        setLanguage("en");
+        savedProgressExists = false;
+        served = 0;
+        streak = 0;
+        nextOrders = [];
+        discoveredOrders = [];
+        order = null;
+        tray = {};
+        trayDrink = null;
+        selectedSauce = null;
+        renderAll();
+        updateHomeSave();
+        leaveHome(true);
+      }
+
+      function continueGame() {
+        if (!(savedProgressExists || hasSavedGame())) return;
+        const previousHome = $("home-screen");
+        previousHome.classList.add("is-leaving");
+        window.setTimeout(() => {
+          previousHome.hidden = true;
+          previousHome.classList.remove("is-leaving");
+          $("game-screen").classList.remove("game-enter");
+          void $("game-screen").offsetWidth;
+          $("game-screen").classList.add("game-enter");
+          if (!state.setupComplete) openSetup(false);
+          else if (!order) nextCustomer();
+        }, 360);
+      }
+
+      function openHomeSettings() {
+        $("settings-bgm-toggle").textContent = state.sound.bgm ? "ON" : "OFF";
+        $("settings-bgm-toggle").setAttribute("aria-pressed", String(state.sound.bgm));
+        $("settings-sfx-toggle").textContent = state.sound.sfx ? "ON" : "OFF";
+        $("settings-sfx-toggle").setAttribute("aria-pressed", String(state.sound.sfx));
+        $("language-select").value = state.language;
+        $("home-settings-modal").hidden = false;
+      }
+
+      function resetHomeProgress() {
+        if (!window.confirm("Sigurado ka bang burahin ang buong save file at magsimula ulit? Hindi na ito maibabalik.")) return;
+        window.localStorage.removeItem(STORAGE_KEY);
+        window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        savedProgressExists = false;
+        window.clearTimeout(arrivalTimer);
+        window.clearTimeout(bgmTimer);
+        bgmTimer = null;
+        state = initialState();
+        served = 0;
+        streak = 0;
+        order = null;
+        tray = {};
+        trayDrink = null;
+        selectedSauce = null;
+        nextOrders = [];
+        discoveredOrders = [];
+        currentWeather = "sunny";
+        weatherSeconds = 60;
+        rushSeconds = 0;
+        renderAll();
+        updateHomeSave();
+        $("home-screen").hidden = false;
+        $("home-settings-modal").hidden = true;
+        renderHomeArt();
+        setLanguage(state.language);
+        window.localStorage.removeItem(STORAGE_KEY);
+        window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        savedProgressExists = false;
+        updateHomeSave();
+        announce("Na-reset na ang lahat. Handa ka nang magsimula ulit.", "info");
+      }
+
+      function renderHomeArt() {
+        const previews = document.querySelectorAll(".home-vendor");
+        const vendors = [
+          { name: "MANONG BOY" },
+          { name: "ATE BEBANG" },
+          { name: "BOSSING" },
+          { name: "ALING NENA" }
+        ];
+        previews.forEach((preview, index) => {
+          preview.lastElementChild.textContent = vendors[index].name;
+        });
+      }
+
+      function wireEvents() {
+        $("food-grid").addEventListener("click", event => {
+          const button = event.target.closest("button[data-food]");
+          if (button && !button.disabled) {
+            playSfx("click");
+            changeFood(button.dataset.food, Number(button.dataset.change));
+          }
+        });
+        $("drink-grid").addEventListener("click", event => {
+          const button = event.target.closest("button[data-drink]");
+          if (button && !button.disabled) {
+            playSfx("click");
+            changeDrink(button.dataset.drink);
+          }
+        });
+        $("sauce-grid").addEventListener("click", event => {
+          const button = event.target.closest("button[data-sauce]");
+          if (!button || button.disabled) return;
+          selectedSauce = selectedSauce === button.dataset.sauce ? null : button.dataset.sauce;
+          playSfx("splash");
+          renderSauces();
+          renderTray();
+        });
+        $("clear-button").addEventListener("click", clearTray);
+        $("serve-button").addEventListener("click", serveOrder);
+        $("settings-button").addEventListener("click", () => openSetup(true));
+        $("new-game-button").addEventListener("click", startNewGame);
+        $("continue-button").addEventListener("click", continueGame);
+        $("home-settings-button").addEventListener("click", openHomeSettings);
+        $("settings-bgm-toggle").addEventListener("click", () => homeSettingsToggle("bgm"));
+        $("settings-sfx-toggle").addEventListener("click", () => homeSettingsToggle("sfx"));
+        $("language-select").addEventListener("change", event => setLanguage(event.target.value));
+        $("home-reset-button").addEventListener("click", resetHomeProgress);
+        $("clean-oil-button").addEventListener("click", cleanOil);
+        $("jar-cover-button").addEventListener("click", () => {
+          state.jarCovered = !state.jarCovered;
+          persist();
+          renderSanitation();
+          announce(state.jarCovered ? "Tinakpan na ang mga sawsawan." : "Nabuksan ang mga sawsawan.", "info");
+        });
+        $("inspection-button").addEventListener("click", inspectCart);
+        $("inspection-dismiss").addEventListener("click", () => {
+          $("inspection-modal").hidden = true;
+          $("serve-button").focus();
+        });
+        $("bgm-toggle").addEventListener("click", () => toggleAudio("bgm"));
+        $("sfx-toggle").addEventListener("click", () => toggleAudio("sfx"));
+        $("quests-button").addEventListener("click", () => {
+          renderQuests();
+          $("quests-modal").hidden = false;
+        });
+        $("shop-button").addEventListener("click", () => {
+          renderShop();
+          $("shop-modal").hidden = false;
+        });
+        $("credit-button").addEventListener("click", () => {
+          renderCredits();
+          $("credit-modal").hidden = false;
+        });
+        $("weather-button").addEventListener("click", advanceWeather);
+        $("rush-extension").addEventListener("click", useRushExtension);
+        $("location-select").addEventListener("change", event => {
+          const location = LOCATIONS.find(item => item.id === event.target.value);
+          if (!location || !availableLocation(location.id)) {
+            renderHeader();
+            announce("Buksan muna ang bagong location sa Cart Shop.", "error");
+            return;
+          }
+          state.location = location.id;
+          persist();
+          renderHeader();
+          renderShop();
+          announce(`Bagong pwesto: ${location.name}!`);
+        });
+        $("quest-list").addEventListener("click", event => {
+          const button = event.target.closest("button[data-claim]");
+          if (button) claimQuest(button.dataset.claim);
+        });
+        $("quests-refresh").addEventListener("click", () => {
+          if (!window.confirm("I-reset ang Daily Quests para subukan ulit? Mawawala ang progress at mga na-claim ngayong araw.")) return;
+          state.quests = defaultQuests(todayKey());
+          persist();
+          renderQuests();
+          announce("Bagong quest progress na! Tara ulit!", "info");
+        });
+        $("shop-tabs").addEventListener("click", event => {
+          const button = event.target.closest("button[data-category]");
+          if (!button) return;
+          shopCategory = button.dataset.category;
+          document.querySelectorAll(".shop-tab").forEach(tab => {
+            tab.classList.toggle("active", tab === button);
+            tab.setAttribute("aria-selected", String(tab === button));
+          });
+          renderShop();
+        });
+        $("shop-list").addEventListener("click", event => {
+          const button = event.target.closest("button[data-product]");
+          if (button && !button.disabled) purchaseShopItem(button.dataset.product);
+        });
+        $("ledger-list").addEventListener("click", event => {
+          const button = event.target.closest("button[data-remind]");
+          if (button) remindCredit(button.dataset.remind);
+        });
+        $("credit-decline").addEventListener("click", () => {
+          if (!pendingCredit) return;
+          $("credit-offer-modal").hidden = true;
+          pendingCredit = null;
+          completeServe(false);
+        });
+        $("credit-accept").addEventListener("click", () => {
+          if (!pendingCredit) return;
+          $("credit-offer-modal").hidden = true;
+          pendingCredit = null;
+          completeServe(true);
+        });
+        document.querySelectorAll("[data-close-modal]").forEach(button => button.addEventListener("click", () => {
+          $(button.dataset.closeModal).hidden = true;
+        }));
+        $("setup-submit").addEventListener("click", saveSetup);
+        $("reset-progress-button").addEventListener("click", resetProgress);
+        $("setup-cancel").addEventListener("click", () => {
+          $("setup-modal").hidden = true;
+          isSetupEditing = false;
+        });
+        $("vendor-options").addEventListener("click", event => {
+          const button = event.target.closest("button[data-vendor]");
+          if (button) selectVendor(button.dataset.vendor);
+        });
+        $("level-dismiss").addEventListener("click", () => {
+          $("level-modal").hidden = true;
+          $("serve-button").focus();
+        });
+        document.addEventListener("pointerdown", () => {
+          if (state.sound.bgm && bgmTimer === null) {
+            getAudioContext();
+            playMusicNote();
+          }
+        }, { once: false });
+        document.addEventListener("keydown", event => {
+          if (event.key !== "Escape") return;
+          for (const id of ["level-modal", "quests-modal", "shop-modal", "credit-modal"]) {
+            if (!$(`${id}`).hidden) {
+              $(`${id}`).hidden = true;
+              return;
+            }
+          }
+        });
+        $("vendor-name-input").addEventListener("keydown", event => {
+          if (event.key === "Enter") saveSetup();
+        });
+        document.addEventListener("keydown", event => {
+          if (event.key !== "Escape") return;
+          if (!$("home-settings-modal").hidden) $("home-settings-modal").hidden = true;
+          else if (!$("inspection-modal").hidden) $("inspection-modal").hidden = true;
+          else if (!$("level-modal").hidden) $("level-modal").hidden = true;
+          else if (!$("setup-modal").hidden && isSetupEditing) {
+            $("setup-modal").hidden = true;
+            isSetupEditing = false;
+          }
+        });
+        window.addEventListener("storage", event => {
+          if (event.key !== STORAGE_KEY || event.newValue === null) return;
+          try {
+            state = normalizeState(JSON.parse(event.newValue));
+            renderAll();
+            if (!$("quests-modal").hidden) renderQuests();
+            if (!$("shop-modal").hidden) renderShop();
+            if (!$("credit-modal").hidden) renderCredits();
+          } catch (error) {
+            console.error("Unable to sync Kainan Sim progress across tabs.", error);
+            announce("Hindi ma-sync ang progress mula sa kabilang tab.", "error");
+          }
+        });
+      }
+
+      function init() {
+        state = loadProgress();
+        served = state.served;
+        streak = state.streak;
+        ensureQuestDay();
+        processDueCredits();
+        order = null;
+        patience = 0;
+        patienceMax = orderDuration();
+        wireEvents();
+        renderHomeArt();
+        renderAll();
+        renderQuests();
+        $("home-screen").hidden = false;
+        $("game-screen").classList.remove("game-enter");
+        window.setInterval(tick, 1000);
+        setLanguage(state.language);
+      }
+
+      init();
+    })();
+  </script>
+  <script>
+    if ("serviceWorker" in navigator && /^https?:$/.test(window.location.protocol)) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch((error) => {
+          console.error("Unable to enable offline play for Kainan Sim.", error);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
