@@ -32,6 +32,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
     body { margin: 0; min-width: 320px; min-height: 100vh; color: var(--ink); background: var(--cream); }
     button, input { font: inherit; }
     button { color: inherit; }
@@ -51,10 +52,17 @@
     .icon-button { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--white); cursor: pointer; font-size: 17px; transition: background .15s, transform .15s; }
     .icon-button:hover { transform: translateY(-1px); background: #fffaf3; }
     .sound-toggle { display: flex; align-items: center; gap: 5px; width: auto; padding: 0 10px; color: #645144; font-size: 10px; font-weight: 800; }
+    .audio-controls { position: relative; }
+    .audio-controls summary { min-height: 38px; display: flex; align-items: center; gap: 5px; padding: 0 10px; border: 1px solid var(--line); border-radius: 12px; background: white; color: #645144; cursor: pointer; font-size: 10px; font-weight: 800; list-style: none; white-space: nowrap; }
+    .audio-controls summary::-webkit-details-marker { display: none; }
+    .audio-popover { position: absolute; z-index: 25; top: calc(100% + 8px); right: 0; width: 240px; display: grid; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: white; box-shadow: var(--shadow); }
+    .audio-popover label, .volume-control { display: grid; gap: 5px; color: #645144; font-size: 10px; font-weight: 800; }
+    .audio-popover input[type="range"], .volume-control input[type="range"] { width: 100%; accent-color: var(--terracotta); }
+    .volume-label { display: flex; justify-content: space-between; gap: 8px; }
+    .language-toggle { min-height: 38px; max-width: 130px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: #645144; font-size: 10px; font-weight: 800; }
     .game-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: -5px 0 16px; }
-    .tool-button, .weather-button, .location-select { min-height: 37px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 10px; background: white; color: #59483a; cursor: pointer; font-size: 10px; font-weight: 800; transition: border-color .15s, background .15s, transform .15s; }
-    .tool-button:hover, .weather-button:hover, .location-select:hover { transform: translateY(-1px); border-color: #e2b884; background: #fffaf4; }
-    .weather-button { color: #79532b; background: #fff7e8; }
+    .tool-button, .location-select { min-height: 37px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 10px; background: white; color: #59483a; cursor: pointer; font-size: 10px; font-weight: 800; transition: border-color .15s, background .15s, transform .15s; }
+    .tool-button:hover, .location-select:hover { transform: translateY(-1px); border-color: #e2b884; background: #fffaf4; }
     .rush-live { color: #a94331; border-color: #edc5b3; background: #fff0e8; animation: rush-pulse 1s ease-in-out infinite alternate; }
     .location-select { max-width: 180px; cursor: pointer; }
     .tool-spacer { flex: 1; }
@@ -89,13 +97,48 @@
     .scene-window::after { position: absolute; top: 48%; right: 0; left: 0; border-top: 3px solid #734538; content: ""; }
     .scene-counter { position: absolute; right: 0; bottom: 37px; left: 0; height: 33px; border-top: 5px solid #75402e; background: #cc8854; }
     .scene-counter::after { position: absolute; right: 16%; bottom: -26px; left: 16%; height: 25px; background: #75402e; content: ""; }
-    .customer-person { position: absolute; z-index: 2; bottom: 54px; left: 50%; width: 109px; height: 160px; transform: translateX(-50%); }
-    .customer-person .hair { position: absolute; top: 1px; left: 27px; width: 56px; height: 53px; border: 3px solid #382620; border-radius: 48% 47% 30% 35%; background: #39251f; transform: rotate(-5deg); }
-    .customer-person .face { position: absolute; top: 14px; left: 35px; width: 45px; height: 51px; border-radius: 47% 47% 45% 45%; background: #d99466; }
-    .customer-person .face::before { position: absolute; top: 24px; left: 10px; width: 4px; height: 4px; border-radius: 50%; background: #382620; box-shadow: 17px 0 #382620; content: ""; }
-    .customer-person .face::after { position: absolute; right: 15px; bottom: 10px; width: 12px; height: 5px; border-bottom: 2px solid #873d38; border-radius: 0 0 50% 50%; content: ""; }
-    .customer-person .body { position: absolute; top: 56px; left: 17px; width: 83px; height: 99px; border: 3px solid #743936; border-radius: 42% 42% 12px 12px; background: #dd6552; }
-    .customer-person .body::after { position: absolute; top: 10px; left: 25px; width: 25px; height: 47px; border: 2px solid #f1c276; border-radius: 0 0 9px 9px; background: #f5ead0; content: ""; }
+    .customer-person { --person-scale: 1; position: absolute; z-index: 2; bottom: 38px; left: 66%; width: 106px; height: 128px; transform: translateX(-50%) scale(var(--person-scale)); filter: drop-shadow(0 5px 5px rgb(69 37 23 / 28%)); transition: filter .25s ease; }
+    .customer-person svg { width: 100%; height: 100%; overflow: visible; }
+    .customer-person.impatient { transform: translateX(-50%) rotate(-3deg) scale(var(--person-scale)); filter: drop-shadow(0 5px 5px rgb(130 39 27 / 35%)) saturate(.84); }
+    .customer-person.arriving { animation: customer-enter .7s cubic-bezier(.16,.84,.34,1.18) both; }
+    .customer-person.waiting-idle { animation: customer-idle 2.4s ease-in-out infinite; }
+    .customer-person.happy { animation: customer-cheer .72s ease-out; }
+    .customer-person.rejecting { animation: customer-reject-exit .68s ease-in both; }
+    .customer-mood { position: absolute; z-index: 6; top: 88px; left: calc(66% + 34px); display: none; padding: 5px 7px; border: 2px solid white; border-radius: 50%; background: #fff5da; font-size: 17px; box-shadow: 0 3px 9px rgb(69 37 23 / 20%); }
+    .customer-scene[data-mood="impatient"] .customer-mood, .customer-scene[data-mood="happy"] .customer-mood, .customer-scene[data-mood="angry"] .customer-mood { display: block; }
+    .customer-scene[data-mood="impatient"] .customer-mood { background: #ffe2d9; }
+    .customer-scene[data-mood="happy"] .customer-mood { background: #e4f7d9; }
+    .customer-scene[data-mood="angry"] .customer-mood { background: #ffe0dc; animation: mood-pop .22s ease-out both; }
+    .customer-order-bubble { position: absolute; z-index: 5; top: 51px; left: 7px; display: grid; width: min(45%, 126px); gap: 3px; padding: 7px 8px; border: 2px solid #fff; border-radius: 12px 12px 12px 4px; background: #fffdf8; color: #744534; box-shadow: 0 4px 10px rgb(61 35 23 / 19%); pointer-events: none; }
+    .customer-order-bubble::after { position: absolute; bottom: -7px; left: 11px; width: 10px; height: 10px; transform: rotate(45deg); border-right: 2px solid #fff; border-bottom: 2px solid #fff; background: inherit; content: ""; }
+    .customer-order-bubble[hidden] { display: none; }
+    .bubble-label { color: #a75337; font-size: 8px; font-weight: 950; letter-spacing: .45px; }
+    .bubble-icons { display: flex; flex-wrap: wrap; gap: 3px; }
+    .bubble-item { padding: 2px 4px; border-radius: 99px; background: #f7eddd; font-size: 11px; font-weight: 850; white-space: nowrap; }
+    .customer-scene.is-arriving .customer-order-bubble { animation: bubble-pop .48s .22s cubic-bezier(.2,1.4,.55,1) both; }
+    .customer-scene.is-rejecting { animation: cart-reject .58s ease-in-out both; }
+    .customer-scene.is-rejecting .customer-order-bubble { border-color: #ffd1c9; background: #fff0ed; color: #a13530; }
+    .customer-scene.is-rejecting .bubble-label { color: #ba3d35; }
+    .customer-scene.is-celebrating { background: linear-gradient(165deg, #b9dfae 0%, #e7e4a6 37%, #b96a43 37%, #9e4a30 100%); }
+    .customer-scene.is-celebrating .customer-person { animation: customer-happy-depart .98s cubic-bezier(.2,.7,.25,1) both; }
+    .customer-scene.is-celebrating .customer-order-bubble { animation: bubble-pop .32s ease-out reverse both; }
+    .customer-fx { position: absolute; z-index: 7; top: 36%; left: 50%; width: 1px; height: 1px; pointer-events: none; }
+    .customer-fx .reward-particle { position: absolute; left: 0; display: block; color: #fff; font-size: 12px; font-weight: 950; text-shadow: 0 2px 4px #713e34, 0 0 3px #713e34; white-space: nowrap; animation: customer-reward-rise .95s ease-out both; }
+    .customer-fx .reward-particle:nth-child(1) { --drift: -34px; }
+    .customer-fx .reward-particle:nth-child(2) { --drift: 28px; animation-delay: .08s; }
+    .customer-fx .reward-particle:nth-child(3) { --drift: -8px; animation-delay: .16s; }
+    @keyframes customer-cheer { 25%, 62% { transform: translateX(-50%) translateY(-17px) rotate(5deg) scale(var(--person-scale)); } 45%, 80% { transform: translateX(-50%) translateY(-5px) rotate(-3deg) scale(var(--person-scale)); } }
+    @keyframes customer-idle { 0%, 100% { transform: translateX(-50%) scale(var(--person-scale)) translateY(0); } 50% { transform: translateX(-50%) scale(var(--person-scale)) translateY(-4px); } }
+    @keyframes customer-enter { 0% { transform: translateX(calc(-50% - 155px)) translateY(6px) scale(var(--person-scale)); opacity: 0; } 72% { transform: translateX(calc(-50% + 7px)) translateY(-3px) scale(var(--person-scale)); opacity: 1; } 100% { transform: translateX(-50%) scale(var(--person-scale)); opacity: 1; } }
+    @keyframes customer-reject-exit { 0%, 20% { transform: translateX(-50%) rotate(-7deg) scale(var(--person-scale)); opacity: 1; } 34%, 48% { transform: translateX(calc(-50% - 9px)) rotate(7deg) scale(var(--person-scale)); opacity: 1; } 100% { transform: translateX(calc(-50% - 180px)) translateY(10px) rotate(-17deg) scale(.78); opacity: 0; } }
+    @keyframes customer-happy-depart { 0%, 20% { transform: translateX(-50%) scale(var(--person-scale)); opacity: 1; } 32%, 49% { transform: translateX(-50%) translateY(-17px) rotate(4deg) scale(calc(var(--person-scale) * 1.08)); opacity: 1; } 40%, 58% { transform: translateX(-50%) translateY(-4px) rotate(-3deg) scale(var(--person-scale)); opacity: 1; } 100% { transform: translateX(calc(-50% + 180px)) translateY(6px) rotate(15deg) scale(.8); opacity: 0; } }
+    @keyframes bubble-pop { 0% { transform: scale(.35) translateY(10px); opacity: 0; } 75% { transform: scale(1.06) translateY(-2px); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+    @keyframes cart-reject { 0%, 100% { transform: translateX(0); } 15%, 45%, 75% { transform: translateX(-7px) rotate(-.7deg); } 30%, 60%, 90% { transform: translateX(7px) rotate(.7deg); } }
+    @keyframes mood-pop { from { transform: scale(.3) rotate(-25deg); } to { transform: scale(1) rotate(0); } }
+    @keyframes customer-reward-rise { from { transform: translate3d(0, 10px, 0) scale(.8); opacity: 0; } 18% { opacity: 1; } to { transform: translate3d(var(--drift), -76px, 0) scale(1.04); opacity: 0; } }
+    .customer-scene[data-mood="impatient"] { background: linear-gradient(165deg, #f0be8a 0%, #f5cf99 37%, #b96a43 37%, #9e4a30 100%); }
+    .customer-scene[data-mood="happy"] { background: linear-gradient(165deg, #b9dfae 0%, #e7e4a6 37%, #b96a43 37%, #9e4a30 100%); }
+    .customer-scene[data-mood="angry"] { background: linear-gradient(165deg, #f4a99b 0%, #f6d0a0 37%, #b96a43 37%, #9e4a30 100%); }
     .scene-sign { position: absolute; z-index: 3; top: 4px; left: 50%; padding: 5px 10px; transform: translateX(-50%); border-radius: 6px; background: #fff5da; color: #8d482b; font-size: 9px; font-weight: 950; letter-spacing: 1.1px; white-space: nowrap; }
     .customer-nametag { position: absolute; z-index: 3; bottom: 8px; left: 9px; padding: 5px 9px; border: 1px solid rgb(255 255 255 / 70%); border-radius: 99px; background: #fff; color: #705346; font-size: 9px; font-weight: 800; }
     .order-card { margin: 12px 15px 0; padding: 13px; border: 1px solid #f2c6b7; border-radius: 12px; background: #fff8f5; }
@@ -112,45 +155,44 @@
     .stat-value { margin-top: 5px; font-size: 19px; font-weight: 900; font-variant-numeric: tabular-nums; }
     .stat-value.streak { color: var(--terracotta); }
 
-    .workbench { display: grid; gap: 14px; min-width: 0; }
+    .workbench { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; min-width: 0; }
+    .prep-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); align-items: start; gap: 10px; }
+    .prep-foods { display: grid; align-content: start; gap: 8px; min-width: 0; }
+    .order-station { display: grid; gap: 8px; min-width: 0; }
     .station-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 54px; padding: 0 18px; border-radius: 15px; background: var(--terracotta); color: #fff; box-shadow: 0 5px 12px rgb(200 90 50 / 15%); }
     .station-head .section-heading { font-size: 15px; }
     .station-kicker { margin-top: 3px; color: rgb(255 255 255 / 75%); font-size: 9px; }
     .shift-badge { padding: 6px 9px; border-radius: 99px; color: #80520e; background: #ffda87; font-size: 9px; font-weight: 900; white-space: nowrap; }
-    .food-panel { padding: 18px; }
-    .subhead-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .food-panel { padding: 12px; }
+    .subhead-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
     .subhead-row .section-heading { font-size: 13px; }
     .subhead-caption { color: var(--muted); font-size: 9px; text-align: right; }
-    .food-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .food-card { position: relative; min-width: 0; overflow: hidden; border: 1px solid #edddc5; border-radius: 13px; background: white; transition: transform .15s, box-shadow .15s, border-color .15s; }
+    .food-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+    .food-card { position: relative; min-width: 0; overflow: hidden; padding: 0; border: 1px solid #edddc5; border-radius: 13px; background: white; color: inherit; text-align: left; cursor: pointer; transition: transform .15s, box-shadow .15s, border-color .15s; }
     .food-card:not(.locked):hover { transform: translateY(-2px); border-color: #e6b55c; box-shadow: 0 8px 17px rgb(135 92 38 / 10%); }
     .food-card.prepping .food-art { animation: frying .38s ease-in-out; }
-    .food-card.locked { background: #fbfaf8; }
-    .food-art { position: relative; height: 87px; display: grid; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 50% 91%, #f1cd89 0 23%, transparent 24%), linear-gradient(135deg, #f4e4c2, #fff9eb); }
+    .food-card.locked { border-color: #ded8d0; background: #f5f3f0; color: #827d77; filter: grayscale(1); cursor: not-allowed; }
+    .food-card:disabled { cursor: not-allowed; }
+    .food-art { position: relative; height: 76px; display: grid; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 50% 91%, #f1cd89 0 23%, transparent 24%), linear-gradient(135deg, #f4e4c2, #fff9eb); }
     .food-art::before { position: absolute; right: 0; bottom: 12px; left: 0; height: 8px; border-radius: 50%; background: #bd8755; content: ""; }
     .food-art::after { position: absolute; right: 7px; bottom: 9px; left: 7px; height: 4px; border-radius: 50%; background: #815139; content: ""; }
     .food-art .food-emoji { position: relative; z-index: 1; font-size: 42px; filter: drop-shadow(0 4px 2px rgb(90 54 24 / 17%)); transition: transform .18s; }
     .food-card:not(.locked):hover .food-emoji { transform: translateY(-3px) scale(1.06); }
-    .food-lock-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(60 46 36 / 43%); color: white; font-size: 22px; }
+    .food-lock-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(60 46 36 / 49%); color: white; font-size: 25px; }
     .unlock-chip { position: absolute; z-index: 2; top: 7px; right: 7px; padding: 4px 6px; border-radius: 99px; background: #eef8ed; color: #27733d; font-size: 8px; font-weight: 900; }
     .locked .unlock-chip { color: #755c40; background: #f2eee8; }
-    .food-info { padding: 9px 10px 10px; }
+    .locked-level { left: 5px; right: 5px; max-width: calc(100% - 10px); overflow: hidden; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+    .food-info { padding: 7px 8px; }
     .food-topline { display: flex; align-items: baseline; justify-content: space-between; gap: 4px; }
     .food-name { overflow: hidden; font-size: 11px; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
     .food-price { color: var(--terracotta); font-size: 9px; font-weight: 900; white-space: nowrap; }
     .food-note { overflow: hidden; margin-top: 3px; color: var(--muted); font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
-    .food-controls { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 8px; }
-    .qty-controls { display: flex; align-items: center; gap: 5px; }
-    .qty-button { display: grid; width: 24px; height: 24px; place-items: center; border: 1px solid #eadfd2; border-radius: 50%; background: #fff; cursor: pointer; font-size: 14px; font-weight: 750; transition: background .15s; }
-    .qty-button:hover:not(:disabled) { border-color: var(--terracotta); color: var(--terracotta); background: #fff4ef; }
-    .qty-button.add { border-color: var(--green); background: var(--green); color: white; }
-    .qty-button.add:hover:not(:disabled) { background: var(--green-dark); }
-    .qty-button:disabled { cursor: not-allowed; opacity: .37; }
-    .qty-number { min-width: 14px; text-align: center; font-size: 10px; font-weight: 900; }
-    .tap-hint { color: #9b8172; font-size: 8px; font-weight: 650; }
+    .food-controls { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 5px; }
+    .food-count { min-width: 30px; padding: 3px 6px; border-radius: 99px; background: #edf6eb; color: var(--green-dark); text-align: center; font-size: 9px; font-weight: 900; }
+    .food-count.empty { background: #f4f0ea; color: #84786b; }
 
-    .tray-panel { padding: 17px 18px 18px; }
-    .tray-content { display: grid; grid-template-columns: minmax(115px, 170px) minmax(0, 1fr); align-items: center; gap: 15px; min-height: 110px; margin-top: 12px; padding: 12px; border-radius: 13px; background: #f5ece0; }
+    .tray-panel { padding: 10px; }
+    .tray-content { display: grid; grid-template-columns: 74px minmax(0, 1fr); align-items: center; gap: 8px; min-height: 78px; margin-top: 6px; padding: 7px; border-radius: 11px; background: #f5ece0; }
     .cup-wrap { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 85px; }
     .skewer { position: relative; display: grid; width: 30px; height: 67px; place-items: start center; padding-top: 6px; border-radius: 12px 12px 8px 8px; background: #fff9eb; box-shadow: inset 0 -5px 0 #e5d0ae, 0 2px 5px rgb(81 57 36 / 8%); }
     .skewer::before { position: absolute; top: 8px; bottom: 9px; left: 50%; z-index: 0; border-left: 2px solid #ba7b42; content: ""; }
@@ -168,19 +210,22 @@
     .clear-button:hover:not(:disabled) { color: var(--terracotta); border-color: #e8b09c; }
     .clear-button:disabled { cursor: not-allowed; opacity: .48; }
 
-    .sauce-panel { padding: 17px 18px; }
-    .sauce-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 11px; }
+    .sauce-panel { padding: 10px; }
+    .sauce-grid { display: grid; grid-template-columns: 1fr; gap: 5px; margin-top: 6px; }
     .sauce-button { min-height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 8px; border: 1px solid #eee5db; border-radius: 10px; background: #fbf8f4; cursor: pointer; font-size: 9px; font-weight: 800; transition: border .15s, background .15s, transform .15s; }
     .sauce-button:hover:not(:disabled) { transform: translateY(-1px); border-color: #dfb884; }
-    .sauce-button.selected { border-color: #ec8795; color: #b6344b; background: #fff0f2; box-shadow: 0 0 0 2px rgb(224 100 119 / 10%); }
+    .sauce-button.selected { border: 2px solid var(--green); color: var(--green-dark); background: #eef8ed; box-shadow: 0 0 0 2px rgb(43 147 72 / 10%); }
     .sauce-button:disabled { cursor: not-allowed; opacity: .54; }
-    .sauce-locked { color: #8e837a; }
+    .sauce-locked { color: #8e837a; filter: grayscale(1); background: #f1efec; }
 
-    .serve-button { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; border: 0; border-radius: 11px; background: var(--green); color: white; box-shadow: 0 4px 9px rgb(43 147 72 / 16%); cursor: pointer; font-size: 13px; font-weight: 900; transition: transform .15s, background .15s, box-shadow .15s; }
-    .serve-button:hover { transform: translateY(-1px); background: var(--green-dark); box-shadow: 0 6px 13px rgb(43 147 72 / 22%); }
+    .serve-button { width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 12px; border: 0; border-radius: 11px; background: var(--green); color: white; box-shadow: 0 4px 9px rgb(43 147 72 / 16%); cursor: pointer; font-size: 12px; font-weight: 900; transition: transform .15s, background .15s, box-shadow .15s, opacity .15s; }
+    .serve-button:hover:not(:disabled) { transform: translateY(-1px); background: var(--green-dark); box-shadow: 0 6px 13px rgb(43 147 72 / 22%); }
     .serve-button:active { transform: translateY(0); }
+    .serve-button:disabled { cursor: not-allowed; opacity: .48; box-shadow: none; }
     .order-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 9px; color: var(--muted); font-size: 9px; font-weight: 700; }
     .order-earnings { color: #397d45; text-align: right; }
+    .workbench-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .workbench-footer .order-summary { flex: 1; margin-top: 0; }
 
     .toast { position: fixed; z-index: 20; right: 22px; bottom: 22px; display: flex; align-items: center; gap: 9px; max-width: min(380px, calc(100vw - 32px)); padding: 13px 17px; transform: translateY(18px); border: 1px solid #e6dbcf; border-radius: 12px; background: white; box-shadow: 0 10px 35px rgb(44 31 22 / 16%); opacity: 0; pointer-events: none; font-size: 12px; font-weight: 750; transition: opacity .2s, transform .2s; }
     .toast.visible { transform: translateY(0); opacity: 1; }
@@ -191,6 +236,7 @@
     #level-modal { z-index: 15; }
     #credit-offer-modal { z-index: 16; }
     .modal-backdrop[hidden] { display: none; }
+    #day-report-modal { z-index: 18; }
     .modal { width: min(540px, 100%); max-height: calc(100vh - 36px); overflow-y: auto; padding: 27px; border: 1px solid #eee2d3; border-radius: 19px; background: white; box-shadow: 0 25px 75px rgb(0 0 0 / 22%); }
     .modal-header { text-align: center; }
     .modal-emblem { width: 58px; height: 58px; display: grid; place-items: center; margin: 0 auto 12px; border-radius: 19px; background: #fff1df; font-size: 30px; }
@@ -251,10 +297,21 @@
     .modal-submit.secondary-submit { border: 1px solid var(--line); background: white; color: var(--ink); }
     .modal-submit.secondary-submit:hover { background: #fffaf4; }
     .vip-banner { display: inline-flex; align-items: center; gap: 5px; margin-top: 7px; padding: 4px 7px; border-radius: 99px; background: #fff1d5; color: #825a20; font-size: 8px; font-weight: 900; }
-    .preview-orders { display: grid; gap: 4px; margin: 9px 15px 0; padding: 9px; border: 1px solid #ead9bd; border-radius: 10px; background: #fffaf0; }
-    .preview-orders[hidden] { display: none; }
-    .preview-title { color: #8a6128; font-size: 8px; font-weight: 900; letter-spacing: .4px; }
-    .preview-line { color: #655547; font-size: 8px; line-height: 1.4; }
+    .weather-badge { min-height: 34px; display: inline-flex; align-items: center; padding: 6px 9px; border: 1px solid #f0dfc2; border-radius: 10px; background: #fff7e8; color: #79532b; font-size: 9px; font-weight: 850; white-space: nowrap; }
+    .weather-badge.rush-live { color: #a94331; border-color: #edc5b3; background: #fff0e8; }
+    .game-clock { color: #725733; font-variant-numeric: tabular-nums; }
+    .sanitation-widget { position: relative; }
+    .sanitation-widget > summary { width: fit-content; max-width: 100%; padding: 5px 8px; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: #6c5c4c; cursor: pointer; font-size: 9px; font-weight: 800; list-style: none; }
+    .sanitation-widget > summary::-webkit-details-marker { display: none; }
+    .sanitation-widget[open] > .sanitation-panel { position: absolute; z-index: 5; right: 0; bottom: calc(100% + 6px); width: min(300px, calc(100vw - 32px)); padding: 12px; box-shadow: var(--shadow); }
+    .sanitation-actions button:last-child { display: none; }
+    .day-report { width: min(540px, 100%); }
+    .sales-report { display: grid; gap: 9px; margin-top: 16px; }
+    .sales-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; color: #685949; font-size: 11px; }
+    .sales-row strong { color: var(--ink); font-variant-numeric: tabular-nums; text-align: right; }
+    .sales-row.net-profit { border-color: #cde1ca; background: #f1f8ee; color: var(--green-dark); font-weight: 900; }
+    .sales-stars { margin-top: 12px; color: #d99c20; font-size: 24px; text-align: center; letter-spacing: 4px; }
+    .sales-rating { margin-top: 4px; color: #725733; font-size: 11px; font-weight: 850; text-align: center; }
     .modal-backdrop.home-screen { z-index: 30; padding: 0; overflow-y: auto; background: linear-gradient(155deg, #f9d696 0%, #fbe6bd 45%, #d98355 100%); backdrop-filter: none; }
     #home-settings-modal { z-index: 40; }
     .home-shell { position: relative; width: min(100%, 1100px); min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(270px, .88fr); align-items: center; gap: clamp(22px, 6vw, 72px); margin: auto; padding: clamp(24px, 6vw, 70px); overflow: hidden; }
@@ -297,6 +354,10 @@
     @keyframes game-fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .drink-panel { padding: 17px 18px; }
     .drink-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 11px; }
+    .drink-widget > summary { display: none; }
+    .qty-button { width: 25px; height: 25px; display: grid; place-items: center; border: 1px solid #eadfd2; border-radius: 50%; background: #fff; color: var(--ink); cursor: pointer; font-size: 14px; font-weight: 800; }
+    .qty-button.add { border-color: var(--green); background: var(--green); color: #fff; }
+    .qty-button:disabled { cursor: not-allowed; opacity: .4; }
     .drink-card { min-width: 0; padding: 9px; border: 1px solid #d9e8de; border-radius: 11px; background: linear-gradient(145deg, #f7fff7, #eef8ef); }
     .drink-topline { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
     .drink-name { font-size: 9px; font-weight: 900; }
@@ -334,19 +395,22 @@
     @media (min-width: 1240px) {
       .app { padding-right: 40px; padding-left: 40px; }
       .game-grid { grid-template-columns: 310px minmax(0, 1fr); gap: 24px; }
-      .customer-scene { height: 260px; }
-      .food-art { height: 105px; }
+      .customer-scene { height: 190px; }
+      .food-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+      .food-art { height: 54px; }
+      .food-info { padding: 5px; }
+      .food-note { display: none; }
     }
     @media (max-width: 850px) {
       .app { padding-right: 18px; padding-left: 18px; }
       .game-grid { grid-template-columns: 245px minmax(0, 1fr); gap: 15px; }
       .customer-scene { height: 200px; }
-      .food-panel, .tray-panel, .sauce-panel { padding-right: 13px; padding-left: 13px; }
+      .food-panel, .tray-panel, .sauce-panel { padding-right: 10px; padding-left: 10px; }
       .food-grid { gap: 8px; }
       .food-info { padding-right: 8px; padding-left: 8px; }
       .food-name { font-size: 10px; }
       .sauce-button { gap: 4px; font-size: 8px; }
-      .tray-content { grid-template-columns: 115px minmax(0, 1fr); gap: 9px; }
+      .tray-content { grid-template-columns: 74px minmax(0, 1fr); gap: 7px; }
     }
     @media (max-width: 640px) {
       .app { padding: 0 13px 28px; }
@@ -355,31 +419,38 @@
       .brand-mark { width: 34px; height: 34px; font-size: 19px; }
       .brand-title { font-size: 13px; letter-spacing: -.35px; }
       .brand-subtitle { font-size: 8px; }
-      .header-actions { width: 100%; justify-content: space-between; gap: 5px; }
+      .header-actions { width: 100%; flex-wrap: wrap; justify-content: space-between; gap: 5px; }
       .header-pill { min-height: 34px; gap: 5px; padding: 5px 8px; border-radius: 10px; font-size: 10px; }
       .icon-button { width: 34px; height: 34px; }
-      .sound-toggle { width: 34px; padding: 0; justify-content: center; font-size: 15px; }
-      .sound-toggle span { display: none; }
-      .progress-wrap { height: 43px; gap: 9px; }
+      .audio-controls summary { min-height: 34px; padding: 0 7px; font-size: 9px; }
+      .language-toggle { width: 88px; min-height: 34px; padding: 4px; font-size: 9px; }
+      .progress-wrap { height: 31px; gap: 7px; }
       .progress-label, .progress-count { font-size: 9px; }
       .progress-count { min-width: 57px; }
-      .shift-banner { margin: 3px 0 12px; padding: 9px 11px; }
+      .shift-banner { flex-wrap: wrap; justify-content: flex-start; gap: 4px 8px; margin: 3px 0 7px; padding: 7px 9px; }
       .shift-location { font-size: 9px; }
-      .shift-status { font-size: 9px; }
-      .game-tools { gap: 6px; margin: -3px 0 11px; }
-      .tool-button, .weather-button, .location-select { min-height: 34px; padding: 6px 8px; font-size: 9px; }
+      .shift-status { flex-wrap: wrap; white-space: normal; font-size: 8px; }
+      .game-tools { flex-wrap: nowrap; overflow-x: auto; gap: 6px; margin: -3px 0 7px; padding-bottom: 2px; scrollbar-width: none; }
+      .game-tools::-webkit-scrollbar { display: none; }
+      .game-tools > * { flex: 0 0 auto; }
+      .game-tools .tool-spacer { display: none; }
+      .tool-button, .location-select { min-height: 34px; padding: 6px 8px; font-size: 9px; }
       .location-select { max-width: 145px; }
-      .game-grid { grid-template-columns: 1fr; gap: 12px; }
+      .game-grid { grid-template-columns: 1fr; gap: 9px; }
       .customer-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(125px, .9fr); align-items: start; }
-      .customer-heading { grid-column: 1 / -1; padding: 13px 13px 8px; }
+      .customer-heading { grid-column: 1 / -1; padding: 9px 10px 5px; }
       .customer-heading .section-heading { font-size: 13px; }
-      .customer-heading small { font-size: 9px; }
-      .customer-scene { grid-row: 2 / span 2; height: 154px; margin: 0 0 12px 12px; }
+      .customer-heading small { display: none; }
+      .customer-scene { grid-row: 2 / span 2; height: 110px; margin: 0 0 6px 8px; }
       .scene-window { top: 38px; height: 76px; }
       .scene-awning { top: 21px; height: 17px; }
       .scene-counter { bottom: 26px; height: 25px; }
       .scene-counter::after { bottom: -17px; height: 17px; }
-      .customer-person { bottom: 32px; transform: translateX(-50%) scale(.77); transform-origin: bottom center; }
+      .customer-person { --person-scale: .82; bottom: 12px; left: 78%; width: 84px; height: 101px; transform: translateX(-50%) scale(var(--person-scale)); transform-origin: bottom center; }
+      .customer-order-bubble { top: 22px; left: 5px; width: min(46%, 112px); padding: 5px 6px; }
+      .bubble-label { font-size: 7px; }
+      .bubble-item { padding: 2px 3px; font-size: 9px; }
+      .customer-mood { top: 25px; left: calc(78% + 19px); padding: 4px 5px; font-size: 13px; }
       .scene-sign { top: 1px; font-size: 7px; }
       .lights { top: 8px; }
       .lights i { width: 6px; height: 6px; }
@@ -389,32 +460,45 @@
       .micro-label { font-size: 8px; }
       .patience-row { grid-column: 2; margin: 8px 11px 5px 10px; font-size: 8px; }
       .patience-track { grid-column: 2; height: 6px; margin: 0 11px 0 10px; }
-      .customer-footer { grid-column: 1 / -1; margin: 0 11px 11px; padding: 8px; font-size: 9px; }
-      .stats-grid { margin-top: 10px; gap: 7px; }
-      .stat-card { padding: 9px; }
-      .stat-label { font-size: 8px; }
-      .stat-value { font-size: 16px; }
-      .workbench { gap: 10px; }
-      .station-head { min-height: 47px; padding: 0 13px; }
+      .customer-footer, .stats-grid { display: none; }
+      .workbench { gap: 7px; }
+      .station-head { min-height: 40px; padding: 0 10px; }
       .station-head .section-heading { font-size: 13px; }
       .station-kicker { font-size: 8px; }
       .shift-badge { padding: 5px 7px; font-size: 8px; }
-      .food-panel, .tray-panel, .sauce-panel { padding: 13px; }
-      .subhead-row { margin-bottom: 9px; }
-      .subhead-row .section-heading { font-size: 11px; }
-      .subhead-caption { font-size: 8px; }
-      .food-grid { gap: 8px; }
-      .food-art { height: 77px; }
-      .food-art .food-emoji { font-size: 35px; }
-      .food-info { padding: 8px; }
-      .food-note, .tap-hint { font-size: 7px; }
-      .qty-button { width: 23px; height: 23px; }
-      .tray-content { grid-template-columns: 100px minmax(0, 1fr); gap: 8px; min-height: 96px; padding: 9px; }
-      .skewer { width: 27px; height: 59px; }
+      .prep-grid { grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 7px; }
+      .prep-foods, .order-station { gap: 7px; }
+      .food-panel, .tray-panel, .sauce-panel { padding: 8px; }
+      .subhead-row { margin-bottom: 6px; }
+      .subhead-row .section-heading { font-size: 10px; }
+      .subhead-caption { font-size: 7px; }
+      .food-grid { gap: 5px; }
+      .food-art { height: 38px; }
+      .food-art .food-emoji { font-size: 23px; }
+      .food-info { padding: 5px; }
+      .food-note { display: none; }
+      .food-name { font-size: 8px; }
+      .food-price { font-size: 7px; }
+      .food-controls { margin-top: 3px; }
+      .food-count { min-width: 25px; padding: 2px 4px; font-size: 8px; }
+      .tray-content { grid-template-columns: 52px minmax(0, 1fr); gap: 5px; min-height: 62px; margin-top: 4px; padding: 5px; }
+      .cup-wrap { min-height: 55px; }
+      .skewer { width: 21px; height: 48px; }
       .skewer-emoji { font-size: 13px; line-height: 14px; }
-      .sauce-grid { gap: 6px; }
-      .sauce-button { min-height: 36px; padding: 6px 4px; font-size: 8px; }
-      .serve-button { min-height: 45px; font-size: 12px; }
+      .tray-detail-title, .tray-total { font-size: 7px; }
+      .tray-items { min-height: 18px; margin-top: 3px; gap: 3px; }
+      .tray-chip { padding: 3px 4px; font-size: 7px; }
+      .tray-actions { margin-top: 4px; }
+      .clear-button { padding: 4px 6px; font-size: 7px; }
+      .sauce-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+      .sauce-button { min-height: 31px; padding: 4px 2px; font-size: 7px; }
+      .serve-button { min-height: 37px; padding: 7px; font-size: 10px; }
+      .order-station { gap: 6px; }
+      .workbench-footer { align-items: center; gap: 6px; }
+      .workbench-footer .order-summary { font-size: 7px; }
+      .workbench-footer .order-summary { display: none; }
+      .sanitation-widget > summary { padding: 4px 6px; font-size: 7px; }
+      .game-clock { font-size: 8px; }
       .mobile-tip { display: inline; }
       .modal { padding: 22px 18px; }
       .vendor-options { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
@@ -438,19 +522,87 @@
       .home-vendor { font-size: 7px; }
       .home-vendor-face { width: clamp(39px, 11vw, 49px); border-width: 2px; }
       .home-street-note { bottom: 5px; font-size: 6px; }
-      .drink-panel, .sanitation-panel { padding: 12px; }
-      .drink-grid { gap: 5px; }
-      .drink-card { padding: 7px 5px; }
+      .drink-panel, .sanitation-panel { padding: 8px; }
+      .drink-widget > summary { min-height: 30px; display: flex; align-items: center; padding: 6px 8px; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: #685541; cursor: pointer; font-size: 8px; font-weight: 850; list-style: none; }
+      .drink-widget > summary::-webkit-details-marker { display: none; }
+      .drink-widget[open] > summary { margin-bottom: 5px; }
+      .drink-grid { display: flex; gap: 5px; overflow-x: auto; margin-top: 5px; }
+      .drink-card { padding: 5px 4px; }
+      .drink-card { flex: 0 0 82px; }
       .drink-name { font-size: 8px; }
-      .drink-emoji { font-size: 18px; }
+      .drink-emoji { font-size: 16px; }
     }
     @media (max-width: 370px) {
+      body { min-width: 0; }
+      .app { padding: 0 10px 14px; }
+      .topbar { min-height: 56px; padding: 5px 0; }
+      .brand-mark { width: 29px; height: 29px; font-size: 16px; }
       .brand-title { font-size: 11px; }
       .header-pill { padding-right: 6px; padding-left: 6px; font-size: 9px; }
+      .header-actions { gap: 3px; }
+      .language-toggle { display: none; }
+      .audio-controls summary, .language-toggle, .icon-button { min-height: 30px; }
+      .icon-button { width: 30px; height: 30px; }
+      .progress-wrap { height: 25px; gap: 5px; }
+      .shift-banner { flex-wrap: wrap; justify-content: flex-start; gap: 4px 8px; margin: 2px 0 7px; padding: 6px 8px; }
+      .shift-status { flex-wrap: wrap; gap: 4px; white-space: normal; font-size: 7px; }
+      .game-clock { font-size: 7px; }
+      .game-tools { flex-wrap: nowrap; overflow-x: auto; margin: -2px 0 7px; padding-bottom: 2px; scrollbar-width: none; }
+      .game-tools::-webkit-scrollbar { display: none; }
+      .game-tools > * { flex: 0 0 auto; }
+      .game-tools .tool-spacer { display: none; }
+      .location-select { width: 110px; max-width: 110px; }
+      .tool-button, .location-select, .weather-badge { min-height: 28px; padding: 4px 6px; font-size: 8px; }
+      .game-grid { gap: 6px; }
       .customer-panel { grid-template-columns: minmax(0, 1fr) minmax(115px, .9fr); }
       .tray-content { grid-template-columns: 81px minmax(0, 1fr); gap: 5px; padding: 7px; }
-      .sauce-grid { grid-template-columns: 1fr; }
-      .sauce-button { min-height: 33px; }
+      .customer-heading { display: none; }
+      .customer-scene { grid-row: 1 / span 2; height: 82px; margin: 0 0 5px 7px; }
+      .scene-window { top: 25px; height: 48px; }
+      .scene-awning { top: 13px; height: 12px; }
+      .scene-counter { bottom: 19px; height: 18px; }
+      .scene-counter::after { bottom: -11px; height: 11px; }
+      .customer-person { --person-scale: .65; bottom: 3px; width: 72px; height: 86px; }
+      .customer-order-bubble { top: 15px; width: min(46%, 100px); padding: 4px 5px; }
+      .bubble-label { font-size: 6px; }
+      .bubble-item { padding: 1px 3px; font-size: 8px; }
+      .customer-mood { top: 14px; padding: 3px 4px; font-size: 11px; }
+      .customer-nametag { bottom: 3px; left: 3px; padding: 3px 4px; font-size: 6px; }
+      .scene-sign { top: 0; font-size: 6px; }
+      .order-card { margin: 0 6px; padding: 6px; }
+      .order-text { font-size: 8px; }
+      .micro-label { font-size: 7px; }
+      .patience-row { margin: 4px 7px 3px; font-size: 7px; }
+      .patience-track { height: 5px; margin: 0 7px; }
+      .customer-footer, .stats-grid { display: none; }
+      .vip-banner { grid-column: 1 / -1; margin: 3px 7px; font-size: 7px; }
+      .station-head { min-height: 34px; }
+      .station-head .section-heading { font-size: 10px; }
+      .station-kicker, .shift-badge { font-size: 7px; }
+      .station-head > div:first-child { min-width: 0; }
+      .station-head .sanitation-widget { margin-left: auto; }
+      .station-head .sanitation-widget > summary { max-width: 105px; overflow: hidden; padding: 4px 5px; color: #685541; font-size: 6px; text-overflow: ellipsis; white-space: nowrap; }
+      .station-head .shift-badge { display: none; }
+      .workbench-footer .order-summary { display: none; }
+      .sauce-button { min-height: 29px; font-size: 6px; }
+      .food-panel, .tray-panel, .sauce-panel { padding: 6px; }
+      .food-art { height: 30px; }
+      .food-art .food-emoji { font-size: 20px; }
+      .food-info { padding: 3px 4px; }
+      .food-controls { margin-top: 1px; }
+      .food-count { min-width: 0; padding: 1px 3px; }
+      .food-price { display: none; }
+      .food-count { white-space: nowrap; font-size: 6px; }
+      .tray-content { grid-template-columns: 40px minmax(0, 1fr); gap: 3px; min-height: 52px; margin-top: 3px; padding: 4px; }
+      .cup-wrap { min-height: 45px; }
+      .cup-empty span:last-child, .tray-detail-title { display: none; }
+      .tray-actions { gap: 3px; }
+      .tray-total { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      #clear-button { width: 32px; overflow: hidden; padding: 4px 2px; text-overflow: ellipsis; white-space: nowrap; }
+      .drink-panel { padding: 6px; }
+      .drink-card { min-height: 46px; }
+      .sauce-grid { gap: 3px; }
+      .tray-chip { font-size: 6px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -560,12 +712,15 @@
       <div class="header-actions">
         <div class="header-pill level-pill" aria-label="Player level"><span aria-hidden="true">🏅</span> <span id="level-display">Level 1</span></div>
         <div class="header-pill coin-pill" aria-label="Total coins"><span aria-hidden="true">🪙</span> <span id="coin-display">₱ 0</span></div>
-        <button class="icon-button sound-toggle" id="bgm-toggle" type="button" aria-pressed="false" aria-label="Turn background music on" title="Background music"><span aria-hidden="true">🔇</span><span>BGM Off</span></button>
-        <button class="icon-button sound-toggle" id="sfx-toggle" type="button" aria-pressed="true" aria-label="Turn sound effects off" title="Sound effects"><span aria-hidden="true">🔔</span><span>SFX On</span></button>
+        <details class="audio-controls"><summary id="audio-controls-label">🔊 Volume</summary><div class="audio-popover">
+          <label for="header-bgm-volume"><span class="volume-label"><span id="header-bgm-label">🎵 Music</span><output id="header-bgm-value">0%</output></span><input id="header-bgm-volume" type="range" min="0" max="100" step="1" value="0"></label>
+          <label for="header-sfx-volume"><span class="volume-label"><span id="header-sfx-label">🔔 Effects</span><output id="header-sfx-value">100%</output></span><input id="header-sfx-volume" type="range" min="0" max="100" step="1" value="100"></label>
+        </div></details>
+        <select class="language-toggle" id="header-language-select" aria-label="Language / Wika"><option value="tl">🇵🇭 Tagalog</option><option value="en">🇺🇸 English</option></select>
         <button class="icon-button" id="settings-button" type="button" aria-label="Open vendor settings" title="Vendor settings">⚙</button>
       </div>
     </header>
-    <section class="shift-banner" id="health-seal-banner" hidden><div class="shift-location">🏅 <span id="health-seal-label">OFFICIAL HEALTH SEAL · +15% MENU PRICES</span></div><div class="shift-status">CLEAN CART, TRUSTED SUKI!</div></section>
+    <section class="shift-banner" id="health-seal-banner" hidden><div class="shift-location">🏅 <span id="health-seal-label">OFFICIAL HEALTH SEAL · +15% MENU PRICES</span></div><div class="shift-status" id="health-seal-status">CLEAN CART, TRUSTED SUKI!</div></section>
     <div class="progress-wrap" role="group" aria-label="Experience progress">
       <span class="progress-label">LEVEL UP</span>
       <div class="progress-track" id="xp-track" role="progressbar" aria-label="Experience points" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="xp-fill"></div></div>
@@ -574,7 +729,7 @@
 
     <div class="shift-banner">
       <div class="shift-location"><span aria-hidden="true">📍</span><span id="location-display">QUIAPO • Manila Street Market</span></div>
-      <div class="shift-status"><span class="status-dot"></span> OPEN FOR BUSINESS <span id="weather-status"></span></div>
+      <div class="shift-status"><span class="status-dot"></span> <span id="business-status">OPEN FOR BUSINESS</span><span aria-hidden="true">·</span><span class="game-clock" id="game-clock">Day 1 · 6:00 AM</span></div>
     </div>
     <nav class="game-tools" aria-label="Cart management">
       <button class="tool-button" id="quests-button" type="button">📋 Daily Quests</button>
@@ -582,26 +737,31 @@
       <button class="tool-button" id="credit-button" type="button">📒 Lista <span id="credit-badge"></span></button>
       <span class="tool-spacer"></span>
       <select class="location-select" id="location-select" aria-label="Change cart location"></select>
-      <button class="weather-button" id="weather-button" type="button" aria-label="Current weather and rush event">☀️ Sunny</button>
-      <button class="weather-button" id="rush-extension" type="button" hidden>⏱️ +10s Rush (<span id="extension-count">0</span>)</button>
+      <span class="weather-badge" id="weather-badge" role="status" aria-live="polite">☀️ Sunny</span>
+      <button class="tool-button" id="rush-extension" type="button" hidden>⏱️ +10s Rush (<span id="extension-count">0</span>)</button>
     </nav>
 
     <div class="game-grid">
       <aside>
         <section class="panel customer-panel" aria-labelledby="customer-title">
           <div class="customer-heading"><h1 class="section-heading" id="customer-title"><span class="heading-number">01</span><span>May order ka!<small>Heto na ang susunod mong suki.</small></span></h1></div>
-          <div class="customer-scene" role="img" aria-label="A friendly customer waiting at a colorful Manila street food stall">
+          <div class="customer-scene" id="customer-scene" role="group" aria-label="A friendly customer waiting at a colorful Manila street food stall">
             <div class="lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
             <div class="scene-awning" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
             <div class="scene-window" aria-hidden="true"></div>
             <span class="scene-sign" aria-hidden="true">TUSOK-TUSOK</span>
-            <div class="customer-person" aria-hidden="true"><div class="hair"></div><div class="face"></div><div class="body"></div></div>
+            <div class="customer-order-bubble" id="customer-order-bubble" role="status" aria-live="polite" hidden>
+              <span class="bubble-label" id="customer-bubble-label" data-i18n="customer-bubble-label">MY ORDER!</span>
+              <span class="bubble-icons" id="customer-order-icons" aria-hidden="true"></span>
+            </div>
+            <div class="customer-person" id="customer-sprite" aria-hidden="true"><svg viewBox="0 0 100 120" role="img" aria-label="Aling Nena, customer"><use id="customer-avatar-use" href="#avatar-marites" width="100" height="120"></use></svg></div>
+            <span class="customer-mood" id="customer-mood" aria-hidden="true">💚</span>
+            <div class="customer-fx" id="customer-fx" aria-hidden="true"></div>
             <div class="scene-counter" aria-hidden="true"></div>
             <span class="customer-nametag" id="customer-name">Your new suki</span>
           </div>
           <div class="order-card"><div class="micro-label">ORDER NI SUKI</div><div class="order-text" id="order-description" aria-live="polite">Loading your next order...</div></div>
           <div class="vip-banner" id="vip-banner" hidden></div>
-          <div class="preview-orders" id="preview-orders" hidden></div>
           <div class="patience-row"><span>INGATAN ANG PASENSYA</span><span class="patience-value" id="patience-label">100%</span></div>
           <div class="patience-track" id="patience-track" role="progressbar" aria-label="Customer patience" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div class="patience-fill" id="patience-fill"></div></div>
           <div class="customer-footer" id="customer-footer" aria-live="polite"><span aria-hidden="true">💚</span><span>Perfect order = bonus tip!</span></div>
@@ -613,38 +773,52 @@
       </aside>
 
       <section class="workbench" aria-label="Street food cart workbench">
-        <div class="station-head"><div><h2 class="section-heading">Lutuan ng order</h2><div class="station-kicker">Fresh sa kawali, para sa iyong suki</div></div><div class="shift-badge" id="vendor-badge">🌟 KUYA JUN</div></div>
-        <section class="panel food-panel" aria-labelledby="food-title">
-          <div class="subhead-row"><h2 class="section-heading" id="food-title"><span class="heading-number">02</span>Pumili ng tusok-tusok</h2><span class="subhead-caption">Tap + para idagdag sa cup</span></div>
-          <div class="food-grid" id="food-grid"></div>
-        </section>
-        <section class="panel drink-panel" aria-labelledby="drink-title">
-          <div class="subhead-row"><h2 class="section-heading" id="drink-title"><span class="heading-number">🧋</span>Palamig &amp; Street Drinks</h2><span class="subhead-caption">Combo meal? Dagdag palamig!</span></div>
-          <div class="drink-grid" id="drink-grid"></div>
-        </section>
-        <section class="panel tray-panel" aria-labelledby="tray-title">
-          <div class="subhead-row"><h2 class="section-heading" id="tray-title"><span class="heading-number">03</span>Ayusin sa order tray</h2><span class="subhead-caption">Dito mapupunta ang laman</span></div>
-          <div class="tray-content">
-            <div class="cup-wrap" id="cup-preview" aria-label="Your prepared order"></div>
-            <div class="tray-details">
-              <div class="tray-detail-title">KASALUKUYANG ORDER</div>
-              <div class="tray-items" id="tray-items" aria-live="polite"></div>
-              <div class="tray-actions"><span class="tray-total" id="tray-total">Wala pang laman ang cup</span><button class="clear-button" id="clear-button" type="button" disabled>↺ Tapon Laman</button></div>
-            </div>
+        <div class="station-head"><div><h2 class="section-heading">Lutuan ng order</h2><div class="station-kicker">Fresh sa kawali, para sa iyong suki</div></div>
+          <details class="sanitation-widget" id="sanitation-widget">
+            <summary id="sanitation-summary">🧼 Oil 100% · Jars covered</summary>
+            <section class="panel sanitation-panel">
+              <div class="subhead-row"><h2 class="section-heading" id="sanitation-title">🧼 Cart Cleanliness</h2><span class="subhead-caption" id="seal-pricing-note">Clean cart, happy inspector!</span></div>
+              <div class="sanitation-row"><span class="sanitation-label">Clean Oil Gauge</span><span class="sanitation-value" id="sanitation-value">100%</span><div class="sanitation-meter" id="oil-meter" role="progressbar" aria-label="Clean cooking oil" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span id="oil-meter-fill"></span></div></div>
+              <div class="sanitation-actions"><button id="clean-oil-button" type="button">🧽 Clean Oil</button><button id="jar-cover-button" type="button">🫙 Jar Covered ✓</button></div>
+            </section>
+          </details>
+          <div class="shift-badge" id="vendor-badge">🌟 KUYA JUN</div>
+        </div>
+        <div class="prep-grid">
+          <div class="prep-foods">
+            <section class="panel food-panel" aria-labelledby="food-title">
+              <div class="subhead-row"><h2 class="section-heading" id="food-title"><span class="heading-number">02</span><span data-i18n="food-heading">Pumili ng tusok-tusok</span></h2><span class="subhead-caption" data-i18n="food-caption">Tap a food to add it to the cup</span></div>
+              <div class="food-grid" id="food-grid"></div>
+            </section>
+            <details class="drink-widget" id="drink-widget" open>
+              <summary id="drink-summary">🧋 Palamig &amp; Street Drinks</summary>
+              <section class="panel drink-panel" aria-labelledby="drink-title">
+                <div class="subhead-row"><h2 class="section-heading" id="drink-title"><span class="heading-number">🧋</span><span data-i18n="drink-heading">Palamig &amp; Street Drinks</span></h2><span class="subhead-caption" data-i18n="drink-caption">Combo meal? Dagdag palamig!</span></div>
+                <div class="drink-grid" id="drink-grid"></div>
+              </section>
+            </details>
           </div>
-        </section>
-        <section class="panel sauce-panel" aria-labelledby="sauce-title">
-          <div class="subhead-row"><h2 class="section-heading" id="sauce-title"><span class="heading-number">04</span>Piliin ang sawsawan</h2><span class="subhead-caption">Isa lang ang pipiliin</span></div>
-          <div class="sauce-grid" id="sauce-grid"></div>
-        </section>
-        <section class="panel sanitation-panel" aria-labelledby="sanitation-title">
-          <div class="subhead-row"><h2 class="section-heading" id="sanitation-title">🧼 Kalinisan ng Kariton</h2><span class="subhead-caption" id="seal-pricing-note">Clean cart, happy inspector!</span></div>
-          <div class="sanitation-row"><span class="sanitation-label">Clean Oil Gauge</span><span class="sanitation-value" id="sanitation-value">100%</span><div class="sanitation-meter" id="oil-meter" role="progressbar" aria-label="Clean cooking oil" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span id="oil-meter-fill"></span></div></div>
-          <div class="sanitation-actions"><button id="clean-oil-button" type="button">🧽 Clean Oil</button><button id="jar-cover-button" type="button">🫙 Jar Covered ✓</button><button id="inspection-button" type="button">🧼 Random Inspection</button></div>
-        </section>
-        <div>
-          <button class="serve-button" id="serve-button" type="button"><span aria-hidden="true">🍡</span><span>Ihain na sa customer!</span><span aria-hidden="true">➜</span></button>
-          <div class="order-summary"><span id="order-summary-text">Handa ka na? Ihambing ang order bago ihain.</span><span class="order-earnings" id="earnings-preview">Suki tip hanggang ₱8</span></div>
+          <div class="order-station">
+            <section class="panel sauce-panel" aria-labelledby="sauce-title">
+              <div class="subhead-row"><h2 class="section-heading" id="sauce-title"><span class="heading-number">03</span><span data-i18n="sauce-heading">Choose a dipping sauce</span></h2></div>
+              <div class="sauce-grid" id="sauce-grid"></div>
+            </section>
+            <section class="panel tray-panel" aria-labelledby="tray-title">
+              <div class="subhead-row"><h2 class="section-heading" id="tray-title"><span class="heading-number">04</span><span data-i18n="tray-heading">Your Paper Cup</span></h2></div>
+              <div class="tray-content">
+                <div class="cup-wrap" id="cup-preview" aria-label="Your prepared order"></div>
+                <div class="tray-details">
+                  <div class="tray-detail-title" data-i18n="tray-detail-title">CURRENT ORDER</div>
+                  <div class="tray-items" id="tray-items" aria-live="polite"></div>
+                  <div class="tray-actions"><span class="tray-total" id="tray-total">Your cup is empty</span><button class="clear-button" id="clear-button" type="button" disabled>↺ Clear</button></div>
+                </div>
+              </div>
+            </section>
+            <button class="serve-button" id="serve-button" type="button" disabled><span aria-hidden="true">🍡</span><span data-i18n="serve-label">Serve the customer!</span><span aria-hidden="true">➜</span></button>
+          </div>
+        </div>
+        <div class="workbench-footer">
+          <div class="order-summary"><span id="order-summary-text">Check the order before serving.</span><span class="order-earnings" id="earnings-preview">Suki tip up to ₱8</span></div>
         </div>
       </section>
     </div>
@@ -723,8 +897,8 @@
     <section class="modal">
       <div class="modal-header"><div class="modal-emblem">⚙️</div><div class="modal-eyebrow">AYUSIN ANG IYONG LARO</div><h2 id="home-settings-title">Settings</h2><p class="modal-description">I-personalize ang tunog at wika ng Kainan Sim.</p></div>
       <div class="home-settings">
-        <div class="home-setting-toggle"><span>🔊 Background Music (BGM)</span><button id="settings-bgm-toggle" type="button" aria-pressed="false">OFF</button></div>
-        <div class="home-setting-toggle"><span>🔔 Sound Effects (SFX)</span><button id="settings-sfx-toggle" type="button" aria-pressed="true">ON</button></div>
+        <label class="volume-control" for="settings-bgm-volume"><span class="volume-label"><span id="settings-bgm-label">🔊 Background Music (BGM)</span><output id="settings-bgm-value">0%</output></span><input id="settings-bgm-volume" type="range" min="0" max="100" step="1" value="0"></label>
+        <label class="volume-control" for="settings-sfx-volume"><span class="volume-label"><span id="settings-sfx-label">🔔 Sound Effects (SFX)</span><output id="settings-sfx-value">100%</output></span><input id="settings-sfx-volume" type="range" min="0" max="100" step="1" value="100"></label>
       </div>
       <label class="language-setting" for="language-select"><span>🌐 Language / Wika</span><select id="language-select"><option value="en">English</option><option value="tl">Tagalog</option></select></label>
       <button class="settings-reset" id="home-reset-button" type="button" style="margin-top:14px">🗑️ Reset Game Progress</button>
@@ -741,15 +915,39 @@
     </section>
   </div>
 
+  <div class="modal-backdrop" id="day-report-modal" role="dialog" aria-modal="true" aria-labelledby="day-report-title" hidden>
+    <section class="modal day-report">
+      <div class="modal-header"><div class="modal-emblem" aria-hidden="true">📌</div><div class="modal-eyebrow" data-i18n="day-report-eyebrow">DAILY SALES REPORT</div><h2 id="day-report-title">Day 1 Complete!</h2><p class="modal-description" id="day-report-description" data-i18n="day-report-description">The cart is closed for tonight. Here's today's tally.</p></div>
+      <div class="sales-report">
+        <div class="sales-row"><span data-i18n="sales-customers">Customers served</span><strong id="report-served">0</strong></div>
+        <div class="sales-row"><span data-i18n="sales-lost">Customers lost</span><strong id="report-lost">0</strong></div>
+        <div class="sales-row"><span data-i18n="sales-gross">Food &amp; drink sales</span><strong id="report-gross">₱0</strong></div>
+        <div class="sales-row"><span data-i18n="sales-tips">Tips &amp; bonuses</span><strong id="report-tips">₱0</strong></div>
+        <div class="sales-row"><span data-i18n="sales-total">Gross earnings</span><strong id="report-gross-total">₱0</strong></div>
+        <div class="sales-row"><span data-i18n="sales-expenses">Rent &amp; supplies</span><strong id="report-expenses">−₱50</strong></div>
+        <div class="sales-row net-profit"><span data-i18n="sales-net">Net profit</span><strong id="report-net">₱0</strong></div>
+      </div>
+      <div class="sales-stars" id="report-stars" aria-label="Performance rating">☆☆☆</div>
+      <div class="sales-rating" id="report-rating">Keep building your neighborhood business!</div>
+      <button class="modal-submit green-submit" id="next-day-button" type="button">🌞 Start a New Day</button>
+    </section>
+  </div>
+
   <script>
     (() => {
       "use strict";
 
       const STORAGE_KEY = "kainanSim.pinoyStreetFood.v1";
       const LEGACY_STORAGE_KEY = "kainanSim_saveData";
+      const BGM_VOLUME_KEY = "kainanSim_volume_bgm";
+      const SFX_VOLUME_KEY = "kainanSim_volume_sfx";
       const MAX_LEVEL = 6;
       const MAX_TRAY_ITEMS = 12;
       const ORDER_DURATION = 75;
+      const DAY_DURATION_SECONDS = 180;
+      const DAY_OPENING_MINUTES = 6 * 60;
+      const DAILY_EXPENSES = 50;
+      const INSPECTION_CHANCE = .15;
       const VENDORS = {
         jun: { name: "Kuya Jun", emoji: "👨🏽‍🍳", cart: "Kuya Jun's Tusok-Tusok Cart" },
         manong: { name: "Manong Boy", emoji: "👨🏽‍🍳", cart: "Manong Boy's Tusok-Tusok Cart" },
@@ -806,6 +1004,8 @@
         unlockedSauces: ["sweet"], vendor: "jun",
         cartName: VENDORS.jun.cart, setupComplete: false,
         served: 0, streak: 0,
+        dayNumber: 1, dayElapsedSeconds: 0, dayClosed: false, inspectionAtSeconds: 120,
+        daySales: { served: 0, lost: 0, sales: 0, tips: 0 },
         unlockedDrinks: [],
         sanitation: 100, jarCovered: true, healthSeal: false,
         language: "en",
@@ -880,6 +1080,16 @@
           setupComplete: value.setupComplete === true,
           served: Number.isSafeInteger(value.served) ? Math.max(0, value.served) : 0,
           streak: Number.isSafeInteger(value.streak) ? Math.max(0, value.streak) : 0,
+          dayNumber: Number.isSafeInteger(value.dayNumber) ? Math.max(1, Math.min(1000000, value.dayNumber)) : 1,
+          dayElapsedSeconds: Number.isSafeInteger(value.dayElapsedSeconds) ? Math.max(0, Math.min(DAY_DURATION_SECONDS, value.dayElapsedSeconds)) : 0,
+          dayClosed: value.dayClosed === true,
+          inspectionAtSeconds: Number.isSafeInteger(value.inspectionAtSeconds) ? Math.max(120, Math.min(1000000, value.inspectionAtSeconds)) : 120,
+          daySales: {
+            served: Number.isSafeInteger(value.daySales?.served) ? Math.max(0, value.daySales.served) : 0,
+            lost: Number.isSafeInteger(value.daySales?.lost) ? Math.max(0, value.daySales.lost) : 0,
+            sales: Number.isSafeInteger(value.daySales?.sales) ? Math.max(0, value.daySales.sales) : 0,
+            tips: Number.isSafeInteger(value.daySales?.tips) ? Math.max(0, value.daySales.tips) : 0
+          },
           sanitation: Number.isFinite(value.sanitation) ? Math.max(0, Math.min(100, value.sanitation)) : 100,
           jarCovered: value.jarCovered !== false,
           healthSeal: value.healthSeal === true,
@@ -928,21 +1138,86 @@
       let rushSeconds = 0;
       let questAfterServe = null;
       let pendingCredit = null;
+      let customerMood = "waiting";
       let shopCategory = "upgrades";
-      let discoveredOrders = [];
-      let nextOrders = [];
+      let drinkPanelAutoOpened = false;
       let arrivalTimer = null;
+      let customerTransitionTimer = null;
+      let arrivalAnimationTimer = null;
+      let customerTransitioning = false;
       let repayNoticeDay = "";
       let audioContext = null;
       let bgmTimer = null;
       let musicStep = 0;
       let savedProgressExists = false;
+      let bgmVolume = 0;
+      let sfxVolume = 100;
 
       const $ = id => document.getElementById(id);
 
+      function localizeNotice(message) {
+        const fixed = new Map([
+          ["Hindi suportado ng browser na ito ang Web Audio.", "This browser does not support Web Audio."],
+          ["Hindi na-save ang progress mo. Pakitingnan ang browser storage settings.", "Your progress could not be saved. Check your browser storage settings."],
+          ["Hindi mabasa ang saved progress. Bagong laro ang sisimulan.", "The saved progress could not be read. A new game will start."],
+          ["Tapos ang workshop! +25 XP.", "Workshop complete! +25 XP."],
+          ["Na-clear na ang order tray.", "Order tray cleared."],
+          ["Pumili muna ng tusok-tusok para sa order!", "Choose some tusok-tusok for the order first!"],
+          ["Piliin muna ang tamang sawsawan para sa suki.", "Choose the right sauce for your customer first."],
+          ["Hindi tugma ang pagkain o sawsawan. Ayusin muna ang order!", "The food or sauce does not match. Fix the order and try again!"],
+          ["Rush extension activated! +10 segundo para sa order na ito.", "Rush extension activated! +10 seconds for this order."],
+          ["May utang nang due. Buksan ang Lista at paalalahanan ang suki!", "A customer payment is due. Open the Credit Book to send a reminder!"],
+          ["Pumasa sa health inspection! +15% selling prices permanently!", "Health inspection passed! Selling prices are permanently increased by 15%."],
+          ["Malinis na ulit ang mantika. Salamat sa pag-aalaga ng kariton!", "The oil is clean again. Thanks for taking care of your cart!"],
+          ["Na-reset na ang progress mo. Pumili ng bagong vendor para magsimula ulit.", "Your progress has been reset. Choose a vendor to start again."],
+          ["Na-reset na ang lahat. Handa ka nang magsimula ulit.", "Everything has been reset. You're ready to start again."],
+          ["Buksan muna ang bagong location sa Cart Shop.", "Unlock this location in the Cart Shop first."],
+          ["Bagong quest progress na! Tara ulit!", "Quest progress reset! Let's try again!"],
+          ["Hindi ma-sync ang progress mula sa kabilang tab.", "Progress could not be synced from the other tab."]
+        ]);
+        if (state.language === "tl") {
+          const englishToTagalog = new Map([...fixed].map(([tagalog, english]) => [english, tagalog]));
+          if (englishToTagalog.has(message)) return englishToTagalog.get(message);
+          const patterns = [
+            [/^Quest complete! \+₱(\d+) and \+(\d+) XP!$/, "Kumpleto ang misyon! +₱$1 at +$2 XP!"],
+            [/^Not enough coins\. You need ₱(\d+)\.$/, "Kulang ang barya. Kailangan mo ng ₱$1."],
+            [/^Only (\d+) items fit in the cup\.$/, "Hanggang $1 piraso lang ang kasya sa cup."],
+            [/^Welcome to (.+)!$/, "Mabuhay! Welcome sa $1!"],
+            [/^New location: (.+)!$/, "Bagong pwesto: $1!"],
+            [/^(.+) is ready!$/, "Handa na ang $1!"],
+            [/^(.+) purchased!$/, "Nabili na ang $1!"],
+            [/^(.+) paid ₱(\d+), including a tip!$/, "Nagbayad si $1 ng ₱$2, kasama ang tip!"]
+          ];
+          for (const [pattern, replacement] of patterns) {
+            if (pattern.test(message)) return message.replace(pattern, replacement);
+          }
+          return message;
+        }
+        if (fixed.has(message)) return fixed.get(message);
+        const patterns = [
+          [/^Quest kumpleto! \+₱(\d+) at \+(\d+) XP!$/, "Quest complete! +₱$1 and +$2 XP!"],
+          [/^Kulang ang coins mo\. Kailangan ng ₱(\d+)\.$/, "Not enough coins. You need ₱$1."],
+          [/^Kasya lang ang (\d+) piraso sa cup\.$/, "Only $1 items fit in the cup."],
+          [/^Hanggang 9 piraso lang ng bawat pagkain sa isang cup\.$/, "You can add up to 9 of each food in one cup."],
+          [/^Ilagay muna ang pangalan ng iyong kariton\.$/, "Enter a name for your cart first."],
+          [/^Pumili muna ng tindero para sa iyong kariton\.$/, "Choose a vendor for your cart first."],
+          [/^Mabuhay! Welcome sa (.+)!$/, "Welcome to $1!"],
+          [/^Bagong pwesto: (.+)!$/, "New location: $1!"],
+          [/^(.+) is ready!$/, "$1 is ready!"],
+          [/^(.+) nabili na!$/, "$1 purchased!"],
+          [/^(.+) paid ₱(\d+), kasama na ang tip!$/, "$1 paid ₱$2, including a tip!"],
+          [/^Naka-lista kay (.+)! \+10 goodwill at \+(\d+) XP\.$/, "$1's purchase was added to the credit book! +10 goodwill and +$2 XP."],
+          [/^Ayos! ₱(\d+)(.*) at \+(\d+) XP\. Salamat, suki!$/, "Great! ₱$1$2 and +$3 XP. Thanks for stopping by!"]
+        ];
+        for (const [pattern, replacement] of patterns) {
+          if (pattern.test(message)) return message.replace(pattern, replacement);
+        }
+        return message;
+      }
+
       function announce(message, kind = "success") {
         const toast = $("toast");
-        $("toast-message").textContent = message;
+        $("toast-message").textContent = localizeNotice(message);
         $("toast-icon").textContent = kind === "error" ? "⚠️" : kind === "success" ? "✨" : "ℹ️";
         toast.className = `toast visible ${kind}`;
         window.clearTimeout(toastTimer);
@@ -962,14 +1237,63 @@
         return audioContext;
       }
 
+      function readVolume(key, fallback) {
+        try {
+          const saved = window.localStorage.getItem(key);
+          if (saved === null) return fallback;
+          const value = Number(saved);
+          return Number.isFinite(value) ? Math.round(Math.max(0, Math.min(100, value))) : fallback;
+        } catch (error) {
+          console.error(`Unable to read audio setting ${key}.`, error);
+          return fallback;
+        }
+      }
+
+      function syncVolumeControls() {
+        const controls = [
+          ["header-bgm-volume", "header-bgm-value", bgmVolume],
+          ["settings-bgm-volume", "settings-bgm-value", bgmVolume],
+          ["header-sfx-volume", "header-sfx-value", sfxVolume],
+          ["settings-sfx-volume", "settings-sfx-value", sfxVolume]
+        ];
+        controls.forEach(([inputId, outputId, value]) => {
+          $(inputId).value = String(value);
+          $(outputId).value = `${value}%`;
+          $(outputId).textContent = `${value}%`;
+        });
+      }
+
+      function setVolume(kind, value) {
+        const next = Math.round(Math.max(0, Math.min(100, Number(value) || 0)));
+        const previous = kind === "bgm" ? bgmVolume : sfxVolume;
+        if (kind === "bgm") {
+          bgmVolume = next;
+          state.sound.bgm = next > 0;
+        } else {
+          sfxVolume = next;
+          state.sound.sfx = next > 0;
+        }
+        syncVolumeControls();
+        if (kind === "bgm" && previous === 0 && next > 0) {
+          getAudioContext();
+          playMusicNote();
+        } else if (kind === "bgm" && next === 0) {
+          window.clearTimeout(bgmTimer);
+          bgmTimer = null;
+        }
+        if (kind === "sfx" && previous === 0 && next > 0) playSfx("click");
+        persist();
+      }
+
       function tone(frequency, duration, options = {}) {
-        if (!state.sound.sfx && !options.music) return;
+        const level = options.music ? bgmVolume : sfxVolume;
+        if (level === 0) return;
         const context = getAudioContext();
         if (!context) return;
         const oscillator = context.createOscillator();
         const gain = context.createGain();
         const start = context.currentTime + (options.delay || 0);
-        const volume = options.volume ?? 0.045;
+        const volume = (options.volume ?? 0.045) * level / 100;
         oscillator.type = options.type || "sine";
         oscillator.frequency.setValueAtTime(frequency, start);
         if (options.endFrequency) oscillator.frequency.exponentialRampToValueAtTime(options.endFrequency, start + duration);
@@ -983,7 +1307,7 @@
       }
 
       function playSfx(kind) {
-        if (!state.sound.sfx) return;
+        if (sfxVolume === 0) return;
         const notes = {
           click: [[520, .055, { type: "triangle", volume: .035 }]],
           fry: [[180, .16, { type: "sawtooth", endFrequency: 105, volume: .018 }]],
@@ -992,13 +1316,17 @@
           clear: [[280, .12, { type: "triangle", endFrequency: 185, volume: .035 }]],
           cash: [[660, .11, { type: "triangle", volume: .045 }], [880, .12, { type: "triangle", delay: .075, volume: .04 }], [1180, .17, { type: "sine", delay: .15, volume: .035 }]],
           claim: [[660, .1, { type: "sine", volume: .04 }], [880, .1, { type: "sine", delay: .08, volume: .04 }], [1100, .18, { type: "sine", delay: .16, volume: .04 }]],
+          close: [[784, .18, { type: "sine", volume: .025 }], [659, .24, { type: "sine", delay: .14, volume: .022 }]],
           level: [[523, .15, { type: "triangle", volume: .045 }], [659, .15, { type: "triangle", delay: .13, volume: .045 }], [784, .15, { type: "triangle", delay: .26, volume: .045 }], [1047, .32, { type: "sine", delay: .39, volume: .05 }]]
         };
         (notes[kind] || []).forEach(([frequency, duration, options]) => tone(frequency, duration, options));
       }
 
       function playMusicNote() {
-        if (!state.sound.bgm) return;
+        if (bgmVolume === 0) {
+          bgmTimer = null;
+          return;
+        }
         const melody = [523, 659, 784, 659, 587, 698, 880, 698, 523, 659, 784, 988, 880, 784, 659, 587];
         const note = melody[musicStep % melody.length];
         tone(note, .18, { type: "triangle", volume: .018, music: true });
@@ -1007,31 +1335,13 @@
         bgmTimer = window.setTimeout(playMusicNote, 245);
       }
 
-      function toggleAudio(kind) {
-        state.sound[kind] = !state.sound[kind];
-        const button = $(`${kind}-toggle`);
-        const enabled = state.sound[kind];
-        button.setAttribute("aria-pressed", String(enabled));
-        button.setAttribute("aria-label", `Turn ${kind === "bgm" ? "background music" : "sound effects"} ${enabled ? "off" : "on"}`);
-        button.innerHTML = `<span aria-hidden="true">${kind === "bgm" ? enabled ? "🔊" : "🔇" : enabled ? "🔔" : "🔕"}</span><span>${kind === "bgm" ? `BGM ${enabled ? "On" : "Off"}` : `SFX ${enabled ? "On" : "Off"}`}</span>`;
-        if (kind === "bgm") {
-          window.clearTimeout(bgmTimer);
-          if (enabled) {
-            getAudioContext();
-            playMusicNote();
-          }
-        } else if (enabled) {
-          getAudioContext();
-          playSfx("click");
-        }
-        persist();
-      }
-
       function persist() {
         try {
           const serialized = JSON.stringify(state);
           window.localStorage.setItem(STORAGE_KEY, serialized);
           window.localStorage.setItem(LEGACY_STORAGE_KEY, serialized);
+          window.localStorage.setItem(BGM_VOLUME_KEY, String(bgmVolume));
+          window.localStorage.setItem(SFX_VOLUME_KEY, String(sfxVolume));
           savedProgressExists = hasSavedGame();
           if ($("continue-button")) updateHomeSave();
           return true;
@@ -1045,59 +1355,185 @@
       function updateHomeSave() {
         const exists = savedProgressExists || hasSavedGame();
         $("continue-button").disabled = !exists;
-        $("save-badge").textContent = exists ? `Level ${state.level} · ₱${state.coins.toLocaleString("en-PH")}` : "NO SAVE";
+        $("save-badge").textContent = exists
+          ? `${state.language === "tl" ? "Antas" : "Level"} ${state.level} · ₱${state.coins.toLocaleString("en-PH")}`
+          : (state.language === "tl" ? "WALANG SAVE" : "NO SAVE");
       }
 
       function setLanguage(language) {
         state.language = language === "tl" ? "tl" : "en";
-        document.documentElement.lang = state.language === "tl" ? "tl" : "en";
+        const isTl = state.language === "tl";
+        document.documentElement.lang = isTl ? "tl" : "en";
         $("language-select").value = state.language;
-        const labels = state.language === "tl" ? {
-          "new-game-button": "🎮 BAGONG LARO",
-          "continue-button": "⏯️ IPAGPATULOY",
-          "home-settings-button": "⚙️ MGA SETTING",
-          "quests-button": "📋 Mga Quest",
-          "shop-button": "🛒 Tindahan",
-          "credit-button": "📒 Lista",
-          "food-title": "Pumili ng tusok-tusok",
-          "drink-title": "Palamig at Inumin",
-          "tray-title": "Ayusin sa order tray",
-          "sauce-title": "Piliin ang sawsawan",
-          "serve-button": "🍡 Ihain na sa customer! ➜",
-          "settings": "Mga Setting"
-        } : {
-          "new-game-button": "🎮 START NEW GAME",
-          "continue-button": "⏯️ CONTINUE",
-          "home-settings-button": "⚙️ SETTINGS",
-          "quests-button": "📋 Daily Quests",
-          "shop-button": "🛒 Cart Shop",
-          "credit-button": "📒 Lista",
-          "food-title": "Pumili ng tusok-tusok",
-          "drink-title": "Palamig & Street Drinks",
-          "tray-title": "Ayusin sa order tray",
-          "sauce-title": "Piliin ang sawsawan",
-          "serve-button": "🍡 Ihain na sa customer! ➜",
-          "settings": "Settings"
+        $("header-language-select").value = state.language;
+        const put = (selector, english, tagalog) => {
+          const element = document.querySelector(selector);
+          if (element) element.textContent = isTl ? tagalog : english;
         };
-        $("new-game-button").textContent = labels["new-game-button"];
-        $("continue-button").firstChild.textContent = `${labels["continue-button"]} `;
-        $("home-settings-button").textContent = labels["home-settings-button"];
-        $("quests-button").textContent = labels["quests-button"];
-        $("shop-button").textContent = labels["shop-button"];
-        $("credit-button").firstChild.textContent = `${labels["credit-button"]} `;
-        ["food-title", "drink-title", "tray-title", "sauce-title"].forEach(id => {
-          const heading = $(id);
-          heading.lastChild.textContent = labels[id];
+        const copy = [
+          ["#home-title span", "Pinoy Street Food Tycoon", "Pinoy Street Food Tycoon"],
+          ["#home-description", "Serve tusok-tusok, pour fresh palamig, and become the neighborhood's favorite street cart.", "Magtinda ng tusok-tusok at sariwang palamig, at maging paboritong kariton ng buong barangay."],
+          [".home-kicker", "🇵🇭 YOUR LITTLE CORNER OF MANILA", "🇵🇭 MUNTING SULOK MO SA MAYNILA"],
+          ["#new-game-button", "🎮 START NEW GAME", "🎮 BAGONG LARO"],
+          ["#continue-button", "⏯️ CONTINUE", "⏯️ IPAGPATULOY"],
+          ["#home-settings-button", "⚙️ SETTINGS", "⚙️ MGA SETTING"],
+          ["#audio-controls-label", "🔊 Volume", "🔊 Lakas ng Tunog"],
+          ["#header-bgm-label", "🎵 Music", "🎵 Musika"],
+          ["#header-sfx-label", "🔔 Effects", "🔔 Epekto"],
+          ["#level-display", `Level ${state.level}`, `Antas ${state.level}`],
+          [".progress-label", "LEVEL UP", "PAG-LEVEL UP"],
+          ["#business-status", "OPEN FOR BUSINESS", "BUKAS NA ANG TINDAHAN"],
+          ["#health-seal-status", "CLEAN CART, TRUSTED SUKI!", "MALINIS NA KARITON, MAPAGKAKATIWALAANG SUKI!"],
+          ["#quests-button", "📋 Daily Quests", "📋 Mga Misyon"],
+          ["#shop-button", "🛒 Cart Shop", "🛒 Tindahan"],
+          [".customer-heading h1 > span:last-child", "Your customer is here!|The next suki is ready to order.", "May order ka!|Heto na ang susunod mong suki."],
+          [".order-card .micro-label", "CUSTOMER ORDER", "ORDER NI SUKI"],
+          [".patience-row span:first-child", "CUSTOMER PATIENCE", "PASENSYA NG SUKI"],
+          [".customer-footer span:last-child", "Perfect order = bonus tip!", "Tamang order = dagdag tip!"],
+          [".stat-card:first-child .stat-label", "Orders served", "Mga naihain na order"],
+          [".stat-card:last-child .stat-label", "Suki streak", "Sunod-sunod na suki"],
+          [".station-head h2", "Prepare the order", "Ihanda ang order"],
+          [".station-kicker", "Fresh from the pan, made for your suki", "Bagong luto sa kawali, para sa suki"],
+          ["#tray-total", "Your cup is empty", "Wala pang laman ang cup"],
+          ["#clear-button", "↺ Clear Cup", "↺ Alisin ang laman"],
+          ["#sanitation-title", "🧼 Cart Cleanliness", "🧼 Kalinisan ng Kariton"],
+          ["#seal-pricing-note", state.healthSeal ? "Official seal: +15% selling prices" : "Clean cart, happy inspector!", state.healthSeal ? "Opisyal na selyo: +15% sa presyo" : "Malinis na kariton, masayang inspektor!"],
+          [".sanitation-label", "Clean Oil Gauge", "Sukat ng Kalinisan ng Mantika"],
+          ["#clean-oil-button", "🧽 Clean Oil", "🧽 Linisin ang Mantika"],
+          ["#jar-cover-button", state.jarCovered ? "🫙 Jar Covered ✓" : "🫙 Jar Open", state.jarCovered ? "🫙 Takip ang Garapon ✓" : "🫙 Bukas ang Garapon"],
+          ["#order-summary-text", "Compare the order before serving.", "Tiyaking tama ang order bago ihain."],
+          ["#earnings-preview", `Suki tip up to ₱${order ? 8 : 0}`, `Tip ng suki hanggang ₱${order ? 8 : 0}`],
+          ["#setup-title", "Open your street cart!", "Buksan na ang iyong kariton!"],
+          [".modal-eyebrow", "WELCOME TO KAINAN SIM", "MALIGAYANG PAGDATING SA KAINAN SIM"],
+          ["#setup-description", "Choose a cart name and vendor. Let's start your Pinoy street food adventure!", "Pumili ng pangalan at tindero. Simulan na natin ang iyong Pinoy street food adventure!"],
+          ["label[for='vendor-name-input']", "Name your cart", "Pangalan ng iyong kariton"],
+          ["#vendor-options", "Manong Boy|Classic tusok-tusok uncle|Kuya Jun|Classic tusok-tusok vendor|Ate Bebang|Energetic street-food vendor|Bossing|Cool street-food vendor", "Manong Boy|Klasikong tusok-tusok na tiyuhin|Kuya Jun|Palakaibigang tusok-tusok vendor|Ate Bebang|Masayahing street-food ate|Bossing|Astig na vendor"],
+          ["#reset-progress-button", "🗑️ Reset Progress", "🗑️ I-reset ang Progress"],
+          ["#setup-submit", "Start my business! →", "Simulan ang negosyo! →"],
+          ["#setup-cancel", "Back to the game", "Bumalik sa laro"],
+          ["#level-description", "Great work! You're the talk of the neighborhood!", "Ang galing mo! Usap-usapan ka na sa buong barangay!"],
+          ["#level-dismiss", "Keep the cart rolling! →", "Tuloy ang negosyo! →"],
+          ["#quests-title", "Daily Quests", "Mga Misyon Ngayon"],
+          [".quest-modal-description", "Complete today's challenges and claim your bonus!", "Tapusin ang mga hamon ngayong araw at kunin ang bonus!"],
+          ["#quests-refresh", "↻ New Quests (test)", "↻ Mga Bagong Misyon (test)"],
+          ["#shop-title", "Cart Shop", "Tindahan ng Kariton"],
+          ["#shop-description", "Upgrade your cart, gear up your vendor, and find a new spot!", "I-upgrade ang kariton, bihisan ang tindero, at humanap ng bagong pwesto!"],
+          ["#credit-title", "Neighborhood Credit Book", "Lista sa Listahan"],
+          ["#credit-description", "Borrow today, repay tomorrow. Visit your suki to remind them.", "Utang ngayon, bayad bukas. Bisitahin muli ang suki para magpaalala."],
+          ["#credit-offer-title", "Add it to the credit list?", "Ilista muna natin?"],
+          ["#credit-decline", "Pay now", "Bayad ngayon"],
+          ["#credit-accept", "Sure, put it on my list!", "Sige, ilista mo!"],
+          ["#home-settings-title", "Settings", "Mga Setting"],
+          ["#home-settings-description", "Customize game sound and language.", "I-personalize ang tunog at wika ng laro."],
+          ["#settings-bgm-label", "🔊 Background Music (BGM)", "🔊 Musikang Panglikod (BGM)"],
+          ["#settings-sfx-label", "🔔 Sound Effects (SFX)", "🔔 Mga Epekto ng Tunog (SFX)"],
+          ["label[for='language-select'] span", "🌐 Language", "🌐 Wika"],
+          ["#home-reset-button", "🗑️ Reset Game Progress", "🗑️ I-reset ang Laro"],
+          ["#inspection-title", "🚨 BARANGAY HEALTH INSPECTOR ARRIVED!", "🚨 DUMATING ANG INSPEKTOR NG BARANGAY!"],
+          ["#inspection-description", "Orders are paused while the inspector checks your cart.", "Pansamantalang hihinto ang bentahan habang sinusuri ang iyong kariton."],
+          ["#inspection-dismiss", "OK, Back to Selling!", "Sige, balik sa benta!"],
+          ["#credit-button", "📒 Credit Book", "📒 Lista"],
+          ["[data-close-modal='home-settings-modal']", "✖ Close Settings", "✖ Isara ang Settings"],
+          ["[data-close-modal='quests-modal']", "Continue playing", "Tuloy ang laro"],
+          ["[data-close-modal='shop-modal']", "Back to the cart", "Bumalik sa kariton"],
+          ["[data-close-modal='credit-modal']", "Back to business", "Tuloy ang negosyo"]
+        ];
+        copy.forEach(([selector, english, tagalog]) => {
+          const value = isTl ? tagalog : english;
+          if (selector === "#vendor-options") {
+            document.querySelectorAll(".vendor-option").forEach((option, index) => {
+              const [name, detail] = value.split("|").slice(index * 2, index * 2 + 2);
+              option.querySelector("small").textContent = detail;
+              if (option.dataset.vendor !== "manong" && option.dataset.vendor !== "jun") option.querySelector("strong").textContent = name;
+            });
+          } else if (selector === ".customer-heading h1 > span:last-child") {
+            const [title, subtitle] = value.split("|");
+            const span = document.querySelector(selector);
+            span.firstChild.textContent = title;
+            span.querySelector("small").textContent = subtitle;
+          } else if (["#continue-button", "#credit-button", "#food-title", "#drink-title", "#tray-title", "#sauce-title"].includes(selector)) {
+            const element = document.querySelector(selector);
+            if (selector === "#continue-button" || selector === "#credit-button") element.firstChild.textContent = `${value} `;
+            else element.lastChild.textContent = value;
+          } else {
+            put(selector, english, tagalog);
+          }
         });
-        $("serve-button").querySelector("span:nth-child(2)").textContent = state.language === "tl" ? "Ihain na sa suki!" : "Ihain na sa customer!";
-        $("home-settings-title").textContent = labels.settings;
-        $("home-description").textContent = state.language === "tl"
-          ? "Tusok-tusok, palamig, at diskarte! Buksan ang iyong kariton at maging paboritong tindahan ng buong barangay."
-          : "Serve tusok-tusok, pour fresh palamig, and become the neighborhood's favorite street cart.";
-        $("settings-bgm-toggle").textContent = state.sound.bgm ? "ON" : "OFF";
-        $("settings-bgm-toggle").setAttribute("aria-pressed", String(state.sound.bgm));
-        $("settings-sfx-toggle").textContent = state.sound.sfx ? "ON" : "OFF";
-        $("settings-sfx-toggle").setAttribute("aria-pressed", String(state.sound.sfx));
+        const labels = {
+          "food-heading": ["Choose tusok-tusok", "Pumili ng tusok-tusok"],
+          "food-caption": ["Tap a food to add it to the cup", "Pindutin ang pagkain para idagdag sa cup"],
+          "drink-heading": ["Palamig & Street Drinks", "Palamig at mga Inumin"],
+          "drink-caption": ["Add a cool drink to make it a combo!", "Magdagdag ng palamig para sa combo!"],
+          "tray-heading": ["Your Paper Cup", "Paper Cup Mo"],
+          "customer-bubble-label": ["MY ORDER!", "ORDER KO!"],
+          "tray-detail-title": ["CURRENT ORDER", "KASALUKUYANG ORDER"],
+          "sauce-heading": ["Choose a dipping sauce", "Piliin ang sawsawan"],
+          "serve-label": ["Serve the customer!", "Ihain na sa suki!"],
+          "day-report-eyebrow": ["DAILY SALES REPORT", "TALAAN NG BENTA NGAYONG ARAW"],
+          "day-report-description": ["The cart is closed for tonight. Here's today's tally.", "Sarado na ang kariton ngayong gabi. Heto ang talaan ng benta."],
+          "sales-customers": ["Customers served", "Mga suking naihain"],
+          "sales-lost": ["Customers lost", "Mga suking nainip/naiwan"],
+          "sales-gross": ["Food & drink sales", "Benta ng pagkain at inumin"],
+          "sales-tips": ["Tips & bonuses", "Mga tip at bonus"],
+          "sales-total": ["Gross earnings", "Kabuuang benta"],
+          "sales-expenses": ["Rent & supplies", "Upa at mga suplay"],
+          "sales-net": ["Net profit", "Malinis na kita"]
+        };
+        document.querySelectorAll("[data-i18n]").forEach(element => {
+          const translations = labels[element.dataset.i18n];
+          if (translations) element.textContent = translations[isTl ? 1 : 0];
+        });
+        $("home-settings-modal").querySelector(".modal-description").id = "home-settings-description";
+        const modalDescriptions = {
+          "quests-modal": ["Complete today's challenges and claim your bonus!", "Tapusin ang mga hamon ngayong araw at kunin ang bonus!"],
+          "shop-modal": ["Upgrade your cart, gear up your vendor, and find a new spot!", "I-upgrade ang kariton, bihisan ang tindero, at humanap ng bagong pwesto!"],
+          "credit-modal": ["Borrow today, repay tomorrow. Visit your suki to remind them.", "Utang ngayon, bayad bukas. Bisitahin muli ang suki para magpaalala!"],
+          "home-settings-modal": ["Customize game sound and language.", "I-personalize ang tunog at wika ng laro."]
+        };
+        Object.entries(modalDescriptions).forEach(([id, values]) => {
+          const paragraph = $(`${id}`).querySelector(".modal-description");
+          paragraph.textContent = values[isTl ? 1 : 0];
+        });
+        document.querySelectorAll(".shop-tab").forEach(button => {
+          const labels = {
+            upgrades: ["⚙️ Upgrades", "⚙️ Mga Upgrade"],
+            cosmetics: ["🧢 Cosmetics", "🧢 Pampa-ayos"],
+            vehicles: ["🛺 Rides", "🛺 Sasakyan"],
+            locations: ["📍 Locations", "📍 Mga Lugar"]
+          };
+          button.textContent = labels[button.dataset.category][isTl ? 1 : 0];
+        });
+        const settingsEyebrow = $("home-settings-modal").querySelector(".modal-eyebrow");
+        settingsEyebrow.textContent = isTl ? "AYUSIN ANG IYONG LARO" : "PERSONALIZE YOUR GAME";
+        const questEyebrow = $("quests-modal").querySelector(".modal-eyebrow");
+        questEyebrow.textContent = isTl ? "BAGONG ARAW, BAGONG DISKARTE" : "A NEW DAY, A NEW CHALLENGE";
+        const shopEyebrow = $("shop-modal").querySelector(".modal-eyebrow");
+        shopEyebrow.textContent = isTl ? "INVEST SA IYONG KARITON" : "INVEST IN YOUR CART";
+        const creditEyebrow = $("credit-modal").querySelector(".modal-eyebrow");
+        creditEyebrow.textContent = isTl ? "TIWALA NG KAPITBAHAY" : "NEIGHBORHOOD TRUST";
+        const setupEyebrow = $("setup-modal").querySelector(".modal-eyebrow");
+        setupEyebrow.textContent = isTl ? "MALIGAYANG PAGDATING SA KAINAN SIM" : "WELCOME TO KAINAN SIM";
+        const levelEyebrow = $("level-modal").querySelector(".modal-eyebrow");
+        levelEyebrow.textContent = isTl ? "SANA ALL, UMAANGAT!" : "LOOK AT YOU LEVELING UP!";
+        const inspectionEyebrow = $("inspection-modal").querySelector(".modal-eyebrow");
+        inspectionEyebrow.textContent = isTl ? "TANGGAPAN NG KALUSUGAN NG BARANGAY" : "BARANGAY HEALTH OFFICE";
+        $("day-report-modal").querySelector(".modal-eyebrow").textContent = isTl ? "TALAAN NG BENTA NGAYONG ARAW" : "DAILY SALES REPORT";
+        const creditOfferEyebrow = $("credit-offer-modal").querySelector(".modal-eyebrow");
+        creditOfferEyebrow.textContent = isTl ? "REGULAR NA SUKI" : "REGULAR CUSTOMER";
+        $("home-settings-modal").querySelector("[data-close-modal]").textContent = isTl ? "✖ Isara ang Settings" : "✖ Close Settings";
+        document.querySelector(".brand-subtitle").textContent = "PINOY STREET FOOD TYCOON";
+        document.querySelector(".brand").setAttribute("aria-label", isTl ? "Kainan Sim, negosyong Pinoy na street food" : "Kainan Sim street food tycoon");
+        $("language-select").value = state.language;
+        renderHeader();
+        renderCustomer();
+        renderFood();
+        renderDrinks();
+        renderSauces();
+        renderTray();
+        renderSanitation();
+        renderQuests();
+        if (state.dayClosed) renderDayReport();
+        if (!$("shop-modal").hidden) renderShop();
         updateHomeSave();
         persist();
       }
@@ -1160,19 +1596,31 @@
         ensureQuestDay();
         const list = $("quest-list");
         list.replaceChildren();
+        const questCopy = {
+          fishballs: ["Serve 10 Fishballs", "Fishballs na naihain ngayong araw", "Maghain ng 10 Fishball", "Fishball na naihain ngayong araw"],
+          spicy: ["Serve 5 customers with Spicy Sauce", "Customers served with Spicy Sauce", "Maghain sa 5 suki ng Spicy Sauce", "Mga suking inihainan ng Spicy Sauce"],
+          streak: ["Get a 5-customer streak", "Perfect orders in a row", "Makakuha ng 5 sunod-sunod na suki", "Perpektong sunod-sunod na order"],
+          earnings: ["Earn ₱500 in one day", "Coins earned today", "Kumita ng ₱500 sa isang araw", "Mga baryang kinita ngayong araw"]
+        };
         QUEST_DEFINITIONS.forEach(quest => {
           const progress = questProgress(quest.id);
           const claimed = state.quests.claimed.includes(quest.id);
+          const [englishTitle, englishDetail, tagalogTitle, tagalogDetail] = questCopy[quest.id];
+          const title = state.language === "tl" ? tagalogTitle : englishTitle;
+          const detail = state.language === "tl" ? tagalogDetail : englishDetail;
+          const claimLabel = claimed ? (state.language === "tl" ? "✅ Tapos na" : "✅ Done")
+            : isQuestClaimable(quest) ? (state.language === "tl" ? "Kunin ang Gantimpala" : "Claim Reward")
+              : (state.language === "tl" ? "Isinasagawa" : "In Progress");
           const card = document.createElement("article");
           card.className = "quest-card";
           card.innerHTML = `
-            <div class="quest-card-top"><strong class="quest-title">${quest.title}</strong><span class="quest-reward">₱${quest.rewardCoins} + ${quest.rewardXp} XP</span></div>
-            <div class="quest-progress-text">${quest.detail} · ${progress.toLocaleString("en-PH")}/${quest.target.toLocaleString("en-PH")}</div>
-            <div class="quest-meter" role="progressbar" aria-label="${quest.title}" aria-valuemin="0" aria-valuemax="${quest.target}" aria-valuenow="${progress}"><div class="quest-meter-fill" style="width:${progress / quest.target * 100}%"></div></div>
-            <button class="quest-claim${isQuestClaimable(quest) ? " ready" : ""}" type="button" data-claim="${quest.id}" ${claimed ? "disabled" : ""}>${claimed ? "✅ Done" : isQuestClaimable(quest) ? "Claim Reward" : "In Progress"}</button>`;
+            <div class="quest-card-top"><strong class="quest-title">${title}</strong><span class="quest-reward">₱${quest.rewardCoins} + ${quest.rewardXp} XP</span></div>
+            <div class="quest-progress-text">${detail} · ${progress.toLocaleString("en-PH")}/${quest.target.toLocaleString("en-PH")}</div>
+            <div class="quest-meter" role="progressbar" aria-label="${title}" aria-valuemin="0" aria-valuemax="${quest.target}" aria-valuenow="${progress}"><div class="quest-meter-fill" style="width:${progress / quest.target * 100}%"></div></div>
+            <button class="quest-claim${isQuestClaimable(quest) ? " ready" : ""}" type="button" data-claim="${quest.id}" ${claimed ? "disabled" : ""}>${claimLabel}</button>`;
           list.append(card);
         });
-        $("quest-day").textContent = `Daily reset: ${state.quests.day}`;
+        $("quest-day").textContent = `${state.language === "tl" ? "Bagong misyon sa" : "Daily reset"}: ${state.quests.day}`;
       }
 
       function claimQuest(id) {
@@ -1232,18 +1680,62 @@
         $("shop-balance").textContent = `₱${state.coins.toLocaleString("en-PH")}`;
         const list = $("shop-list");
         list.replaceChildren();
+        const isTl = state.language === "tl";
+        const productNames = {
+          pan: ["Frying Pan Capacity", "Kapasidad ng Kawali"],
+          fryer: ["Speed Fryer Booster", "Pampabilis ng Pagprito"],
+          security: ["Cart Security Guard", "Guwardiya ng Kariton"],
+          time: ["Rush Hour Time Extension", "Dagdag Oras sa Rush Hour"],
+          training: ["Vendor Skills Workshop", "Workshop ng Kasanayan"],
+          "jun-apron": ["Kuya Jun's Best Apron", "Pinakamagandang Apron ni Kuya Jun"],
+          "bebang-hat": ["Ate Bebang's Chef Hat", "Sombrerong Chef ni Ate Bebang"],
+          "bossing-shades": ["Bossing's Neon Shades", "Neon Shades ni Bossing"],
+          "neon-sign": ["Neon Tusok-Tusok Sign", "Neon Karatula ng Tusok-Tusok"],
+          "pedal-trike": ["Pedal Trike", "Bisikart"],
+          ebike: ["E-Bike", "E-Bike"],
+          sidecar: ["Motorized Sidecar", "De-motor na Sidecar"],
+          quiapo: ["Quiapo Market", "Pamilihan ng Quiapo"],
+          plaza: ["Town Plaza", "Plasa ng Bayan"],
+          school: ["School Gates", "Tarangkahan ng Paaralan"],
+          terminal: ["Jeepney Terminal", "Terminal ng Jeep"]
+        };
+        const productDetails = {
+          pan: [`Capacity: ${trayCapacity()} items${state.upgrades.pan ? " (upgraded)" : ""}`, `Kapasidad: ${trayCapacity()} piraso${state.upgrades.pan ? " (na-upgrade na)" : ""}`],
+          fryer: ["20% faster prep and 15 extra seconds of patience.", "20% mas mabilis maghanda at dagdag 15 segundo sa pasensya."],
+          security: ["Protect your food from thieves while you work.", "Protektahan ang pagkain laban sa mga magnanakaw."],
+          time: [`${state.upgrades.timeCharges} extra 10-second rush-hour extension(s).`, `${state.upgrades.timeCharges} dagdag-oras na tig-10 segundo para sa rush hour.`],
+          training: [`${state.upgrades.training} workshop(s) completed · +25 XP each.`, `${state.upgrades.training} workshop ang natapos · +25 XP bawat isa.`],
+          "jun-apron": ["A fresh look for Kuya Jun.", "Bagong bihis para kay Kuya Jun."],
+          "bebang-hat": ["The chef of the neighborhood!", "Chef ng buong barangay!"],
+          "bossing-shades": ["Look cool from morning to night.", "Astig mula umaga hanggang gabi."],
+          "neon-sign": ["Make your cart easy to spot.", "Makikita ang kariton kahit sa malayo."],
+          "pedal-trike": ["Your original neighborhood ride.", "Orihinal na sakay pang-kanto."],
+          ebike: ["Unlock the School Gates and Jeepney Terminal.", "Buksan ang Tarangkahan ng Paaralan at Terminal ng Jeep."],
+          sidecar: ["Unlock every selling location.", "Buksan ang lahat ng puwesto."],
+          quiapo: ["Balanced customer flow · 100% tips", "Balanseng dami ng suki · 100% tip"],
+          plaza: ["Steady neighborhood customers · 100% tips", "Palaging may suki · 100% tip"],
+          school: ["Lots of students · 90% tips", "Maraming estudyante · 90% tip"],
+          terminal: ["Bigger tips · 140% tips", "Mas malaking tip · 140% tip"]
+        };
         shopProducts(shopCategory).forEach(product => {
           const equipped = product.id === state.equippedCosmetic || product.id === state.vehicle || product.id === state.location;
           const owned = Boolean(product.owned);
-          const buttonLabel = product.id === "time" ? "Buy +1" : product.id === "training" ? "Buy workshop" : product.disabled ? "Locked" : owned ? (equipped ? "✓ Equipped" : product.id === "pan" || product.id === "fryer" || product.id === "security" ? "✓ Owned" : "Equip") : `Buy ₱${product.cost}`;
+          const buttonLabel = product.id === "time" ? (isTl ? "Bumili +1" : "Buy +1")
+            : product.id === "training" ? (isTl ? "Bumili ng workshop" : "Buy workshop")
+              : product.disabled ? (isTl ? "Naka-lock" : "Locked")
+                : owned ? (equipped ? (isTl ? "✓ Suot/Gamit" : "✓ Equipped") : ["pan", "fryer", "security"].includes(product.id) ? (isTl ? "✓ Pag-aari" : "✓ Owned") : (isTl ? "Gamitin" : "Equip"))
+                  : `${isTl ? "Bumili" : "Buy"} ₱${product.cost}`;
           const vendorLocked = Boolean(product.vendor && product.vendor !== state.vendor);
           const disabled = product.disabled || vendorLocked || owned && !["cosmetics", "vehicles", "locations"].includes(shopCategory) || product.id === "time" && state.upgrades.timeCharges >= 99;
-          const detail = vendorLocked ? `Vendor-specific look for ${VENDORS[product.vendor].name}. Change vendors in Settings to buy it.` : product.detail;
+          const detail = vendorLocked
+            ? (isTl ? `Para kay ${VENDORS[product.vendor].name} lamang. Palitan ang tindero sa Settings para mabili ito.` : `Vendor-specific style for ${VENDORS[product.vendor].name}. Change vendors in Settings to buy it.`)
+            : (productDetails[product.id]?.[isTl ? 1 : 0] || product.detail);
+          const productName = productNames[product.id]?.[isTl ? 1 : 0] || product.name;
           const card = document.createElement("article");
           card.className = "shop-card";
           card.innerHTML = `
-              <div><div class="shop-card-top"><strong class="shop-title">${product.emoji} ${product.name}</strong><span class="shop-cost">${owned ? "Ready" : `₱${product.cost.toLocaleString("en-PH")}`}</span></div><div class="shop-detail">${detail}</div></div>
-              <button class="shop-buy" type="button" data-product="${product.id}" ${disabled ? "disabled" : ""}>${vendorLocked ? "Locked" : buttonLabel}</button>`;
+              <div><div class="shop-card-top"><strong class="shop-title">${product.emoji} ${productName}</strong><span class="shop-cost">${owned ? (isTl ? "Handa na" : "Ready") : `₱${product.cost.toLocaleString("en-PH")}`}</span></div><div class="shop-detail">${detail}</div></div>
+              <button class="shop-buy" type="button" data-product="${product.id}" ${disabled ? "disabled" : ""}>${vendorLocked ? (isTl ? "Naka-lock" : "Locked") : buttonLabel}</button>`;
           list.append(card);
         });
       }
@@ -1323,7 +1815,7 @@
 
       function renderHeader() {
         const required = levelRequirement();
-        $("level-display").textContent = `Level ${state.level}`;
+        $("level-display").textContent = `${state.language === "tl" ? "Antas" : "Level"} ${state.level}`;
         $("coin-display").textContent = `₱ ${state.coins.toLocaleString("en-PH")}`;
         $("xp-fill").style.width = `${Math.min(100, state.xp / required * 100)}%`;
         $("xp-count").textContent = `${state.xp} / ${required} XP`;
@@ -1332,77 +1824,120 @@
         const cosmetic = COSMETICS.find(item => item.id === state.equippedCosmetic);
         $("vendor-badge").textContent = `${cosmetic?.emoji || VENDORS[state.vendor].emoji} ${vendorDisplayName().toLocaleUpperCase("en")}`;
         document.title = `${state.cartName} — Kainan Sim`;
-        const bgm = $("bgm-toggle");
-        bgm.setAttribute("aria-pressed", String(state.sound.bgm));
-        bgm.setAttribute("aria-label", `Turn background music ${state.sound.bgm ? "off" : "on"}`);
-        bgm.innerHTML = `<span aria-hidden="true">${state.sound.bgm ? "🔊" : "🔇"}</span><span>BGM ${state.sound.bgm ? "On" : "Off"}</span>`;
-        const sfx = $("sfx-toggle");
-        sfx.setAttribute("aria-pressed", String(state.sound.sfx));
-        sfx.setAttribute("aria-label", `Turn sound effects ${state.sound.sfx ? "off" : "on"}`);
-        sfx.innerHTML = `<span aria-hidden="true">${state.sound.sfx ? "🔔" : "🔕"}</span><span>SFX ${state.sound.sfx ? "On" : "Off"}</span>`;
-        $("location-display").textContent = `${LOCATIONS.find(item => item.id === state.location)?.name.toLocaleUpperCase("en") || "QUIAPO MARKET"} • Manila Street Market`;
+        $("header-language-select").value = state.language;
+        syncVolumeControls();
+        const locationNames = {
+          quiapo: ["Quiapo Market", "Pamilihan ng Quiapo"],
+          plaza: ["Town Plaza", "Plasa ng Bayan"],
+          school: ["School Gates", "Tarangkahan ng Paaralan"],
+          terminal: ["Jeepney Terminal", "Terminal ng Jeep"]
+        };
+        const activeLocation = locationNames[state.location] || locationNames.quiapo;
+        $("location-display").textContent = `${activeLocation[state.language === "tl" ? 1 : 0].toLocaleUpperCase(state.language === "tl" ? "tl-PH" : "en")} • ${state.language === "tl" ? "Pamilihang Maynila" : "Manila Street Market"}`;
         const locationSelect = $("location-select");
+        locationSelect.setAttribute("aria-label", state.language === "tl" ? "Palitan ang lokasyon ng kariton" : "Change cart location");
         const currentLocation = state.location;
         locationSelect.replaceChildren(...LOCATIONS.map(location => {
           const option = document.createElement("option");
           option.value = location.id;
-          option.textContent = `${location.emoji} ${location.name}${availableLocation(location.id) ? "" : " 🔒"}`;
+          const translatedName = locationNames[location.id]?.[state.language === "tl" ? 1 : 0] || location.name;
+          option.textContent = `${location.emoji} ${translatedName}${availableLocation(location.id) ? "" : " 🔒"}`;
           option.disabled = !availableLocation(location.id);
           option.selected = location.id === currentLocation;
           return option;
         }));
-        $("weather-status").textContent = currentWeather === "rush" ? ` · STUDENT RUSH ${rushSeconds}s` : ` · ${currentWeather === "rainy" ? "RAINY" : "SUNNY"} ${weatherSeconds}s`;
-        const weatherButton = $("weather-button");
-        const weatherName = { sunny: "☀️ Sunny", rainy: "🌧️ Rainy", rush: `🔔 Rush ${rushSeconds}s` }[currentWeather];
-        weatherButton.textContent = weatherName;
-        weatherButton.classList.toggle("rush-live", currentWeather === "rush");
-        weatherButton.setAttribute("aria-label", `${weatherName}. Tap to cycle weather and rush events.`);
+        const weatherName = currentWeather === "sunny" ? (state.language === "tl" ? "☀️ Maaraw" : "☀️ Sunny")
+          : currentWeather === "rainy" ? (state.language === "tl" ? "🌧️ Maulan" : "🌧️ Rainy")
+            : (state.language === "tl" ? `⚡ Oras ng Rush · ${rushSeconds}s` : `⚡ Rush Hour · ${rushSeconds}s`);
+        $("weather-badge").textContent = weatherName;
+        $("weather-badge").classList.toggle("rush-live", currentWeather === "rush");
+        const elapsedMinutes = Math.floor(state.dayElapsedSeconds * (18 * 60) / DAY_DURATION_SECONDS);
+        const clockMinutes = (DAY_OPENING_MINUTES + elapsedMinutes) % (24 * 60);
+        const hour24 = Math.floor(clockMinutes / 60);
+        const minute = clockMinutes % 60;
+        const hour12 = hour24 % 12 || 12;
+        const meridiem = hour24 < 12 ? "AM" : "PM";
+        $("game-clock").textContent = `${state.language === "tl" ? `Araw ${state.dayNumber}` : `Day ${state.dayNumber}`} · ${hour12}:${String(minute).padStart(2, "0")} ${meridiem}`;
+        $("business-status").textContent = state.dayClosed
+          ? (state.language === "tl" ? "SARADO NA NGAYONG ARAW" : "CLOSED FOR THE DAY")
+          : (state.language === "tl" ? "BUKAS NA ANG TINDAHAN" : "OPEN FOR BUSINESS");
         $("rush-extension").hidden = currentWeather !== "rush" || state.upgrades.timeCharges < 1;
         $("extension-count").textContent = String(state.upgrades.timeCharges);
         $("credit-badge").textContent = state.credits.length ? `(${state.credits.length})` : "";
         $("health-seal-banner").hidden = !state.healthSeal;
-        $("seal-pricing-note").textContent = state.healthSeal ? "Official seal: +15% selling prices" : "Clean cart, happy inspector!";
+        $("xp-track").setAttribute("aria-label", state.language === "tl" ? "Karanasan" : "Experience points");
+        $("customer-scene").setAttribute("aria-label", state.language === "tl" ? "Suki na naghihintay sa makulay na kariton sa Maynila" : "A customer waiting at a colorful Manila street food cart");
+        $("cup-preview").setAttribute("aria-label", state.language === "tl" ? "Inihandang order" : "Your prepared order");
+        $("patience-track").setAttribute("aria-label", state.language === "tl" ? "Pasensya ng suki" : "Customer patience");
+        $("seal-pricing-note").textContent = state.healthSeal
+          ? (state.language === "tl" ? "Opisyal na selyo: +15% sa presyo" : "Official seal: +15% selling prices")
+          : (state.language === "tl" ? "Malinis na kariton, masayang inspektor!" : "Clean cart, happy inspector!");
         updateHomeSave();
       }
 
       function renderCustomer() {
+        const sprite = $("customer-sprite");
+        const scene = document.querySelector(".customer-scene");
         if (!order) {
-          $("customer-name").textContent = "Heto na ang susunod na suki...";
-          $("order-description").textContent = "Sandali lang, naghahanda na ang susunod mong customer.";
+          $("customer-name").textContent = state.language === "tl" ? "Heto na ang susunod na suki..." : "The next customer is on the way...";
+          $("order-description").textContent = state.language === "tl" ? "Sandali lang, naghahanda na ang susunod mong customer." : "Just a moment, your next customer is getting ready.";
           $("vip-banner").hidden = true;
+          $("customer-order-bubble").hidden = true;
+          $("customer-order-icons").replaceChildren();
+          sprite.classList.remove("impatient");
+          scene.dataset.mood = customerMood;
+          $("customer-mood").textContent = customerMood === "happy" ? "🥰" : customerMood === "angry" ? "💢" : "💚";
           return;
         }
         $("customer-name").textContent = order.customer;
+        const customerName = order.customer.toLocaleLowerCase("en");
+        const avatar = order.vip?.id === "marites" || /aling nena|tita|ate mercy|marites/.test(customerName)
+          ? "marites"
+          : order.vip?.id === "tanod" || /manong|mang |jun-jun/.test(customerName)
+            ? "manong"
+            : /bebang|bebeng|maya/.test(customerName) ? "bebang" : "bossing";
+        $("customer-avatar-use").setAttribute("href", `#avatar-${avatar}`);
+        sprite.querySelector("svg").setAttribute("aria-label", `${order.customer}, ${state.language === "tl" ? "suki" : "customer"}`);
         const requirements = Object.entries(order.items).map(([id, quantity]) => {
           const item = foodFor(id);
           return `${quantity} ${item.name}${quantity > 1 ? "s" : ""}`;
         });
         const sauce = SAUCES.find(item => item.id === order.sauce);
         const orderPhrase = requirements.join(" + ");
-        $("order-description").textContent = `${orderPhrase}${order.drink ? ` + 1 ${drinkFor(order.drink).name}` : ""} with ${sauce.name} ${sauce.emoji}`;
-        $("customer-footer").innerHTML = `<span aria-hidden="true">💚</span><span>Perfect order = bonus tip!</span>`;
+        const orderDescription = `${orderPhrase}${order.drink ? ` + 1 ${drinkFor(order.drink).name}` : ""} ${state.language === "tl" ? "na may" : "with"} ${sauce.name} ${sauce.emoji}`;
+        $("order-description").textContent = orderDescription;
+        const bubble = $("customer-order-bubble");
+        bubble.hidden = false;
+        $("customer-bubble-label").textContent = state.language === "tl" ? "ORDER KO!" : "MY ORDER!";
+        bubble.setAttribute("aria-label", orderDescription);
+        const bubbleIcons = $("customer-order-icons");
+        bubbleIcons.replaceChildren();
+        const orderIcons = Object.entries(order.items).map(([id, quantity]) => ({
+          emoji: foodFor(id).emoji,
+          label: `${foodFor(id).name} ×${quantity}`,
+          count: quantity
+        }));
+        if (order.drink) orderIcons.push({ emoji: drinkFor(order.drink).emoji, label: drinkFor(order.drink).name, count: 1 });
+        orderIcons.push({ emoji: sauce.emoji, label: sauce.name, count: 1 });
+        orderIcons.forEach(item => {
+          const icon = document.createElement("span");
+          icon.className = "bubble-item";
+          icon.textContent = `${item.emoji}${item.count > 1 ? `×${item.count}` : ""}`;
+          icon.title = item.label;
+          bubbleIcons.append(icon);
+        });
+        $("customer-footer").innerHTML = `<span aria-hidden="true">💚</span><span>${state.language === "tl" ? "Tamang order = dagdag tip!" : "Perfect order = bonus tip!"}</span>`;
         const vip = order.vip;
         $("vip-banner").hidden = !vip;
-        if (vip) $("vip-banner").textContent = `${vip.emoji} ${vip.name} · ${vip.perk}`;
-        const preview = $("preview-orders");
-        preview.hidden = !discoveredOrders.length;
-        preview.replaceChildren();
-        if (discoveredOrders.length) {
-          const heading = document.createElement("div");
-          heading.className = "preview-title";
-          heading.textContent = "🔮 MARITES' TSISMIS: SUSUNOD NA 3 ORDER";
-          preview.append(heading);
-          discoveredOrders.forEach((next, index) => {
-            const line = document.createElement("div");
-            line.className = "preview-line";
-            const items = Object.entries(next.items).map(([id, count]) => `${count} ${foodFor(id).name}`).join(" + ");
-            const drink = next.drink ? ` + ${drinkFor(next.drink).name}` : "";
-            line.textContent = `${index + 1}. ${next.customer}: ${items}${drink} w/ ${SAUCES.find(item => item.id === next.sauce).name}`;
-            preview.append(line);
-          });
+        if (vip) {
+          const perks = {
+            tanod: ["Keeps food thieves away while here", "Pinipigilan ang mga magnanakaw habang narito"],
+            rich: ["Pays double for premium tusok-tusok", "Doble ang bayad sa premium na tusok-tusok"]
+          };
+          $("vip-banner").textContent = `${vip.emoji} ${vip.name} · ${perks[vip.id]?.[state.language === "tl" ? 1 : 0] || vip.perk}`;
         }
         $("patience-track").setAttribute("aria-valuenow", String(Math.ceil(patience / patienceMax * 100)));
-        renderPatience();
+        if (!customerTransitioning) renderPatience();
       }
 
       function renderPatience() {
@@ -1411,6 +1946,14 @@
         $("patience-fill").style.width = `${percent}%`;
         $("patience-fill").style.background = percent < 27 ? "#cb4b3b" : percent < 55 ? "#e6a333" : "#3a9a57";
         $("patience-track").setAttribute("aria-valuenow", String(Math.ceil(percent)));
+        const sprite = $("customer-sprite");
+        const scene = document.querySelector(".customer-scene");
+        const impatient = percent < 35;
+        customerMood = impatient ? "impatient" : "waiting";
+        sprite.classList.toggle("impatient", impatient);
+        sprite.classList.toggle("waiting-idle", !impatient && !customerTransitioning && !["arriving", "happy", "rejecting"].some(name => sprite.classList.contains(name)));
+        scene.dataset.mood = impatient ? "impatient" : "waiting";
+        $("customer-mood").textContent = impatient ? "💦" : "💚";
       }
 
       function renderFood() {
@@ -1419,23 +1962,24 @@
         FOODS.forEach(item => {
           const unlocked = state.unlockedItems.includes(item.id);
           const count = tray[item.id] || 0;
-          const card = document.createElement("article");
+          const card = document.createElement("button");
+          card.type = "button";
+          card.disabled = !unlocked || !order || customerTransitioning || preparedTotal() >= trayCapacity() || count >= 9 || state.dayClosed;
           card.className = `food-card${unlocked ? "" : " locked"}`;
+          card.dataset.food = item.id;
+          card.setAttribute("aria-label", unlocked
+            ? `${item.name}, ${count} ${state.language === "tl" ? "sa cup" : "in cup"}. ${state.language === "tl" ? "Pindutin para magdagdag ng isa." : "Tap to add one."}`
+            : `${item.name}. 🔒 ${state.language === "tl" ? "Mabubuksan sa Antas" : "Unlocks at Level"} ${item.unlock}`);
           card.innerHTML = `
             <div class="food-art">
               <span class="food-emoji" aria-hidden="true">${item.emoji}</span>
-              ${unlocked ? '<span class="unlock-chip">✓ READY</span>' : '<div class="food-lock-overlay" aria-label="Locked">🔒</div>'}
+              ${unlocked ? `<span class="unlock-chip">${state.language === "tl" ? "✓ BUKAS" : "✓ READY"}</span>` : `<span class="unlock-chip locked-level">${state.language === "tl" ? `Antas ${item.unlock}` : `Unlocks at Level ${item.unlock}`}</span><div class="food-lock-overlay" aria-hidden="true">🔒</div>`}
             </div>
             <div class="food-info">
-              <div class="food-topline"><span class="food-name">${item.name}</span><span class="food-price">₱${Math.ceil(item.price * (state.healthSeal ? 1.15 : 1))} / pc</span></div>
-              <div class="food-note">${unlocked ? item.note : `Unlocks at Level ${item.unlock}`}</div>
+              <div class="food-topline"><span class="food-name">${item.name}</span><span class="food-price">₱${Math.ceil(item.price * (state.healthSeal ? 1.15 : 1))} / ${state.language === "tl" ? "piraso" : "pc"}</span></div>
               <div class="food-controls">
-                <span class="tap-hint">${unlocked ? "Tusok-tusok!" : "Sarado pa"}</span>
-                <div class="qty-controls">
-                  <button class="qty-button" type="button" data-food="${item.id}" data-change="-1" aria-label="Remove one ${item.name}" ${!unlocked || !count ? "disabled" : ""}>−</button>
-                  <span class="qty-number" aria-label="${count} in cup">${count}</span>
-                  <button class="qty-button add" type="button" data-food="${item.id}" data-change="1" aria-label="Add one ${item.name} to the cup" ${!unlocked || preparedTotal() >= trayCapacity() || count >= 9 ? "disabled" : ""}>+</button>
-                </div>
+                <span class="food-note">${unlocked ? (state.language === "tl" ? "Pindutin para idagdag" : "Tap to add one") : `${state.language === "tl" ? "Mabubuksan sa Antas" : "Unlocks at Level"} ${item.unlock}`}</span>
+                <span class="food-count${count ? "" : " empty"}">${count ? `${count}x ${item.name}` : (unlocked ? "＋" : "🔒")}</span>
               </div>
             </div>`;
           grid.append(card);
@@ -1450,12 +1994,12 @@
           const button = document.createElement("button");
           button.type = "button";
           button.className = `sauce-button${selectedSauce === sauce.id ? " selected" : ""}${unlocked ? "" : " sauce-locked"}`;
-          button.disabled = !unlocked;
+          button.disabled = !unlocked || !order || customerTransitioning || state.dayClosed;
           button.setAttribute("aria-pressed", String(selectedSauce === sauce.id));
-          button.setAttribute("aria-label", unlocked ? `${sauce.name}${selectedSauce === sauce.id ? ", selected" : ""}` : `${sauce.name}, unlocks at level ${sauce.unlock}`);
+          button.setAttribute("aria-label", unlocked ? `${sauce.name}${selectedSauce === sauce.id ? (state.language === "tl" ? ", napili" : ", selected") : ""}` : `${sauce.name}, ${state.language === "tl" ? "mabubuksan sa antas" : "unlocks at level"} ${sauce.unlock}`);
           button.innerHTML = unlocked
-            ? `<span aria-hidden="true">${sauce.emoji}</span><span>${sauce.name}</span>`
-            : `<span aria-hidden="true">🔒</span><span>Level ${sauce.unlock}</span>`;
+            ? `<span aria-hidden="true">${selectedSauce === sauce.id ? "✅" : sauce.emoji}</span><span>${sauce.name}${selectedSauce === sauce.id ? (state.language === "tl" ? " · Napili" : " · Selected") : ""}</span>`
+            : `<span aria-hidden="true">🔒</span><span>${state.language === "tl" ? `Mabubuksan sa Antas ${sauce.unlock}` : `Unlocks at Level ${sauce.unlock}`}</span>`;
           if (unlocked) button.dataset.sauce = sauce.id;
           grid.append(button);
         });
@@ -1464,6 +2008,16 @@
       function renderDrinks() {
         const grid = $("drink-grid");
         if (!grid) return;
+        const widget = $("drink-widget");
+        const anyDrinkUnlocked = state.unlockedDrinks.length > 0;
+        $("drink-summary").textContent = anyDrinkUnlocked
+          ? (state.language === "tl" ? "🧋 Palamig at mga Inumin" : "🧋 Street Drinks")
+          : (state.language === "tl" ? "🧋 Mga inumin · Mabubuksan sa Antas 3" : "🧋 Drinks · Unlocks at Level 3");
+        if (window.matchMedia("(max-width: 640px)").matches && !anyDrinkUnlocked) widget.open = false;
+        else if (anyDrinkUnlocked && !drinkPanelAutoOpened) {
+          widget.open = true;
+          drinkPanelAutoOpened = true;
+        }
         grid.replaceChildren();
         DRINKS.forEach(drink => {
           const unlocked = state.unlockedDrinks.includes(drink.id);
@@ -1486,13 +2040,13 @@
           control.className = "drink-control";
           const lock = document.createElement("span");
           lock.className = "drink-lock";
-          lock.textContent = unlocked ? (selected ? "In the combo ✓" : "Palamig") : `🔒 Level ${drink.unlock}`;
+          lock.textContent = unlocked ? (selected ? (state.language === "tl" ? "Kasama sa combo ✓" : "In the combo ✓") : (state.language === "tl" ? "Palamig" : "Cold drink")) : `🔒 ${state.language === "tl" ? "Antas" : "Level"} ${drink.unlock}`;
           const button = document.createElement("button");
           button.className = `qty-button${selected ? " add" : ""}`;
           button.type = "button";
           button.textContent = selected ? "✓" : "+";
-          button.disabled = !unlocked || (!selected && preparedTotal() >= trayCapacity());
-          button.setAttribute("aria-label", unlocked ? `${selected ? "Remove" : "Add"} ${drink.name}` : `${drink.name} unlocks at level ${drink.unlock}`);
+          button.disabled = !unlocked || !order || customerTransitioning || state.dayClosed || (!selected && preparedTotal() >= trayCapacity());
+          button.setAttribute("aria-label", unlocked ? `${selected ? (state.language === "tl" ? "Alisin" : "Remove") : (state.language === "tl" ? "Idagdag" : "Add")} ${drink.name}` : `${drink.name} ${state.language === "tl" ? "mabubuksan sa antas" : "unlocks at level"} ${drink.unlock}`);
           if (unlocked) button.dataset.drink = drink.id;
           control.append(lock, button);
           card.append(top, price, control);
@@ -1504,16 +2058,19 @@
         if (!$("sanitation-value")) return;
         const oil = Math.round(state.sanitation);
         $("sanitation-value").textContent = `${oil}%`;
+        $("sanitation-summary").textContent = `🧼 ${state.language === "tl" ? `Mantika ${oil}% · ${state.jarCovered ? "Takip ang garapon" : "Bukas ang garapon"}` : `Oil ${oil}% · Jars ${state.jarCovered ? "covered" : "open"}`}`;
         $("oil-meter").setAttribute("aria-valuenow", String(oil));
         $("oil-meter-fill").style.width = `${oil}%`;
         $("oil-meter-fill").style.background = oil < 45 ? "#cb4b3b" : oil < 70 ? "#e6a333" : "linear-gradient(90deg, #48a65b, #91bd5c)";
         $("jar-cover-button").classList.toggle("sealed", state.jarCovered);
-        $("jar-cover-button").textContent = state.jarCovered ? "🫙 Jar Covered ✓" : "🫙 Cover Sauce Jars";
+        $("jar-cover-button").textContent = state.jarCovered
+          ? (state.language === "tl" ? "🫙 Takip ang Garapon ✓" : "🫙 Jar Covered ✓")
+          : (state.language === "tl" ? "🫙 Takpan ang Garapon" : "🫙 Cover Sauce Jars");
         $("health-seal-banner").hidden = !state.healthSeal;
-        $("inspection-button").textContent = state.healthSeal ? "🏅 Health Seal Active" : "🧼 Random Inspection";
-        $("inspection-button").classList.toggle("sealed", state.healthSeal);
         $("clean-oil-button").disabled = state.sanitation >= 100;
-        $("clean-oil-button").textContent = state.sanitation >= 100 ? "✨ Oil is Clean" : "🧽 Clean Oil";
+        $("clean-oil-button").textContent = state.sanitation >= 100
+          ? (state.language === "tl" ? "✨ Malinis ang Mantika" : "✨ Oil is Clean")
+          : (state.language === "tl" ? "🧽 Linisin ang Mantika" : "🧽 Clean Oil");
       }
 
       function renderTray() {
@@ -1558,7 +2115,7 @@
         } else if (total === 0) {
           const empty = document.createElement("div");
           empty.className = "cup-empty";
-          empty.innerHTML = '<span aria-hidden="true">🥡</span><span>Walang laman pa ang cup</span>';
+          empty.innerHTML = `<span aria-hidden="true">🥡</span><span>${state.language === "tl" ? "Walang laman pa ang cup" : "Your cup is still empty"}</span>`;
           preview.append(empty);
         } else {
           Object.entries(tray).forEach(([id, quantity]) => {
@@ -1576,13 +2133,15 @@
           });
         }
         $("tray-total").textContent = preparedTotal()
-          ? `${preparedTotal()} item${preparedTotal() === 1 ? "" : "s"} ${preparedTotal() >= trayCapacity() ? "• punô na!" : ""}`
-          : "Wala pang laman ang cup";
-        $("clear-button").disabled = total === 0 && !selectedSauce && !trayDrink;
+          ? `${preparedTotal()} ${state.language === "tl" ? "piraso" : `item${preparedTotal() === 1 ? "" : "s"}`} ${preparedTotal() >= trayCapacity() ? (state.language === "tl" ? "• punô na!" : "• full!") : ""}`
+          : (state.language === "tl" ? "Wala pang laman ang cup" : "Your cup is empty");
+        $("clear-button").disabled = customerTransitioning || (total === 0 && !selectedSauce && !trayDrink);
+        $("clear-button").textContent = state.language === "tl" ? "↺ Tapon" : "↺ Clear";
+        $("serve-button").disabled = state.dayClosed || customerTransitioning || !order || total === 0 || !selectedSauce;
         $("order-summary-text").textContent = order
           ? `${orderTotal()} piraso${order.drink ? ` + 1 ${drinkFor(order.drink).name}` : ""} • ${SAUCES.find(sauce => sauce.id === order.sauce).name}`
-          : "Handa ka na? Ihambing ang order bago ihain.";
-        $("earnings-preview").textContent = `Suki tip hanggang ₱${order ? 8 : 0}`;
+          : (state.language === "tl" ? "Handa ka na? Ihambing ang order bago ihain." : "Ready? Check the order before serving.");
+        $("earnings-preview").textContent = `${state.language === "tl" ? "Tip ng suki hanggang" : "Suki tip up to"} ₱${order ? 8 : 0}`;
       }
 
       function renderStats() {
@@ -1608,7 +2167,6 @@
         const requestedCount = Math.random() < twoItemChance && foods.length > 1 ? 2 : 1;
         let shuffled = [...foods].sort(() => Math.random() - .5);
         const eligibleVips = [
-          ...(state.level >= 2 ? [{ id: "marites", name: "Tsismosa Marites", emoji: "💬", perk: "Perfect order reveals 3 orders ahead" }] : []),
           ...(state.level >= 3 ? [{ id: "tanod", name: "Barangay Tanod", emoji: "🛡️", perk: "Keeps buraut away habang nandito" }] : []),
           ...(state.level >= 4 ? [{ id: "rich", name: "Rich Suki", emoji: "💎", perk: "Doble ang bayad sa premium tusok-tusok" }] : [])
         ];
@@ -1640,34 +2198,122 @@
         };
       }
 
+      function playCustomerArrival() {
+        const scene = $("customer-scene");
+        const sprite = $("customer-sprite");
+        scene.classList.remove("is-rejecting", "is-celebrating");
+        scene.classList.add("is-arriving");
+        sprite.classList.remove("impatient", "happy", "rejecting", "waiting-idle");
+        sprite.classList.add("arriving");
+        window.clearTimeout(arrivalAnimationTimer);
+        arrivalAnimationTimer = window.setTimeout(() => {
+          scene.classList.remove("is-arriving");
+          sprite.classList.remove("arriving");
+          if (order && !customerTransitioning && patience > 0) sprite.classList.add("waiting-idle");
+          arrivalAnimationTimer = null;
+        }, 760);
+      }
+
+      function showCustomerRewards(coins, xp, onCredit = false) {
+        const effects = $("customer-fx");
+        effects.replaceChildren();
+        [
+          onCredit ? `📝 ₱${coins}` : `+₱${coins}`,
+          `❤️ +${xp} XP`,
+          "💖"
+        ].forEach(message => {
+          const particle = document.createElement("span");
+          particle.className = "reward-particle";
+          particle.textContent = message;
+          effects.append(particle);
+        });
+        window.setTimeout(() => effects.replaceChildren(), 1100);
+      }
+
+      function rejectCustomer(reason) {
+        if (!order || customerTransitioning) return;
+        customerTransitioning = true;
+        customerMood = "angry";
+        state.daySales.lost += 1;
+        state.streak = 0;
+        state.quests.streak = 0;
+        streak = 0;
+        if (reason === "impatience") state.coins = Math.max(0, state.coins - 5);
+        persist();
+        renderHeader();
+        renderStats();
+        renderQuests();
+        renderFood();
+        renderDrinks();
+        renderSauces();
+        renderTray();
+        window.clearTimeout(arrivalAnimationTimer);
+        arrivalAnimationTimer = null;
+        const scene = $("customer-scene");
+        const sprite = $("customer-sprite");
+        scene.classList.remove("is-arriving", "is-celebrating");
+        scene.classList.add("is-rejecting");
+        scene.dataset.mood = "angry";
+        sprite.classList.remove("arriving", "waiting-idle", "happy", "impatient");
+        sprite.classList.add("rejecting");
+        $("customer-mood").textContent = reason === "impatience" ? "💢" : "💢💧";
+        $("customer-bubble-label").textContent = reason === "impatience"
+          ? (state.language === "tl" ? "BILIS!" : "HURRY!")
+          : (state.language === "tl" ? "MALI!" : "WRONG!");
+        playSfx("error");
+        announce(reason === "impatience"
+          ? (state.language === "tl"
+            ? "Nainip ang suki at umalis nang walang order. Nawalan ka ng ₱5."
+            : "The customer ran out of patience and left without ordering. You lost ₱5.")
+          : (state.language === "tl"
+            ? "Mali ang order! Umalis ang suki nang walang bayad."
+            : "Wrong order! The customer left without paying."), "error");
+        customerTransitionTimer = window.setTimeout(() => {
+          customerTransitionTimer = null;
+          customerTransitioning = false;
+          nextCustomer();
+        }, 720);
+      }
+
       function nextCustomer() {
         window.clearTimeout(arrivalTimer);
+        window.clearTimeout(customerTransitionTimer);
+        window.clearTimeout(arrivalAnimationTimer);
+        arrivalTimer = null;
+        customerTransitionTimer = null;
+        arrivalAnimationTimer = null;
+        customerTransitioning = false;
+        customerMood = "waiting";
+        $("customer-scene").classList.remove("is-arriving", "is-rejecting", "is-celebrating");
+        $("customer-sprite").classList.remove("arriving", "waiting-idle", "impatient", "happy", "rejecting");
+        $("customer-fx").replaceChildren();
         order = null;
         tray = {};
         trayDrink = null;
         selectedSauce = null;
         renderAll();
+        if (state.dayClosed) return;
         const spawnRate = currentWeather === "rainy" ? 1250 : currentWeather === "rush" ? 800 : 1000;
-        arrivalTimer = window.setTimeout(() => {
-          order = nextOrders.length ? nextOrders.shift() : generateOrder();
+        const arrive = () => {
+          if (state.dayClosed) return;
+          if (isGamePaused()) {
+            arrivalTimer = window.setTimeout(arrive, 250);
+            return;
+          }
+          order = generateOrder();
           patienceMax = orderDuration();
           patience = patienceMax;
           renderAll();
-        }, spawnRate);
+          playCustomerArrival();
+        };
+        arrivalTimer = window.setTimeout(arrive, spawnRate);
       }
 
-      function advancePreview() {
-        if (!discoveredOrders.length) return;
-        discoveredOrders.shift();
-        while (nextOrders.length < 3) nextOrders.push(generateOrder());
-        discoveredOrders = nextOrders.slice(0, 3);
-      }
-
-      function changeFood(id, change) {
+      function changeFood(id) {
         const item = foodFor(id);
-        if (!item || !state.unlockedItems.includes(id)) return;
-        const next = (tray[id] || 0) + change;
-        if (next > 0 && change > 0 && preparedTotal() >= trayCapacity()) {
+        if (!item || !state.unlockedItems.includes(id) || !order || customerTransitioning || state.dayClosed) return;
+        const next = (tray[id] || 0) + 1;
+        if (preparedTotal() >= trayCapacity()) {
           announce(`Kasya lang ang ${trayCapacity()} piraso sa cup.`, "error");
           return;
         }
@@ -1675,40 +2321,38 @@
           announce("Hanggang 9 piraso lang ng bawat pagkain sa isang cup.", "error");
           return;
         }
-        if (next > 0) tray[id] = next;
-        else delete tray[id];
-        if (change > 0) {
-          playSfx("fry");
-          if (!state.upgrades.security && order.vip?.id !== "tanod" && trayTotal() > 0 && Math.random() < .018) {
-            const stolen = Object.keys(tray).find(foodId => tray[foodId] > 0);
-            if (stolen) {
-              tray[stolen] -= 1;
-              if (!tray[stolen]) delete tray[stolen];
-              announce("Ay! May buraut na dumukot sa cup! Mag-ingat sa kariton.", "error");
-              playSfx("error");
-            }
+        tray[id] = next;
+        playSfx("fry");
+        if (!state.upgrades.security && order?.vip?.id !== "tanod" && trayTotal() > 0 && Math.random() < .018) {
+          const stolen = Object.keys(tray).find(foodId => tray[foodId] > 0);
+          if (stolen) {
+            tray[stolen] -= 1;
+            if (!tray[stolen]) delete tray[stolen];
+            announce("Ay! May buraut na dumukot sa cup! Mag-ingat sa kariton.", "error");
+            playSfx("error");
           }
         }
         renderFood();
+        renderDrinks();
         renderTray();
-        if (change > 0) {
-          const card = $("food-grid").querySelector(`[data-food="${id}"][data-change="1"]`)?.closest(".food-card");
-          if (card) {
-            card.classList.add("prepping");
-            window.setTimeout(() => card.classList.remove("prepping"), state.upgrades.fryer ? 320 : 400);
-          }
+        const card = $("food-grid").querySelector(`[data-food="${id}"]`);
+        if (card) {
+          card.classList.add("prepping");
+          window.setTimeout(() => card.classList.remove("prepping"), state.upgrades.fryer ? 320 : 400);
         }
       }
 
       function changeDrink(id) {
-        if (!state.unlockedDrinks.includes(id)) return;
+        if (!state.unlockedDrinks.includes(id) || !order || customerTransitioning || state.dayClosed) return;
         trayDrink = trayDrink === id ? null : id;
         playSfx("splash");
         renderDrinks();
+        renderFood();
         renderTray();
       }
 
       function clearTray() {
+        if (customerTransitioning) return;
         tray = {};
         trayDrink = null;
         selectedSauce = null;
@@ -1738,25 +2382,25 @@
             FOODS.filter(item => item.unlock === state.level).forEach(item => {
               if (!state.unlockedItems.includes(item.id)) {
                 state.unlockedItems.push(item.id);
-                unlocked.push({ emoji: item.emoji, name: item.name, detail: `${item.name} is now on your menu!` });
+                unlocked.push({ emoji: item.emoji, name: item.name, detail: state.language === "tl" ? `Idinagdag na ang ${item.name} sa iyong menu!` : `${item.name} is now on your menu!` });
               }
             });
             SAUCES.filter(sauce => sauce.unlock === state.level).forEach(sauce => {
               if (!state.unlockedSauces.includes(sauce.id)) {
                 state.unlockedSauces.push(sauce.id);
-                unlocked.push({ emoji: sauce.emoji, name: sauce.name, detail: `${sauce.name} is now available for your suki!` });
+                unlocked.push({ emoji: sauce.emoji, name: sauce.name, detail: state.language === "tl" ? `Maaari nang ihain sa suki ang ${sauce.name}!` : `${sauce.name} is now available for your suki!` });
               }
             });
             DRINKS.filter(drink => drink.unlock === state.level).forEach(drink => {
               if (!state.unlockedDrinks.includes(drink.id)) {
                 state.unlockedDrinks.push(drink.id);
-                unlocked.push({ emoji: drink.emoji, name: drink.name, detail: `${drink.name} palamig is now on your combo menu!` });
+                unlocked.push({ emoji: drink.emoji, name: drink.name, detail: state.language === "tl" ? `Idinagdag na ang ${drink.name} sa combo menu!` : `${drink.name} is now on your combo menu!` });
               }
             });
             const vipUnlocks = {
-              2: { emoji: "💬", name: "Tsismosa Marites", detail: "May tsismis na ang susunod na 3 customer orders!" },
-              3: { emoji: "🛡️", name: "Barangay Tanod", detail: "May security boost ang kariton kapag bumisita si Tanod!" },
-              4: { emoji: "💎", name: "Rich Suki", detail: "May premium buyer ka na—double coins sa Kikiam at Calamares!" }
+              2: { emoji: "💬", name: "Tsismosa Marites", detail: state.language === "tl" ? "Malalaman mo ang susunod na 3 order kapag bumisita si Marites!" : "Marites reveals the next 3 customer orders!" },
+              3: { emoji: "🛡️", name: "Barangay Tanod", detail: state.language === "tl" ? "Protektado ang pagkain laban sa magnanakaw kapag nandito si Tanod!" : "The Tanod protects your food from thieves while visiting!" },
+              4: { emoji: "💎", name: "Rich Suki", detail: state.language === "tl" ? "Doble ang bayad sa Kikiam at Calamares!" : "Earn double coins for Kikiam and Calamares!" }
             };
             if (vipUnlocks[state.level]) unlocked.push(vipUnlocks[state.level]);
           }
@@ -1765,14 +2409,18 @@
       }
 
       function showLevelUp(unlocks) {
-        $("level-title").textContent = `Level ${state.level}! 🎊`;
-        $("level-description").textContent = `Ang galing, ${vendorDisplayName()}! Mas sumisikat na ang iyong kariton.`;
+        $("level-title").textContent = `${state.language === "tl" ? "Antas" : "Level"} ${state.level}! 🎊`;
+        $("level-description").textContent = state.language === "tl"
+          ? `Ang galing, ${vendorDisplayName()}! Mas sumisikat na ang iyong kariton.`
+          : `Great work, ${vendorDisplayName()}! Your cart is becoming a neighborhood favorite.`;
         const list = $("unlock-list");
         list.replaceChildren();
         if (!unlocks.length) {
           const message = document.createElement("div");
           message.className = "nothing-new";
-          message.textContent = "Mas marami ka pang suki, mas marami ka pang kita! Tuloy ang sipag at benta.";
+          message.textContent = state.language === "tl"
+            ? "Mas marami ka pang suki, mas marami ka pang kita! Tuloy ang sipag at benta."
+            : "More customers mean more earnings! Keep up the great work.";
           list.append(message);
         } else {
           unlocks.forEach(item => {
@@ -1803,6 +2451,9 @@
         const spicyRainBonus = currentWeather === "rainy" && order.sauce === "spicy" ? Math.round(baseCoins * .5) : 0;
         const earnedCoins = baseCoins + drinkPrice + comboBonus + tip + spicyRainBonus;
         const earnedXp = 35 + (order.drink ? 10 : 0);
+        state.daySales.served += 1;
+        state.daySales.sales += baseCoins + drinkPrice + comboBonus;
+        if (!onCredit) state.daySales.tips += tip + spicyRainBonus;
 
         if (onCredit) {
           const bill = baseCoins + drinkPrice + comboBonus;
@@ -1824,40 +2475,47 @@
         if (order.sauce === "spicy") updateQuestProgress("spicy", 1);
         state.served += 1;
         state.streak += 1;
+        if (order.vip?.id === "marites") state.goodwill = Math.min(100, state.goodwill + 5);
         state.sanitation = Math.max(0, state.sanitation - itemsCount * 3);
         served = state.served;
         streak = state.streak;
         updateQuestProgress("streak", state.streak);
 
-        if (order.vip?.id === "marites") {
-          nextOrders = [generateOrder(), generateOrder(), generateOrder()];
-          discoveredOrders = nextOrders.slice();
-        } else if (discoveredOrders.length) {
-          advancePreview();
-        }
-
         const unlocks = awardXp(earnedXp);
+        customerTransitioning = true;
+        customerMood = "happy";
         persist();
         renderAll();
+        const scene = $("customer-scene");
+        const sprite = $("customer-sprite");
+        scene.classList.remove("is-arriving", "is-rejecting");
+        scene.classList.add("is-celebrating");
+        scene.dataset.mood = "happy";
+        sprite.classList.remove("arriving", "waiting-idle", "impatient", "rejecting");
+        sprite.classList.add("happy");
+        $("customer-mood").textContent = "🥰";
+        showCustomerRewards(onCredit ? baseCoins + drinkPrice + comboBonus : earnedCoins, earnedXp, onCredit);
         if (state.level > previousLevel) showLevelUp(unlocks);
         if (!onCredit) playSfx("cash");
         const tipMessage = tip ? ` (may ₱${tip} tip!)` : "";
         const weatherMessage = spicyRainBonus ? ` +₱${spicyRainBonus} rainy spicy bonus!` : "";
         announce(onCredit
-          ? `Naka-lista kay ${order.customer}! +10 goodwill at +${earnedXp} XP.`
-          : `Ayos! ₱${earnedCoins}${tipMessage}${weatherMessage} at +${earnedXp} XP. Salamat, suki!`);
-        nextCustomer();
+          ? (state.language === "tl" ? `Naka-lista kay ${order.customer}! +10 goodwill at +${earnedXp} XP.` : `${order.customer}'s order was added to the Credit Book! +10 goodwill and +${earnedXp} XP.`)
+          : (state.language === "tl"
+            ? `Ayos! ₱${earnedCoins}${tipMessage}${weatherMessage} at +${earnedXp} XP. Salamat, boss!`
+            : `Great! ₱${earnedCoins}${tip ? ` (₱${tip} tip!)` : ""}${spicyRainBonus ? ` +₱${spicyRainBonus} rainy spicy bonus!` : ""} and +${earnedXp} XP. Thanks, boss!`));
         if ($("quests-modal").hidden === false) renderQuests();
         if ($("shop-modal").hidden === false) renderShop();
         renderSanitation();
-        if (Math.random() < .12) {
-          window.setTimeout(() => {
-            if ($("home-screen").hidden && $("level-modal").hidden && $("credit-offer-modal").hidden) inspectCart();
-          }, 450);
-        }
+        customerTransitionTimer = window.setTimeout(() => {
+          customerTransitionTimer = null;
+          customerTransitioning = false;
+          nextCustomer();
+        }, 980);
       }
 
       function serveOrder() {
+        if (state.dayClosed || customerTransitioning || !order) return;
         if (!trayTotal()) {
           announce("Pumili muna ng tusok-tusok para sa order!", "error");
           return;
@@ -1867,17 +2525,7 @@
           return;
         }
         if (!isOrderCorrect()) {
-          streak = 0;
-          state.streak = 0;
-          state.quests.streak = 0;
-          persist();
-          patience = Math.max(0, patience - 12);
-          $("customer-footer").innerHTML = '<span aria-hidden="true">🤔</span><span>Hindi ito ang order ko, kuya! Pakitingnan ulit.</span>';
-          renderPatience();
-          renderStats();
-          renderQuests();
-          playSfx("error");
-          announce("Hindi tugma ang pagkain o sawsawan. Ayusin muna ang order!", "error");
+          rejectCustomer("wrong-order");
           return;
         }
         if (order.creditOffer) {
@@ -1897,7 +2545,11 @@
         weatherSeconds = currentWeather === "rush" ? 0 : 60;
         rushSeconds = currentWeather === "rush" ? 45 : 0;
         applyWeatherChange(previousWeather);
-        announce(currentWeather === "rush" ? "🔔 Student rush! Customer timer is faster for 45 seconds!" : currentWeather === "rainy" ? "🌧️ Umuulan! Mas mahaba ang customer patience, at bonus ang spicy orders." : "☀️ Maaraw sa Quiapo! Tara, benta na!", "info");
+        announce(currentWeather === "rush"
+          ? (state.language === "tl" ? "🔔 Oras ng uwian! Mas mabilis ang timer ng suki sa loob ng 45 segundo!" : "🔔 Student rush! Customers have less time for 45 seconds!")
+          : currentWeather === "rainy"
+            ? (state.language === "tl" ? "🌧️ Umuulan! Mas mahaba ang pasensya ng suki at may bonus ang spicy orders." : "🌧️ Rainy weather! Customers are more patient and spicy orders earn a bonus.")
+            : (state.language === "tl" ? "☀️ Maaraw sa Quiapo! Tara, benta na!" : "☀️ Sunny in Quiapo! Let's get selling!"), "info");
       }
 
       function applyWeatherChange(previousWeather) {
@@ -1909,6 +2561,13 @@
         }
         renderHeader();
         renderPatience();
+      }
+
+      function isGamePaused() {
+        return !$("home-screen").hidden
+          || state.dayClosed
+          || ["setup-modal", "level-modal", "quests-modal", "shop-modal", "credit-modal", "credit-offer-modal", "inspection-modal", "day-report-modal"]
+            .some(id => !$(id).hidden);
       }
 
       function useRushExtension() {
@@ -1998,15 +2657,23 @@
       }
 
       function inspectCart() {
-        if (!$("inspection-modal").hidden) return;
-        const oilClean = state.sanitation >= 70;
+        if (!$("inspection-modal").hidden || isGamePaused()) return;
+        const oilClean = state.sanitation > 50;
         const sauceCovered = state.jarCovered;
         const passed = oilClean && sauceCovered;
+        $("inspection-title").textContent = state.language === "tl"
+          ? "🚨 DUMATING ANG INSPEKTOR NG BARANGAY!"
+          : "🚨 BARANGAY HEALTH INSPECTOR ARRIVED!";
+        $("inspection-description").textContent = state.language === "tl"
+          ? "Pansamantalang hihinto ang bentahan habang sinusuri ang iyong kariton."
+          : "Orders are paused while the inspector checks your cart.";
         const checks = $("inspection-checks");
         checks.replaceChildren();
         [
-          { label: "Clean Oil Gauge", pass: oilClean, detail: `${Math.round(state.sanitation)}% clean (70% required)` },
-          { label: "Covered Sauce Jars", pass: sauceCovered, detail: sauceCovered ? "Sawsawan are covered and protected." : "Cover your sauce jars before inspection." }
+          { label: state.language === "tl" ? "Kalinisan ng Mantika" : "Clean Oil Gauge", pass: oilClean, detail: `${Math.round(state.sanitation)}% ${state.language === "tl" ? "malinis (higit 50% kailangan)" : "clean (>50% required)"}` },
+          { label: state.language === "tl" ? "Takip ang mga Garapon" : "Covered Sauce Jars", pass: sauceCovered, detail: sauceCovered
+            ? (state.language === "tl" ? "Nakatakip at protektado ang mga sawsawan." : "Sauces are covered and protected.")
+            : (state.language === "tl" ? "Takpan ang mga garapon bago ang inspeksyon." : "Cover your sauce jars before inspection.") }
         ].forEach(check => {
           const row = document.createElement("div");
           row.className = `inspection-check ${check.pass ? "pass" : "fail"}`;
@@ -2019,28 +2686,36 @@
         });
         const result = $("inspection-result");
         result.replaceChildren();
-        $("inspection-description").textContent = passed
-          ? "Malinis na malinis ang iyong kariton! May opisyal ka nang Health Seal."
-          : "Hindi pa pumapasa ang kariton. Linisin ang mantika at takpan ang mga garapon, saka subukan ulit.";
+        const outcome = document.createElement("div");
+        outcome.className = passed ? "health-seal" : "inspection-check fail";
         if (passed && !state.healthSeal) {
           state.healthSeal = true;
-          const seal = document.createElement("div");
-          seal.className = "health-seal";
-          seal.textContent = "🏅 OFFICIAL BARANGAY HEALTH SEAL! Permanenteng +15% selling price sa lahat ng pagkain at palamig.";
-          result.append(seal);
-          persist();
-          renderAll();
-          announce("Pumasa sa health inspection! +15% selling prices permanently!");
+          state.coins += 30;
+          state.goodwill = Math.min(100, state.goodwill + 5);
+          outcome.textContent = state.language === "tl"
+            ? "🏅 PUMASA! Health Seal +15% sa presyo, +₱30, at +5 goodwill."
+            : "🏅 PASSED! Permanent +15% Health Seal, +₱30, and +5 goodwill.";
           playSfx("claim");
         } else if (passed) {
-          const seal = document.createElement("div");
-          seal.className = "health-seal";
-          seal.textContent = "🏅 May Health Seal ka na! +15% selling prices ay active na.";
-          result.append(seal);
+          state.coins += 30;
+          state.goodwill = Math.min(100, state.goodwill + 5);
+          outcome.textContent = state.language === "tl"
+            ? "✅ PUMASA! +₱30 bonus at +5 goodwill."
+            : "✅ PASSED! +₱30 bonus and +5 goodwill.";
+          playSfx("claim");
         } else {
+          state.coins = Math.max(0, state.coins - 25);
+          outcome.textContent = state.language === "tl"
+            ? "❌ HINDI PUMASA! ₱25 multa. Linisin ang mantika at takpan ang mga garapon."
+            : "❌ FAILED! ₱25 fine. Clean the oil and cover the sauce jars.";
           playSfx("error");
         }
+        result.append(outcome);
+        $("inspection-dismiss").textContent = state.language === "tl" ? "Sige, balik sa benta!" : "OK, Back to Selling!";
+        persist();
+        renderAll();
         $("inspection-modal").hidden = false;
+        announce(state.language === "tl" ? "🚨 Dumating ang health inspector!" : "🚨 The health inspector has arrived!", "info");
         $("inspection-dismiss").focus();
       }
 
@@ -2052,17 +2727,81 @@
         announce("Malinis na ulit ang mantika. Salamat sa pag-aalaga ng kariton!");
       }
 
-      function homeSettingsToggle(kind) {
-        toggleAudio(kind);
-        openHomeSettings();
+      function renderDayReport() {
+        const sales = state.daySales;
+        const gross = sales.sales + sales.tips;
+        const net = gross - DAILY_EXPENSES;
+        $("day-report-title").textContent = state.language === "tl"
+          ? `Tapos na ang Araw ${state.dayNumber}!`
+          : `Day ${state.dayNumber} Complete!`;
+        $("report-served").textContent = String(sales.served);
+        $("report-lost").textContent = String(sales.lost);
+        $("report-gross").textContent = `₱${sales.sales.toLocaleString("en-PH")}`;
+        $("report-tips").textContent = `₱${sales.tips.toLocaleString("en-PH")}`;
+        $("report-gross-total").textContent = `₱${gross.toLocaleString("en-PH")}`;
+        $("report-expenses").textContent = `−₱${DAILY_EXPENSES}`;
+        $("report-net").textContent = `${net < 0 ? "−" : ""}₱${Math.abs(net).toLocaleString("en-PH")}`;
+        const stars = sales.served >= 10 ? 3 : sales.served >= 5 ? 2 : sales.served > 0 ? 1 : 0;
+        $("report-stars").textContent = `${"★".repeat(stars)}${"☆".repeat(3 - stars)}`;
+        $("report-stars").setAttribute("aria-label", `${stars} ${state.language === "tl" ? "bituin" : "stars"}`);
+        $("report-rating").textContent = stars === 3
+          ? (state.language === "tl" ? "Masipag na Suki Master!" : "Neighborhood Suki Master!")
+          : stars === 2
+            ? (state.language === "tl" ? "Mahusay na tindero sa kanto!" : "A fantastic neighborhood vendor!")
+            : stars === 1
+              ? (state.language === "tl" ? "Magandang simula—ituloy ang sipag!" : "A good start—keep up the hard work!")
+              : (state.language === "tl" ? "Bukas ulit, mas marami pang suki!" : "More customers tomorrow!");
+        $("next-day-button").textContent = state.language === "tl" ? "🌞 MAGSIMULA NG BAGONG ARAW" : "🌞 START A NEW DAY";
+      }
+
+      function closeDay() {
+        if (state.dayClosed) return;
+        if (order && !customerTransitioning) state.daySales.lost += 1;
+        state.dayElapsedSeconds = DAY_DURATION_SECONDS;
+        state.dayClosed = true;
+        state.coins = Math.max(0, state.coins - DAILY_EXPENSES);
+        window.clearTimeout(arrivalTimer);
+        window.clearTimeout(customerTransitionTimer);
+        window.clearTimeout(arrivalAnimationTimer);
+        arrivalTimer = null;
+        customerTransitionTimer = null;
+        arrivalAnimationTimer = null;
+        customerTransitioning = false;
+        order = null;
+        tray = {};
+        trayDrink = null;
+        selectedSauce = null;
+        renderAll();
+        renderDayReport();
+        persist();
+        $("day-report-modal").hidden = false;
+        playSfx("close");
+        $("next-day-button").focus();
+      }
+
+      function startNextDay() {
+        $("day-report-modal").hidden = true;
+        state.dayNumber += 1;
+        state.dayElapsedSeconds = 0;
+        state.dayClosed = false;
+        state.daySales = { served: 0, lost: 0, sales: 0, tips: 0 };
+        currentWeather = "sunny";
+        weatherSeconds = 60;
+        rushSeconds = 0;
+        state.inspectionAtSeconds = 120 + Math.floor(Math.random() * 61);
+        order = null;
+        tray = {};
+        trayDrink = null;
+        selectedSauce = null;
+        renderAll();
+        persist();
+        nextCustomer();
       }
 
       function restoreSavedSettings() {
-        $("settings-bgm-toggle").textContent = state.sound.bgm ? "ON" : "OFF";
-        $("settings-bgm-toggle").setAttribute("aria-pressed", String(state.sound.bgm));
-        $("settings-sfx-toggle").textContent = state.sound.sfx ? "ON" : "OFF";
-        $("settings-sfx-toggle").setAttribute("aria-pressed", String(state.sound.sfx));
+        syncVolumeControls();
         $("language-select").value = state.language;
+        $("header-language-select").value = state.language;
       }
 
       function tick() {
@@ -2070,7 +2809,22 @@
           renderQuests();
           processDueCredits();
         }
-        if (!$("home-screen").hidden) return;
+        if (isGamePaused()) return;
+        state.dayElapsedSeconds = Math.min(DAY_DURATION_SECONDS, state.dayElapsedSeconds + 1);
+        renderHeader();
+        if (state.dayElapsedSeconds % 5 === 0) persist();
+        if (state.dayElapsedSeconds >= DAY_DURATION_SECONDS) {
+          closeDay();
+          return;
+        }
+        if (state.dayElapsedSeconds >= state.inspectionAtSeconds) {
+          state.inspectionAtSeconds = state.dayElapsedSeconds + 120 + Math.floor(Math.random() * 61);
+          if (Math.random() < INSPECTION_CHANCE) {
+            inspectCart();
+            persist();
+            return;
+          }
+        }
         const previousWeather = currentWeather;
         if (currentWeather === "rush") {
           rushSeconds -= 1;
@@ -2078,6 +2832,7 @@
             currentWeather = "sunny";
             weatherSeconds = 60;
             applyWeatherChange(previousWeather);
+            announce(state.language === "tl" ? "Tapos na ang rush hour. Balik sa normal na bentahan." : "Rush hour is over. The cart is back to normal.", "info");
           } else {
             renderHeader();
           }
@@ -2085,7 +2840,7 @@
           weatherSeconds -= 1;
           if (weatherSeconds <= 0) advanceWeather();
         }
-        if (!order || ["setup-modal", "level-modal", "quests-modal", "shop-modal", "credit-modal", "credit-offer-modal"].some(id => !$(id).hidden)) return;
+        if (customerTransitioning || !order) return;
         patience -= 1;
         renderPatience();
         if (!state.upgrades.security && order.vip?.id !== "tanod" && trayTotal() > 0 && Math.random() < .0015) {
@@ -2100,29 +2855,19 @@
           }
         }
         if (patience <= 0) {
-          streak = 0;
-          state.streak = 0;
-          state.quests.streak = 0;
-          advancePreview();
-          state.coins = Math.max(0, state.coins - 5);
-          persist();
-          renderHeader();
-          renderStats();
-          renderQuests();
-          playSfx("error");
-          announce("Nainip ang suki! Nawalan ka ng ₱5. Bilisan natin ang susunod!", "error");
-          nextCustomer();
+          rejectCustomer("impatience");
         }
       }
 
       function openSetup(editing) {
         isSetupEditing = editing;
+        const isTl = state.language === "tl";
         $("setup-description").textContent = editing
-          ? "I-update ang iyong pangalan at tindero. Maaari mo ring i-reset ang iyong negosyo."
-          : "Pumili ng pangalan at tindero. Simulan na natin ang iyong Pinoy street food adventure!";
+          ? (isTl ? "I-update ang pangalan at tindero. Maaari mo ring i-reset ang iyong negosyo." : "Update your cart name and vendor, or reset your business.")
+          : (isTl ? "Pumili ng pangalan at tindero. Simulan na natin ang iyong Pinoy street food adventure!" : "Choose a cart name and vendor. Start your Pinoy street food adventure!");
         $("setup-submit").innerHTML = editing
-          ? "I-save ang pagbabago <span aria-hidden=\"true\">→</span>"
-          : 'Simulan ang negosyo! <span aria-hidden="true">→</span>';
+          ? (isTl ? 'I-save ang pagbabago <span aria-hidden="true">→</span>' : 'Save changes <span aria-hidden="true">→</span>')
+          : (isTl ? 'Simulan ang negosyo! <span aria-hidden="true">→</span>' : 'Start my business! <span aria-hidden="true">→</span>');
         $("setup-submit").classList.toggle("green-submit", editing);
         $("setup-cancel").hidden = !editing;
         $("reset-progress-button").hidden = !editing;
@@ -2166,7 +2911,9 @@
       }
 
       function resetProgress() {
-        const confirmed = window.confirm("Sigurado ka bang gusto mong i-reset ang lahat ng progress, coins, level, at vendor settings? Hindi na ito maibabalik.");
+        const confirmed = window.confirm(state.language === "tl"
+          ? "Sigurado ka bang i-reset ang lahat ng progress, barya, level, at settings ng tindero? Hindi na ito maibabalik."
+          : "Are you sure you want to reset all progress, coins, levels, and vendor settings? This cannot be undone.");
         if (!confirmed) return;
         window.localStorage.removeItem(STORAGE_KEY);
         window.localStorage.removeItem(LEGACY_STORAGE_KEY);
@@ -2177,8 +2924,7 @@
         currentWeather = "sunny";
         weatherSeconds = 60;
         rushSeconds = 0;
-        nextOrders = [];
-        discoveredOrders = [];
+        state.inspectionAtSeconds = 120 + Math.floor(Math.random() * 61);
         served = 0;
         streak = 0;
         order = null;
@@ -2210,24 +2956,33 @@
       }
 
       function startNewGame() {
-        if ((savedProgressExists || hasSavedGame()) && !window.confirm("Magsisimula ka ba sa Level 1? Mabubura ang lumang save file.")) return;
+        if ((savedProgressExists || hasSavedGame()) && !window.confirm(state.language === "tl"
+          ? "Magsisimula ka ba sa Antas 1? Mabubura ang lumang save file."
+          : "Start again at Level 1? Your previous save will be deleted.")) return;
         window.localStorage.removeItem(STORAGE_KEY);
         window.localStorage.removeItem(LEGACY_STORAGE_KEY);
         savedProgressExists = false;
         window.clearTimeout(arrivalTimer);
+        window.clearTimeout(customerTransitionTimer);
+        window.clearTimeout(arrivalAnimationTimer);
         window.clearTimeout(bgmTimer);
         bgmTimer = null;
+        customerTransitionTimer = null;
+        arrivalAnimationTimer = null;
+        customerTransitioning = false;
         state = initialState();
         setLanguage("en");
         savedProgressExists = false;
         served = 0;
         streak = 0;
-        nextOrders = [];
-        discoveredOrders = [];
         order = null;
         tray = {};
         trayDrink = null;
         selectedSauce = null;
+        currentWeather = "sunny";
+        weatherSeconds = 60;
+        rushSeconds = 0;
+        state.inspectionAtSeconds = 120 + Math.floor(Math.random() * 61);
         renderAll();
         updateHomeSave();
         leaveHome(true);
@@ -2244,27 +2999,35 @@
           void $("game-screen").offsetWidth;
           $("game-screen").classList.add("game-enter");
           if (!state.setupComplete) openSetup(false);
-          else if (!order) nextCustomer();
+          else if (state.dayClosed) {
+            renderDayReport();
+            $("day-report-modal").hidden = false;
+            $("next-day-button").focus();
+          } else if (!order) nextCustomer();
         }, 360);
       }
 
       function openHomeSettings() {
-        $("settings-bgm-toggle").textContent = state.sound.bgm ? "ON" : "OFF";
-        $("settings-bgm-toggle").setAttribute("aria-pressed", String(state.sound.bgm));
-        $("settings-sfx-toggle").textContent = state.sound.sfx ? "ON" : "OFF";
-        $("settings-sfx-toggle").setAttribute("aria-pressed", String(state.sound.sfx));
+        syncVolumeControls();
         $("language-select").value = state.language;
         $("home-settings-modal").hidden = false;
       }
 
       function resetHomeProgress() {
-        if (!window.confirm("Sigurado ka bang burahin ang buong save file at magsimula ulit? Hindi na ito maibabalik.")) return;
+        if (!window.confirm(state.language === "tl"
+          ? "Sigurado ka bang burahin ang buong save file at magsimula ulit? Hindi na ito maibabalik."
+          : "Are you sure you want to erase your entire save and start over? This cannot be undone.")) return;
         window.localStorage.removeItem(STORAGE_KEY);
         window.localStorage.removeItem(LEGACY_STORAGE_KEY);
         savedProgressExists = false;
         window.clearTimeout(arrivalTimer);
+        window.clearTimeout(customerTransitionTimer);
+        window.clearTimeout(arrivalAnimationTimer);
         window.clearTimeout(bgmTimer);
         bgmTimer = null;
+        customerTransitionTimer = null;
+        arrivalAnimationTimer = null;
+        customerTransitioning = false;
         state = initialState();
         served = 0;
         streak = 0;
@@ -2272,11 +3035,10 @@
         tray = {};
         trayDrink = null;
         selectedSauce = null;
-        nextOrders = [];
-        discoveredOrders = [];
         currentWeather = "sunny";
         weatherSeconds = 60;
         rushSeconds = 0;
+        state.inspectionAtSeconds = 120 + Math.floor(Math.random() * 61);
         renderAll();
         updateHomeSave();
         $("home-screen").hidden = false;
@@ -2308,7 +3070,7 @@
           const button = event.target.closest("button[data-food]");
           if (button && !button.disabled) {
             playSfx("click");
-            changeFood(button.dataset.food, Number(button.dataset.change));
+            changeFood(button.dataset.food);
           }
         });
         $("drink-grid").addEventListener("click", event => {
@@ -2320,7 +3082,7 @@
         });
         $("sauce-grid").addEventListener("click", event => {
           const button = event.target.closest("button[data-sauce]");
-          if (!button || button.disabled) return;
+          if (!button || button.disabled || customerTransitioning) return;
           selectedSauce = selectedSauce === button.dataset.sauce ? null : button.dataset.sauce;
           playSfx("splash");
           renderSauces();
@@ -2332,9 +3094,12 @@
         $("new-game-button").addEventListener("click", startNewGame);
         $("continue-button").addEventListener("click", continueGame);
         $("home-settings-button").addEventListener("click", openHomeSettings);
-        $("settings-bgm-toggle").addEventListener("click", () => homeSettingsToggle("bgm"));
-        $("settings-sfx-toggle").addEventListener("click", () => homeSettingsToggle("sfx"));
         $("language-select").addEventListener("change", event => setLanguage(event.target.value));
+        $("header-language-select").addEventListener("change", event => setLanguage(event.target.value));
+        $("header-bgm-volume").addEventListener("input", event => setVolume("bgm", event.target.value));
+        $("settings-bgm-volume").addEventListener("input", event => setVolume("bgm", event.target.value));
+        $("header-sfx-volume").addEventListener("input", event => setVolume("sfx", event.target.value));
+        $("settings-sfx-volume").addEventListener("input", event => setVolume("sfx", event.target.value));
         $("home-reset-button").addEventListener("click", resetHomeProgress);
         $("clean-oil-button").addEventListener("click", cleanOil);
         $("jar-cover-button").addEventListener("click", () => {
@@ -2343,13 +3108,11 @@
           renderSanitation();
           announce(state.jarCovered ? "Tinakpan na ang mga sawsawan." : "Nabuksan ang mga sawsawan.", "info");
         });
-        $("inspection-button").addEventListener("click", inspectCart);
         $("inspection-dismiss").addEventListener("click", () => {
           $("inspection-modal").hidden = true;
           $("serve-button").focus();
         });
-        $("bgm-toggle").addEventListener("click", () => toggleAudio("bgm"));
-        $("sfx-toggle").addEventListener("click", () => toggleAudio("sfx"));
+        $("next-day-button").addEventListener("click", startNextDay);
         $("quests-button").addEventListener("click", () => {
           renderQuests();
           $("quests-modal").hidden = false;
@@ -2362,7 +3125,6 @@
           renderCredits();
           $("credit-modal").hidden = false;
         });
-        $("weather-button").addEventListener("click", advanceWeather);
         $("rush-extension").addEventListener("click", useRushExtension);
         $("location-select").addEventListener("change", event => {
           const location = LOCATIONS.find(item => item.id === event.target.value);
@@ -2382,7 +3144,9 @@
           if (button) claimQuest(button.dataset.claim);
         });
         $("quests-refresh").addEventListener("click", () => {
-          if (!window.confirm("I-reset ang Daily Quests para subukan ulit? Mawawala ang progress at mga na-claim ngayong araw.")) return;
+          if (!window.confirm(state.language === "tl"
+            ? "I-reset ang mga misyon para subukan ulit? Mawawala ang progress at gantimpalang na-claim ngayong araw."
+            : "Reset today's quests to try again? Today's progress and claimed rewards will be lost.")) return;
           state.quests = defaultQuests(todayKey());
           persist();
           renderQuests();
@@ -2480,6 +3244,11 @@
 
       function init() {
         state = loadProgress();
+        drinkPanelAutoOpened = state.unlockedDrinks.length > 0;
+        bgmVolume = readVolume(BGM_VOLUME_KEY, state.sound.bgm ? 100 : 0);
+        sfxVolume = readVolume(SFX_VOLUME_KEY, state.sound.sfx ? 100 : 0);
+        state.sound.bgm = bgmVolume > 0;
+        state.sound.sfx = sfxVolume > 0;
         served = state.served;
         streak = state.streak;
         ensureQuestDay();
