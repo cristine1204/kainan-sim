@@ -2275,7 +2275,7 @@
         }, 720);
       }
 
-      function nextCustomer() {
+      function nextCustomer(immediate = false) {
         window.clearTimeout(arrivalTimer);
         window.clearTimeout(customerTransitionTimer);
         window.clearTimeout(arrivalAnimationTimer);
@@ -2293,7 +2293,7 @@
         selectedSauce = null;
         renderAll();
         if (state.dayClosed) return;
-        const spawnRate = currentWeather === "rainy" ? 1250 : currentWeather === "rush" ? 800 : 1000;
+        const spawnRate = immediate ? 0 : currentWeather === "rainy" ? 1250 : currentWeather === "rush" ? 800 : 1000;
         const arrive = () => {
           if (state.dayClosed) return;
           if (isGamePaused()) {
@@ -2510,7 +2510,7 @@
         customerTransitionTimer = window.setTimeout(() => {
           customerTransitionTimer = null;
           customerTransitioning = false;
-          nextCustomer();
+          nextCustomer(true);
         }, 980);
       }
 
