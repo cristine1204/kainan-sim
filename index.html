@@ -65,6 +65,17 @@
     .tool-button:hover, .location-select:hover { transform: translateY(-1px); border-color: #e2b884; background: #fffaf4; }
     .rush-live { color: #a94331; border-color: #edc5b3; background: #fff0e8; animation: rush-pulse 1s ease-in-out infinite alternate; }
     .location-select { max-width: 180px; cursor: pointer; }
+    .location-picker { position: relative; flex: 0 0 auto; }
+    .location-picker > summary { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 10px; background: #fff; cursor: pointer; list-style: none; }
+    .location-picker > summary::-webkit-details-marker { display: none; }
+    .location-popover { position: absolute; z-index: 25; top: calc(100% + 6px); left: 0; display: grid; gap: 6px; min-width: 185px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: white; box-shadow: var(--shadow); color: #59483a; font-size: 10px; font-weight: 800; }
+    .location-popover .location-select { width: 100%; max-width: none; min-height: 34px; padding: 6px; font-size: 11px; }
+    .save-transfer { display: grid; gap: 7px; margin-top: 15px; padding: 12px; border: 1px solid var(--line); border-radius: 11px; background: #fffdf9; }
+    .save-transfer > strong { font-size: 11px; }
+    .save-transfer > p { margin: 0; color: var(--muted); font-size: 9px; line-height: 1.4; }
+    .save-code-input { width: 100%; min-height: 62px; resize: vertical; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: white; color: var(--ink); font: 10px/1.4 ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+    .save-transfer-actions { display: flex; gap: 7px; }
+    .save-transfer-actions .tool-button { flex: 1; min-height: 34px; padding: 6px; font-size: 9px; }
     .tool-spacer { flex: 1; }
 
     .progress-wrap { height: 49px; display: flex; align-items: center; gap: 13px; }
@@ -80,26 +91,27 @@
 
     .game-grid { display: grid; grid-template-columns: minmax(245px, 310px) minmax(0, 1fr); align-items: start; gap: 22px; }
     .panel { border: 1px solid #f0e9df; border-radius: 17px; background: var(--white); box-shadow: var(--shadow); }
-    .customer-panel { overflow: hidden; }
+    .customer-panel { overflow: hidden; align-items: stretch; }
     .section-heading { display: flex; align-items: center; gap: 9px; margin: 0; font-size: 15px; font-weight: 850; letter-spacing: -.3px; }
     .heading-number { display: grid; width: 23px; height: 23px; flex: 0 0 23px; place-items: center; border-radius: 8px; color: var(--terracotta); background: #fff0e8; font-size: 11px; font-weight: 900; }
     .customer-heading { padding: 19px 19px 12px; }
     .customer-heading small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; font-weight: 500; letter-spacing: 0; }
-    .customer-scene { position: relative; height: 235px; overflow: hidden; margin: 0 15px; border-radius: 13px; background: linear-gradient(165deg, #eac78f 0%, #f3d99f 37%, #b96a43 37%, #9e4a30 100%); }
-    .customer-scene::before { position: absolute; inset: 13px 0 auto; height: 6px; background: #713e34; content: ""; }
+    .customer-scene { position: relative; height: auto; min-height: 0; overflow: hidden; margin: 0 15px; border-radius: 13px; background: linear-gradient(165deg, #eac78f 0%, #f3d99f 37%, #b96a43 37%, #9e4a30 100%); }
+    .customer-scene::before { position: absolute; z-index: 1; inset: 13px 0 auto; height: 6px; background: #713e34; content: ""; }
     .lights { position: absolute; z-index: 1; top: 10px; left: 12px; display: flex; width: calc(100% - 24px); justify-content: space-around; }
     .lights i { width: 8px; height: 8px; border-radius: 50%; background: #ffe58d; box-shadow: 0 0 9px #ffe58d; }
-    .scene-awning { position: absolute; top: 26px; left: 10px; display: flex; width: calc(100% - 20px); height: 21px; overflow: hidden; border-radius: 5px 5px 0 0; }
+    .scene-awning { position: absolute; z-index: 1; top: 26px; left: 10px; display: flex; width: calc(100% - 20px); height: 21px; overflow: hidden; border-radius: 5px 5px 0 0; }
     .scene-awning i { height: 100%; flex: 1; background: #d65e43; }
     .scene-awning i:nth-child(even) { background: #ffe3ad; }
-    .scene-window { position: absolute; top: 48px; left: 16px; width: calc(100% - 32px); height: 105px; border: 4px solid #734538; border-radius: 3px; background: linear-gradient(135deg, #a9cbbd 0 42%, #d6e1bd 42%); }
+    .scene-window { position: absolute; z-index: 1; top: 48px; left: 16px; width: calc(100% - 32px); height: 105px; border: 4px solid #734538; border-radius: 3px; background: linear-gradient(135deg, #a9cbbd 0 42%, #d6e1bd 42%); }
     .scene-window::before { position: absolute; top: 0; bottom: 0; left: 49%; border-left: 3px solid #734538; content: ""; }
     .scene-window::after { position: absolute; top: 48%; right: 0; left: 0; border-top: 3px solid #734538; content: ""; }
-    .scene-counter { position: absolute; right: 0; bottom: 37px; left: 0; height: 33px; border-top: 5px solid #75402e; background: #cc8854; }
+    .scene-counter { position: absolute; z-index: 1; right: 0; bottom: 37px; left: 0; height: 33px; border-top: 5px solid #75402e; background: #cc8854; }
     .scene-counter::after { position: absolute; right: 16%; bottom: -26px; left: 16%; height: 25px; background: #75402e; content: ""; }
+    .customer-avatar-container { position: absolute; z-index: 2; inset: 0; pointer-events: none; }
     .customer-person { --person-scale: 1; position: absolute; z-index: 2; bottom: 38px; left: 66%; width: 106px; height: 128px; transform: translateX(-50%) scale(var(--person-scale)); filter: drop-shadow(0 5px 5px rgb(69 37 23 / 28%)); transition: filter .25s ease; }
     .customer-person svg { width: 100%; height: 100%; overflow: visible; }
-    .vendor-person { position: absolute; z-index: 2; bottom: 37px; left: 23%; width: 80px; height: 96px; filter: drop-shadow(0 4px 4px rgb(69 37 23 / 28%)); }
+    .vendor-person { position: absolute; z-index: 1; bottom: 37px; left: 23%; width: 80px; height: 96px; filter: drop-shadow(0 4px 4px rgb(69 37 23 / 28%)); }
     .vendor-person svg { width: 100%; height: 100%; overflow: visible; }
     .vendor-outfit-overlay, .vendor-hat-overlay, .vendor-shades-overlay { display: none; }
     .vendor-person[data-cosmetic="jun-apron"] .vendor-outfit-overlay,
@@ -113,12 +125,12 @@
     .customer-person.waiting-idle { animation: customer-idle 2.4s ease-in-out infinite; }
     .customer-person.happy { animation: customer-cheer .72s ease-out; }
     .customer-person.rejecting { animation: customer-reject-exit .68s ease-in both; }
-    .customer-mood { position: absolute; z-index: 6; top: 88px; left: calc(66% + 34px); display: none; padding: 5px 7px; border: 2px solid white; border-radius: 50%; background: #fff5da; font-size: 17px; box-shadow: 0 3px 9px rgb(69 37 23 / 20%); }
+    .customer-mood { position: absolute; z-index: 3; top: 88px; left: calc(66% + 34px); display: none; padding: 5px 7px; border: 2px solid white; border-radius: 50%; background: #fff5da; font-size: 17px; box-shadow: 0 3px 9px rgb(69 37 23 / 20%); }
     .customer-scene[data-mood="impatient"] .customer-mood, .customer-scene[data-mood="happy"] .customer-mood, .customer-scene[data-mood="angry"] .customer-mood { display: block; }
     .customer-scene[data-mood="impatient"] .customer-mood { background: #ffe2d9; }
     .customer-scene[data-mood="happy"] .customer-mood { background: #e4f7d9; }
     .customer-scene[data-mood="angry"] .customer-mood { background: #ffe0dc; animation: mood-pop .22s ease-out both; }
-    .customer-order-bubble { position: absolute; z-index: 5; top: 51px; left: 7px; display: grid; width: min(45%, 126px); gap: 3px; padding: 7px 8px; border: 2px solid #fff; border-radius: 12px 12px 12px 4px; background: #fffdf8; color: #744534; box-shadow: 0 4px 10px rgb(61 35 23 / 19%); pointer-events: none; }
+    .customer-order-bubble { position: absolute; z-index: 3; top: 51px; left: 7px; display: grid; width: min(45%, 126px); gap: 3px; padding: 7px 8px; border: 2px solid #fff; border-radius: 12px 12px 12px 4px; background: #fffdf8; color: #744534; box-shadow: 0 4px 10px rgb(61 35 23 / 19%); pointer-events: none; }
     .customer-order-bubble::after { position: absolute; bottom: -7px; left: 11px; width: 10px; height: 10px; transform: rotate(45deg); border-right: 2px solid #fff; border-bottom: 2px solid #fff; background: inherit; content: ""; }
     .customer-order-bubble[hidden] { display: none; }
     .bubble-label { color: #a75337; font-size: 8px; font-weight: 950; letter-spacing: .45px; }
@@ -131,7 +143,7 @@
     .customer-scene.is-celebrating { background: linear-gradient(165deg, #b9dfae 0%, #e7e4a6 37%, #b96a43 37%, #9e4a30 100%); }
     .customer-scene.is-celebrating .customer-person { animation: customer-happy-depart .98s cubic-bezier(.2,.7,.25,1) both; }
     .customer-scene.is-celebrating .customer-order-bubble { animation: bubble-pop .32s ease-out reverse both; }
-    .customer-fx { position: absolute; z-index: 7; top: 36%; left: 50%; width: 1px; height: 1px; pointer-events: none; }
+    .customer-fx { position: absolute; z-index: 4; top: 36%; left: 50%; width: 1px; height: 1px; pointer-events: none; }
     .customer-fx .reward-particle { position: absolute; left: 0; display: block; color: #fff; font-size: 12px; font-weight: 950; text-shadow: 0 2px 4px #713e34, 0 0 3px #713e34; white-space: nowrap; animation: customer-reward-rise .95s ease-out both; }
     .customer-fx .reward-particle:nth-child(1) { --drift: -34px; }
     .customer-fx .reward-particle:nth-child(2) { --drift: 28px; animation-delay: .08s; }
@@ -577,8 +589,7 @@
       .game-grid { gap: 6px; }
       .customer-panel { grid-template-columns: minmax(0, 1fr) minmax(115px, .9fr); }
       .tray-content { grid-template-columns: 81px minmax(0, 1fr); gap: 5px; padding: 7px; }
-      .customer-heading { display: none; }
-      .customer-scene { grid-row: 1 / span 2; height: 82px; margin: 0 0 5px 7px; }
+      .customer-heading { display: none !important; }
       .scene-window { top: 25px; height: 48px; }
       .scene-awning { top: 13px; height: 12px; }
       .scene-counter { bottom: 19px; height: 18px; }
@@ -709,6 +720,207 @@
       .location-select { max-width: min(42vw, 180px); }
       .shift-banner, .progress-wrap, .workbench-footer { width: 100%; min-width: 0; }
       .shift-location, .shift-status { min-width: 0; white-space: normal; }
+      .section-heading, .food-name, .drink-name, .shop-title, .quest-title { white-space: normal; overflow-wrap: anywhere; }
+    }
+    @media (max-width: 640px) {
+      html, body { width: 100%; height: 100%; min-height: 0; overflow: hidden; }
+      .app { width: 100%; height: 100vh; height: 100dvh; min-height: 0; max-height: 100dvh; display: flex; flex-direction: column; gap: 0; overflow: hidden; padding: 0 8px; }
+      #game-screen { display: flex; min-height: 0; flex: 1 1 auto; flex-direction: column; overflow: hidden; }
+      .topbar { min-height: 37px; height: 37px; flex: 0 0 37px; flex-wrap: nowrap; gap: 4px; padding: 2px 0; border: 0; }
+      .brand { flex: 0 0 auto; gap: 0; }
+      .brand-mark { width: 26px; height: 26px; border-radius: 8px; font-size: 15px; }
+      .brand > div { display: none; }
+      .header-actions { width: auto; min-width: 0; flex: 1 1 auto; flex-wrap: nowrap; justify-content: space-between; gap: 3px; }
+      .header-pill { min-height: 27px; gap: 3px; padding: 3px 5px; border-radius: 8px; font-size: 8px; }
+      .audio-controls summary { min-height: 27px; gap: 2px; padding: 0 5px; border-radius: 8px; font-size: 8px; }
+      .audio-popover { position: fixed; top: 42px; right: 8px; width: min(240px, calc(100vw - 16px)); }
+      .language-toggle { width: auto; max-width: 69px; min-height: 27px; padding: 2px; font-size: 7px; }
+      .icon-button { width: 27px; height: 27px; border-radius: 8px; font-size: 13px; }
+      .progress-wrap { height: 20px; min-height: 20px; flex: 0 0 20px; gap: 5px; }
+      .progress-label, .progress-count { font-size: 7px; }
+      .progress-count { min-width: 48px; }
+      .progress-track { height: 6px; }
+      .shift-banner { min-height: 22px; flex: 0 0 22px; justify-content: space-between; gap: 4px; margin: 1px 0 3px; padding: 3px 6px; border-radius: 7px; }
+      .shift-location, .shift-status { gap: 3px; font-size: 7px; white-space: nowrap; }
+      #health-seal-banner { display: none !important; }
+      .game-tools { min-height: 29px; height: 29px; flex: 0 0 29px; flex-wrap: nowrap; align-items: center; gap: 4px; overflow: visible; margin: 0 0 3px; padding: 0; }
+      .game-tools > * { flex: 0 0 auto; }
+      .game-tools .tool-spacer { display: block; flex: 1 1 auto; }
+      .game-tools .tool-button { width: 29px; min-height: 27px; height: 27px; overflow: hidden; padding: 0; border-radius: 8px; font-size: 0; }
+      #quests-button::before { content: "📋"; font-size: 14px; }
+      #shop-button::before { content: "🛒"; font-size: 14px; }
+      #credit-button::before { content: "📒"; font-size: 14px; }
+      #credit-badge { font-size: 7px; }
+      .location-picker > summary { width: 29px; height: 27px; border-radius: 8px; font-size: 12px; }
+      .location-popover { position: fixed; top: 97px; right: 8px; left: auto; }
+      .weather-badge { display: none; }
+      .game-grid { min-height: 0; flex: 1 1 auto; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); grid-template-rows: minmax(95px, .62fr) minmax(0, 2.4fr); align-items: stretch; gap: 5px; overflow: hidden; }
+      .game-grid > aside, .game-grid > .workbench { display: contents; }
+      .customer-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(105px, .8fr); grid-template-rows: 0 minmax(0, 1fr) auto auto; align-content: stretch; overflow: hidden; align-items: stretch; }
+      .customer-heading { display: none; }
+      .customer-scene { grid-column: 1; grid-row: 2 / span 3; width: auto; height: auto; min-height: 0; margin: 0 3px 3px 0; align-self: stretch; overflow: hidden; }
+      .scene-window { top: 26px; height: 48px; }
+      .scene-awning { top: 14px; height: 12px; }
+      .scene-counter { bottom: 19px; height: 18px; }
+      .scene-counter::after { bottom: -11px; height: 11px; }
+      .vendor-person { bottom: 8px; left: 22%; width: 42px; height: 51px; }
+      .customer-person { --person-scale: .58; bottom: 5px; left: 76%; width: 70px; height: 84px; }
+      .customer-order-bubble { top: 17px; left: 4px; width: min(46%, 90px); padding: 3px 4px; }
+      .bubble-label { font-size: 6px; }
+      .bubble-item { padding: 1px 2px; font-size: 7px; }
+      .customer-mood { top: 18px; left: calc(76% + 12px); font-size: 10px; }
+      .scene-sign { top: 1px; padding: 2px 4px; font-size: 5px; }
+      .lights { top: 5px; }
+      .lights i { width: 4px; height: 4px; }
+      .customer-nametag { bottom: 3px; left: 3px; padding: 2px 4px; font-size: 5px; }
+      .order-card { grid-column: 2; grid-row: 2; align-self: end; min-width: 0; margin: 0 4px 3px; padding: 5px; }
+      .micro-label { font-size: 6px; }
+      .order-text { margin-top: 2px; font-size: 8px; line-height: 1.25; }
+      .patience-row { grid-column: 2; grid-row: 3; margin: 0 5px 2px; font-size: 6px; }
+      .patience-track { grid-column: 2; grid-row: 4; height: 4px; margin: 0 5px 5px; }
+      .customer-footer, .stats-grid, .vip-banner { display: none !important; }
+      .station-head { display: none; }
+      .prep-grid { min-height: 0; display: grid; grid-column: 1 / -1; grid-row: 2; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); align-items: stretch; gap: 5px; overflow: hidden; }
+      .prep-foods, .order-station { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+      .food-panel, .drink-panel, .sauce-panel, .tray-panel { min-width: 0; padding: 5px; border-radius: 10px; overflow: hidden; }
+      .food-panel { flex: 1 1 auto; }
+      .subhead-row { gap: 3px; margin-bottom: 3px; }
+      .subhead-row .section-heading { gap: 3px; font-size: 8px; line-height: 1.1; }
+      .heading-number { width: 15px; height: 15px; flex-basis: 15px; border-radius: 5px; font-size: 7px; }
+      .subhead-caption { display: none; }
+      .food-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; }
+      .food-card { border-radius: 8px; }
+      .food-art { height: clamp(20px, 4.2vh, 34px); }
+      .food-art .food-emoji { font-size: 20px; }
+      .food-info { padding: 2px 3px; }
+      .food-name { font-size: 7px; line-height: 1.1; }
+      .food-note, .food-price { display: none; }
+      .food-controls { margin-top: 1px; }
+      .food-count { min-width: 0; padding: 1px 3px; font-size: 6px; }
+      #drink-widget { min-height: 0; flex: 0 1 auto; padding: 0; overflow: hidden; }
+      .drink-widget > summary { min-height: 22px; padding: 4px 5px; border-radius: 7px; font-size: 7px; white-space: nowrap; }
+      .drink-widget[open] > summary { margin-bottom: 3px; }
+      .drink-panel { max-height: 96px; }
+      .drink-panel .subhead-row { display: none; }
+      .drink-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; margin-top: 0; overflow: hidden; }
+      .drink-card { min-height: 46px; padding: 3px 2px; }
+      .drink-topline { min-height: 28px; flex-direction: column-reverse; gap: 0; text-align: center; }
+      .drink-emoji { font-size: 22px; }
+      .drink-name { font-size: 6px; line-height: 1.05; }
+      .drink-price, .drink-control, .drink-lock { display: none; }
+      .order-station { justify-content: flex-start; }
+      .sauce-panel { flex: 0 0 auto; }
+      .sauce-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
+      .sauce-button { min-height: 35px; gap: 1px; padding: 3px 1px; font-size: 6px; line-height: 1; }
+      .sauce-button > span:first-child { flex-basis: auto; font-size: 17px; }
+      .tray-panel { flex: 1 1 auto; }
+      .tray-content { grid-template-columns: 34px minmax(0, 1fr); gap: 3px; min-height: 0; margin-top: 2px; padding: 3px; }
+      .cup-wrap { min-height: 35px; }
+      .skewer { width: 18px; height: 32px; }
+      .skewer-emoji { font-size: 10px; line-height: 11px; }
+      .tray-detail-title { display: none; }
+      .tray-items { min-height: 13px; margin-top: 2px; gap: 2px; }
+      .tray-chip { padding: 2px; font-size: 5px; }
+      .tray-actions { gap: 2px; margin-top: 2px; }
+      .tray-total { min-width: 0; overflow: hidden; font-size: 6px; text-overflow: ellipsis; white-space: nowrap; }
+      .clear-button { padding: 2px 3px; font-size: 6px; }
+      .serve-button { min-height: clamp(36px, 7vh, 49px); flex: 0 0 auto; margin-top: auto; padding: 5px; border-radius: 9px; font-size: 9px; line-height: 1.1; }
+      .workbench-footer { display: none; }
+    }
+    @media (max-height: 620px) and (max-width: 640px) {
+      .topbar { height: 32px; min-height: 32px; flex-basis: 32px; }
+      .progress-wrap { height: 16px; min-height: 16px; flex-basis: 16px; }
+      .shift-banner { min-height: 19px; height: 19px; flex-basis: 19px; margin-bottom: 2px; padding: 2px 5px; }
+      .game-tools { height: 25px; min-height: 25px; flex-basis: 25px; }
+      .customer-panel { grid-template-rows: 0 minmax(0, 1fr) auto auto; }
+      .food-art { height: 20px; }
+      .drink-panel { max-height: 72px; }
+      .drink-emoji { font-size: 17px; }
+      .sauce-button { min-height: 29px; }
+      .sauce-button > span:first-child { font-size: 14px; }
+      .serve-button { min-height: 34px; }
+    }
+    @media (max-width: 768px) {
+      html, body { width: 100%; min-width: 0; height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
+      .app { width: 100%; max-width: 100%; height: auto; min-height: 100dvh; max-height: none; display: block; overflow: visible; padding: 0 12px 24px; }
+      #game-screen { display: block; min-height: 0; height: auto; overflow: visible; }
+      .topbar { width: 100%; height: auto; min-height: 0; flex: initial; flex-wrap: wrap; justify-content: flex-start; gap: 8px; padding: 10px 0; }
+      .brand { flex: 1 1 100%; gap: 7px; }
+      .brand > div { display: block; }
+      .header-actions { width: 100%; min-width: 0; flex: initial; flex-wrap: wrap; justify-content: flex-start; gap: 6px; }
+      .header-pill, .audio-controls, .language-toggle, .icon-button { flex: 0 0 auto; }
+      .language-toggle { display: block; width: auto; max-width: 132px; min-height: 34px; }
+      .icon-button { width: 34px; height: 34px; }
+      .progress-wrap { height: 38px; min-height: 0; flex: initial; gap: 8px; }
+      .progress-count { min-width: 58px; }
+      .shift-banner { min-height: 0; height: auto; flex: initial; flex-wrap: wrap; justify-content: space-between; gap: 6px; margin: 5px 0 10px; padding: 10px 12px; }
+      .shift-location, .shift-status { min-width: 0; white-space: normal; }
+      .game-tools { width: 100%; max-width: 100%; height: auto; min-height: 0; flex: initial; flex-wrap: nowrap; gap: 6px; overflow-x: auto; overflow-y: visible; margin: 0 0 10px; padding: 2px 0 5px; }
+      .game-tools > * { flex: 0 0 auto; }
+      .game-tools .tool-spacer { display: none; }
+      .game-grid { display: grid; width: 100%; min-height: 0; height: auto; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; align-items: start; gap: 12px; overflow: visible; }
+      .game-grid > aside, .game-grid > .workbench,
+      .prep-grid, .prep-foods, .order-station { display: contents; }
+      .customer-panel, .workbench, .panel, .food-panel, .sauce-panel, .tray-panel,
+      .drink-widget, .drink-panel, .station-head { width: 100%; min-width: 0; max-width: 100%; }
+      .customer-panel { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; grid-auto-flow: row; align-items: stretch; overflow: visible; padding: 0 0 12px; }
+      .customer-heading { grid-column: auto; display: block; padding: 12px; }
+      .customer-heading .section-heading { font-size: 15px; white-space: normal; }
+      .customer-heading small { display: block; }
+      .customer-scene { grid-column: auto; grid-row: auto; width: auto; height: clamp(160px, 48vw, 230px); min-height: 0; margin: 0 12px; align-self: stretch; overflow: hidden; }
+      .vendor-person { bottom: 18px; left: 23%; width: 66px; height: 79px; }
+      .customer-person { --person-scale: .9; bottom: 18px; left: 72%; width: 88px; height: 106px; transform: translateX(-50%) scale(var(--person-scale)); transform-origin: bottom center; }
+      .customer-order-bubble { top: 39px; left: 10px; width: min(46%, 150px); padding: 7px 8px; }
+      .customer-mood { top: 60px; left: calc(72% + 23px); }
+      .scene-sign { top: 4px; font-size: 8px; }
+      .order-card { grid-column: auto; grid-row: auto; min-width: 0; margin: 10px 12px 0; padding: 12px; }
+      .order-text { font-size: 12px; white-space: normal; overflow-wrap: anywhere; }
+      .patience-row { grid-column: auto; grid-row: auto; margin: 10px 12px 6px; font-size: 10px; }
+      .patience-track { grid-column: auto; grid-row: auto; height: 7px; margin: 0 12px 4px; }
+      .customer-footer, .stats-grid { display: none; }
+      .station-head { display: none; }
+      .food-panel { order: 2; padding: 12px; }
+      .sauce-panel { order: 3; padding: 12px; }
+      .tray-panel { order: 4; padding: 12px; }
+      .serve-button { order: 5; min-height: 50px; margin: 0; padding: 12px; font-size: 14px; }
+      #drink-widget { order: 6; padding: 0; overflow: visible; }
+      .drink-widget > summary { min-height: 42px; padding: 10px 12px; border-radius: 11px; font-size: 12px; white-space: normal; }
+      .drink-panel { max-height: none; padding: 12px; }
+      .food-panel, .sauce-panel, .tray-panel, .drink-panel { overflow: visible; }
+      .food-panel .subhead-row, .drink-panel .subhead-row, .sauce-panel .subhead-row, .tray-panel .subhead-row { align-items: flex-start; flex-wrap: wrap; padding: 0; }
+      .subhead-row .section-heading { font-size: 14px; white-space: normal; }
+      .subhead-caption { max-width: 100%; font-size: 10px; text-align: left; white-space: normal; }
+      .food-grid { width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .food-card, .drink-card { min-width: 0; width: 100%; }
+      .food-art { height: 60px; }
+      .food-art .food-emoji { font-size: 34px; }
+      .food-info { padding: 12px; }
+      .food-topline { align-items: flex-start; flex-wrap: wrap; }
+      .food-name { font-size: 12px; white-space: normal; overflow-wrap: anywhere; }
+      .food-price { display: block; }
+      .food-note { display: block; font-size: 10px; white-space: normal; }
+      .food-price { font-size: 10px; }
+      .sauce-grid { grid-template-columns: minmax(0, 1fr); gap: 7px; }
+      .sauce-button { min-height: 52px; justify-content: flex-start; gap: 10px; padding: 8px 12px; font-size: 12px; white-space: normal; }
+      .sauce-button > span:first-child { flex-basis: 34px; font-size: 30px; }
+      .tray-content { grid-template-columns: 68px minmax(0, 1fr); min-height: 78px; gap: 8px; padding: 8px; }
+      .cup-wrap { min-height: 68px; }
+      .tray-detail-title, .tray-total { font-size: 9px; white-space: normal; }
+      .tray-items { gap: 5px; }
+      .tray-chip { padding: 5px 7px; font-size: 9px; }
+      .tray-actions { gap: 6px; }
+      .clear-button { min-height: 36px; padding: 7px 9px; font-size: 10px; }
+      .drink-grid { display: grid; width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; overflow: visible; }
+      .drink-card { padding: 8px; }
+      .drink-topline { min-height: 77px; }
+      .drink-name { width: 100%; font-size: 10px; line-height: 1.25; white-space: normal; overflow-wrap: anywhere; }
+      .drink-emoji { font-size: 42px; }
+      .drink-price, .drink-lock { display: block; }
+      .drink-control { display: flex; }
+      .drink-price, .drink-lock { font-size: 9px; white-space: normal; }
+      .drink-control { flex-wrap: wrap; }
+      .workbench-footer { display: none; }
+      .shift-banner, .progress-wrap { width: 100%; min-width: 0; }
       .section-heading, .food-name, .drink-name, .shop-title, .quest-title { white-space: normal; overflow-wrap: anywhere; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -844,7 +1056,10 @@
       <button class="tool-button" id="shop-button" type="button">🛒 Cart Shop</button>
       <button class="tool-button" id="credit-button" type="button">📒 Lista <span id="credit-badge"></span></button>
       <span class="tool-spacer"></span>
-      <select class="location-select" id="location-select" aria-label="Change cart location"></select>
+      <details class="location-picker">
+        <summary aria-label="Choose cart location" title="Choose cart location">📍</summary>
+        <div class="location-popover"><label for="location-select">Cart location</label><select class="location-select" id="location-select" aria-label="Change cart location"></select></div>
+      </details>
       <span class="weather-badge" id="weather-badge" role="status" aria-live="polite">☀️ Sunny</span>
       <button class="tool-button" id="rush-extension" type="button" hidden>⏱️ +10s Rush (<span id="extension-count">0</span>)</button>
     </nav>
@@ -872,7 +1087,8 @@
               <span class="bubble-label" id="customer-bubble-label" data-i18n="customer-bubble-label">MY ORDER!</span>
               <span class="bubble-icons" id="customer-order-icons" aria-hidden="true"></span>
             </div>
-            <div class="customer-person" id="customer-sprite" aria-hidden="true"><svg viewBox="0 0 100 120" role="img" aria-label="Aling Nena, customer"><use id="customer-avatar-use" href="#avatar-marites" width="100" height="120"></use></svg></div>
+            <div class="customer-avatar-container" id="customer-avatar-container"></div>
+            <template id="customer-sprite-template"><div class="customer-person" id="customer-sprite" aria-hidden="true"><svg viewBox="0 0 100 120" role="img" aria-label="Customer"><use id="customer-avatar-use" href="#avatar-marites" width="100" height="120"></use></svg></div></template>
             <span class="customer-mood" id="customer-mood" aria-hidden="true">💚</span>
             <div class="customer-fx" id="customer-fx" aria-hidden="true"></div>
             <div class="scene-counter" aria-hidden="true"></div>
@@ -1020,6 +1236,15 @@
         <label class="volume-control" for="settings-sfx-volume"><span class="volume-label"><span id="settings-sfx-label">🔔 Sound Effects (SFX)</span><output id="settings-sfx-value">100%</output></span><input id="settings-sfx-volume" type="range" min="0" max="100" step="1" value="100"></label>
       </div>
       <label class="language-setting" for="language-select"><span>🌐 Language / Wika</span><select id="language-select"><option value="en">English</option><option value="tl">Tagalog</option></select></label>
+      <div class="save-transfer">
+        <strong data-i18n="save-code-title">Save transfer</strong>
+        <p data-i18n="save-code-hint">Copy this code to move your progress to another device.</p>
+        <textarea class="save-code-input" rows="3" aria-label="Save code" spellcheck="false"></textarea>
+        <div class="save-transfer-actions">
+          <button class="tool-button export-save-button" data-i18n="save-export" data-export-save type="button">Export Save Code</button>
+          <button class="tool-button" data-i18n="save-import" data-import-save type="button">Import Save Code</button>
+        </div>
+      </div>
       <button class="settings-reset" id="home-reset-button" type="button" style="margin-top:14px">🗑️ Reset Game Progress</button>
       <button class="modal-submit" data-close-modal="home-settings-modal" type="button">✖ Close Settings</button>
     </section>
@@ -1064,8 +1289,8 @@
     (() => {
       "use strict";
 
-      const STORAGE_KEY = "kainanSim.pinoyStreetFood.v1";
-      const LEGACY_STORAGE_KEY = "kainanSim_saveData";
+      const STORAGE_KEY = "kainanSim_user_progress";
+      const LEGACY_STORAGE_KEYS = ["kainanSim.pinoyStreetFood.v1", "kainanSim_saveData"];
       const EQUIPPED_COSMETICS_KEY = "kainanSim_equipped_cosmetics";
       const BGM_VOLUME_KEY = "kainanSim_volume_bgm";
       const SFX_VOLUME_KEY = "kainanSim_volume_sfx";
@@ -1470,11 +1695,6 @@
         try {
           const serialized = JSON.stringify(state);
           window.localStorage.setItem(STORAGE_KEY, serialized);
-          window.localStorage.setItem(LEGACY_STORAGE_KEY, serialized);
-          window.localStorage.setItem(EQUIPPED_COSMETICS_KEY, JSON.stringify({
-            owned: state.cosmetics,
-            equipped: state.equippedCosmetic
-          }));
           window.localStorage.setItem(BGM_VOLUME_KEY, String(bgmVolume));
           window.localStorage.setItem(SFX_VOLUME_KEY, String(sfxVolume));
           savedProgressExists = hasSavedGame();
@@ -1632,6 +1852,10 @@
           ["#settings-sfx-label", "🔔 Sound Effects (SFX)", "🔔 Mga Epekto ng Tunog (SFX)"],
           ["label[for='language-select'] span", "🌐 Language", "🌐 Wika"],
           ["#home-reset-button", "🗑️ Reset Game Progress", "🗑️ I-reset ang Laro"],
+          ["[data-i18n='save-code-title']", "Save transfer", "Paglipat ng Save"],
+          ["[data-i18n='save-code-hint']", "Copy this code to move your progress to another device.", "Kopyahin ang code para mailipat ang progress sa ibang device."],
+          ["[data-i18n='save-export']", "Export Save Code", "I-export ang Save Code"],
+          ["[data-i18n='save-import']", "Import Save Code", "I-import ang Save Code"],
           ["#inspection-title", "🚨 BARANGAY HEALTH INSPECTOR ARRIVED!", "🚨 DUMATING ANG INSPEKTOR NG BARANGAY!"],
           ["#inspection-description", "Orders are paused while the inspector checks your cart.", "Pansamantalang hihinto ang bentahan habang sinusuri ang iyong kariton."],
           ["#inspection-dismiss", "OK, Back to Selling!", "Sige, balik sa benta!"],
@@ -1685,6 +1909,9 @@
         document.querySelectorAll("[data-i18n]").forEach(element => {
           const translations = labels[element.dataset.i18n];
           if (translations) element.textContent = translations[isTl ? 1 : 0];
+        });
+        document.querySelectorAll(".save-code-input").forEach(input => {
+          input.placeholder = isTl ? "I-paste rito ang save code…" : "Paste a save code here…";
         });
         $("home-settings-modal").querySelector(".modal-description").id = "home-settings-description";
         const modalDescriptions = {
@@ -1744,13 +1971,14 @@
 
       function loadProgress() {
         try {
-          const savedCandidates = [
-            window.localStorage.getItem(STORAGE_KEY),
-            window.localStorage.getItem(LEGACY_STORAGE_KEY)
-          ].filter(Boolean);
+          const savedCandidates = [STORAGE_KEY, ...LEGACY_STORAGE_KEYS]
+            .map(key => window.localStorage.getItem(key))
+            .filter(Boolean);
           if (!savedCandidates.length) {
             savedProgressExists = false;
-            return initialState();
+            state = initialState();
+            persist();
+            return state;
           }
           const loadedCandidates = [];
           savedCandidates.forEach(serialized => {
@@ -1780,6 +2008,10 @@
           }
           state = loaded;
           savedProgressExists = isProgress(loaded);
+          if (!window.localStorage.getItem(STORAGE_KEY) && persist()) {
+            LEGACY_STORAGE_KEYS.forEach(key => window.localStorage.removeItem(key));
+            window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
+          }
           return loaded;
         } catch (error) {
           console.error("Unable to load Kainan Sim progress.", error);
@@ -2120,18 +2352,23 @@
       }
 
       function renderCustomer() {
-        const sprite = $("customer-sprite");
+        const avatarContainer = $("customer-avatar-container");
+        let sprite = $("customer-sprite");
         const scene = document.querySelector(".customer-scene");
         if (!order) {
+          avatarContainer.innerHTML = "";
           $("customer-name").textContent = state.language === "tl" ? "Heto na ang susunod na suki..." : "The next customer is on the way...";
           $("order-description").textContent = state.language === "tl" ? "Sandali lang, naghahanda na ang susunod mong customer." : "Just a moment, your next customer is getting ready.";
           $("vip-banner").hidden = true;
           $("customer-order-bubble").hidden = true;
           $("customer-order-icons").replaceChildren();
-          sprite.classList.remove("impatient");
           scene.dataset.mood = customerMood;
           $("customer-mood").textContent = customerMood === "happy" ? "🥰" : customerMood === "angry" ? "💢" : "💚";
           return;
+        }
+        if (!sprite) {
+          avatarContainer.append($("customer-sprite-template").content.cloneNode(true));
+          sprite = $("customer-sprite");
         }
         $("customer-name").textContent = order.customer;
         const customerName = order.customer.toLocaleLowerCase("en");
@@ -2529,7 +2766,7 @@
         customerTransitioning = false;
         customerMood = "waiting";
         $("customer-scene").classList.remove("is-arriving", "is-rejecting", "is-celebrating");
-        $("customer-sprite").classList.remove("arriving", "waiting-idle", "impatient", "happy", "rejecting");
+        $("customer-avatar-container").innerHTML = "";
         $("customer-fx").replaceChildren();
         order = null;
         tray = {};
@@ -3187,7 +3424,7 @@
           : "Are you sure you want to reset all progress, coins, levels, and vendor settings? This cannot be undone.");
         if (!confirmed) return;
         window.localStorage.removeItem(STORAGE_KEY);
-        window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        LEGACY_STORAGE_KEYS.forEach(key => window.localStorage.removeItem(key));
         window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
         savedProgressExists = false;
         state = initialState();
@@ -3232,7 +3469,7 @@
           ? "Magsisimula ka ba sa Antas 1? Mabubura ang lumang save file."
           : "Start again at Level 1? Your previous save will be deleted.")) return;
         window.localStorage.removeItem(STORAGE_KEY);
-        window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        LEGACY_STORAGE_KEYS.forEach(key => window.localStorage.removeItem(key));
         window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
         savedProgressExists = false;
         window.clearTimeout(arrivalTimer);
@@ -3291,7 +3528,7 @@
           ? "Sigurado ka bang burahin ang buong save file at magsimula ulit? Hindi na ito maibabalik."
           : "Are you sure you want to erase your entire save and start over? This cannot be undone.")) return;
         window.localStorage.removeItem(STORAGE_KEY);
-        window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        LEGACY_STORAGE_KEYS.forEach(key => window.localStorage.removeItem(key));
         window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
         savedProgressExists = false;
         window.clearTimeout(arrivalTimer);
@@ -3320,7 +3557,7 @@
         renderHomeArt();
         setLanguage(state.language);
         window.localStorage.removeItem(STORAGE_KEY);
-        window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+        LEGACY_STORAGE_KEYS.forEach(key => window.localStorage.removeItem(key));
         window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
         savedProgressExists = false;
         updateHomeSave();
@@ -3340,7 +3577,101 @@
         });
       }
 
+      async function exportSave(button) {
+        const textarea = button.closest(".save-transfer").querySelector(".save-code-input");
+        const code = JSON.stringify(state);
+        textarea.value = code;
+        textarea.focus();
+        textarea.select();
+        if (!navigator.clipboard?.writeText) {
+          announce(state.language === "tl"
+            ? "Naka-select ang save code. Kopyahin ito at i-paste sa kabilang device."
+            : "The save code is selected. Copy it and paste it on your other device.", "info");
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(code);
+          announce(state.language === "tl" ? "Nakopya na ang save code." : "Save code copied to the clipboard.", "success");
+        } catch (error) {
+          console.error("Unable to copy the Kainan Sim save code.", error);
+          announce(state.language === "tl"
+            ? "Naka-select ang save code. Kopyahin ito at i-paste sa kabilang device."
+            : "Clipboard access was unavailable. The save code is selected for you to copy.", "info");
+        }
+      }
+
+      function importSave(button) {
+        const textarea = button.closest(".save-transfer").querySelector(".save-code-input");
+        let imported;
+        try {
+          imported = JSON.parse(textarea.value);
+        } catch {
+          announce(state.language === "tl" ? "Hindi valid ang save code. Suriin at subukan ulit." : "That save code is not valid JSON. Check it and try again.", "error");
+          return;
+        }
+        if (!imported || typeof imported !== "object" || Array.isArray(imported)) {
+          announce(state.language === "tl" ? "Hindi valid ang save code." : "That save code is not valid.", "error");
+          return;
+        }
+        const source = imported.progress && typeof imported.progress === "object" && !Array.isArray(imported.progress)
+          ? { ...imported.progress, ...imported }
+          : imported;
+        const knownFields = ["level", "currentLevel", "coins", "totalCoins", "vendor", "selectedVendor", "setupComplete", "unlockedItems", "unlockedFoods"];
+        if (!knownFields.some(key => Object.hasOwn(source, key))) {
+          announce(state.language === "tl" ? "Hindi makilala ang laman ng save code." : "The save code does not contain a recognized Kainan Sim save.", "error");
+          return;
+        }
+        if (!window.confirm(state.language === "tl"
+          ? "Palitan ang kasalukuyang progress gamit ang save code na ito?"
+          : "Replace this device's current progress with the save code?")) return;
+
+        window.clearTimeout(arrivalTimer);
+        window.clearTimeout(customerTransitionTimer);
+        window.clearTimeout(arrivalAnimationTimer);
+        arrivalTimer = null;
+        customerTransitionTimer = null;
+        arrivalAnimationTimer = null;
+        customerTransitioning = false;
+        state = normalizeState(imported);
+        savedProgressExists = state.setupComplete || state.served > 0 || state.level > 1 || state.coins > 0;
+        served = state.served;
+        streak = state.streak;
+        order = null;
+        tray = {};
+        trayDrink = null;
+        selectedSauce = null;
+        customerMood = "waiting";
+        $("customer-avatar-container").innerHTML = "";
+        $("customer-scene").classList.remove("is-arriving", "is-rejecting", "is-celebrating");
+        $("setup-modal").hidden = true;
+        isSetupEditing = false;
+        drinkPanelAutoOpened = state.unlockedDrinks.length > 0;
+        currentWeather = "sunny";
+        weatherSeconds = 60;
+        rushSeconds = 0;
+        $("home-screen").hidden = false;
+        setLanguage(state.language);
+        updateHomeSave();
+        try {
+          LEGACY_STORAGE_KEYS.forEach(key => window.localStorage.removeItem(key));
+          window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
+        } catch (error) {
+          console.error("Unable to clear legacy Kainan Sim data after importing a save.", error);
+          announce(state.language === "tl"
+            ? "Na-import ang save, pero hindi maalis ang lumang backup data."
+            : "The save was imported, but old backup data could not be cleared.", "error");
+          return;
+        }
+        announce(state.language === "tl" ? "Na-import na ang save code sa device na ito." : "Save code imported on this device.", "success");
+      }
+
       function wireEvents() {
+        document.querySelectorAll("[data-export-save]").forEach(button => {
+          button.addEventListener("click", () => { void exportSave(button); });
+        });
+        document.querySelectorAll("[data-import-save]").forEach(button => {
+          button.addEventListener("click", () => importSave(button));
+        });
         $("food-grid").addEventListener("click", event => {
           const button = event.target.closest("button[data-food]");
           if (button && !button.disabled) {
