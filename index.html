@@ -134,6 +134,7 @@
     .bubble-label { color: #a75337; font-size: 8px; font-weight: 950; letter-spacing: .45px; }
     .bubble-icons { display: flex; flex-wrap: wrap; gap: 3px; }
     .bubble-item { padding: 2px 4px; border-radius: 99px; background: #f7eddd; font-size: 11px; font-weight: 850; white-space: nowrap; }
+    .bubble-item img { width: 18px; height: 18px; display: block; object-fit: contain; }
     .customer-scene.is-arriving .customer-order-bubble { animation: bubble-pop .48s .22s cubic-bezier(.2,1.4,.55,1) both; }
     .customer-scene.is-rejecting { animation: cart-reject .58s ease-in-out both; }
     .customer-scene.is-rejecting .customer-order-bubble { border-color: #ffd1c9; background: #fff0ed; color: #a13530; }
@@ -1591,10 +1592,10 @@
       };
       const FOODS = [
         { id: "fishball", name: "Fishball", emoji: "🍡", image: "assets/foods/fishball.png", unlock: 1, price: 5, note: "Malutong sa labas, juicy sa loob." },
-        { id: "kwek", name: "Kwek-Kwek", emoji: "🥚", unlock: 2, price: 8, note: "Quail egg na may crispy coating." },
+        { id: "kwekkwek", name: "Kwek-Kwek", emoji: "🥚", unlock: 2, price: 8, note: "Quail egg na may crispy coating." },
         { id: "hotdog", name: "Hotdog", emoji: "🌭", image: "assets/foods/hotdog.png", unlock: 2, price: 12, note: "Juicy hotdog, paborito ng bata." },
-        { id: "day-old", name: "Day Old", emoji: "🍗", image: "assets/foods/day-old.png", unlock: 3, price: 10, note: "Sulit at malutong na paborito." },
-        { id: "fried-siomai", name: "Fried Siomai", emoji: "🥟", image: "assets/foods/fried-siomai.png", unlock: 3, price: 10, note: "Mainit-init na fried siomai." },
+        { id: "dayold", name: "Day Old", emoji: "🍗", image: "assets/foods/day-old.png", unlock: 3, price: 10, note: "Sulit at malutong na paborito." },
+        { id: "siomai", name: "Fried Siomai", emoji: "🥟", image: "assets/foods/fried-siomai.png", unlock: 3, price: 10, note: "Mainit-init na fried siomai." },
         { id: "kikiam", name: "Kikiam", emoji: "🥖", image: "assets/foods/kikiam.png", unlock: 4, price: 7, note: "Classic na sawsaw-sarap!" },
         { id: "lumpia", name: "Lumpia", emoji: "🌯", image: "assets/foods/lumpia.png", unlock: 4, price: 8, note: "Crispy lumpia, bagong luto." },
         { id: "calamares", name: "Calamares", emoji: "🦑", image: "assets/foods/calamares.png", unlock: 5, price: 10, note: "Crispy at fresh, paborito ng lahat." }
@@ -1673,10 +1674,13 @@
         const level = Number.isInteger(value.level) ? Math.min(100, Math.max(1, value.level)) : 1;
         const needed = level * 100;
         const rawXp = Number.isFinite(value.xp) ? Math.max(0, Math.floor(value.xp)) : 0;
+        const legacyFoodIds = { "day-old": "dayold", "fried-siomai": "siomai", kwek: "kwekkwek" };
         const validFoods = new Set(FOODS.map(item => item.id));
         const validDrinks = new Set(DRINKS.map(item => item.id));
         const validSauces = new Set(SAUCES.map(item => item.id));
-        const storedFoods = Array.isArray(value.unlockedItems) ? value.unlockedItems.filter(id => validFoods.has(id)) : [];
+        const storedFoods = Array.isArray(value.unlockedItems)
+          ? value.unlockedItems.map(id => legacyFoodIds[id] || id).filter(id => validFoods.has(id))
+          : [];
         const storedDrinks = Array.isArray(value.unlockedDrinks) ? value.unlockedDrinks.filter(id => validDrinks.has(id)) : [];
         const storedSauces = Array.isArray(value.unlockedSauces) ? value.unlockedSauces.filter(id => validSauces.has(id)) : [];
         const vendor = Object.hasOwn(VENDORS, value.vendor) ? value.vendor : base.vendor;
@@ -2671,18 +2675,28 @@
         const bubbleIcons = $("customer-order-icons");
         bubbleIcons.replaceChildren();
         const orderIcons = Object.entries(order.items).map(([id, quantity]) => ({
-          emoji: foodFor(id).emoji,
-          label: `${foodFor(id).name} ×${quantity}`,
+          data: FOODS.find(item => item.id === id),
           count: quantity
         }));
-        if (order.drink) orderIcons.push({ emoji: drinkFor(order.drink).emoji, label: drinkFor(order.drink).name, count: 1 });
-        orderIcons.push({ emoji: sauce.emoji, label: sauce.name, count: 1 });
+        if (order.drink) orderIcons.push({ data: DRINKS.find(item => item.id === order.drink), count: 1 });
+        orderIcons.push({ data: sauce, count: 1 });
         orderIcons.forEach(item => {
-          const icon = document.createElement("span");
-          icon.className = "bubble-item";
-          icon.textContent = `${item.emoji}${item.count > 1 ? `×${item.count}` : ""}`;
-          icon.title = item.label;
-          bubbleIcons.append(icon);
+          if (!item.data) throw new Error("Customer order references an unknown menu item.");
+          const token = document.createElement("span");
+          token.className = "bubble-item";
+          token.title = `${item.data.name}${item.count > 1 ? ` ×${item.count}` : ""}`;
+          if (item.data.image) {
+            const image = document.createElement("img");
+            image.src = item.data.image;
+            image.alt = "";
+            image.loading = "lazy";
+            image.decoding = "async";
+            token.append(image);
+          } else {
+            token.textContent = item.data.emoji;
+          }
+          if (item.count > 1) token.append(`×${item.count}`);
+          bubbleIcons.append(token);
         });
         $("customer-footer").innerHTML = `<span aria-hidden="true">💚</span><span>${state.language === "tl" ? "Tamang order = dagdag tip!" : "Perfect order = bonus tip!"}</span>`;
         const vip = order.vip;
