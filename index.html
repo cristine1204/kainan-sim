@@ -423,10 +423,11 @@
     .drink-panel { padding: 17px 18px; }
     .drink-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 11px; }
     .drink-widget > summary { display: none; }
-    .qty-button { width: 25px; height: 25px; display: grid; place-items: center; border: 1px solid #eadfd2; border-radius: 50%; background: #fff; color: var(--ink); cursor: pointer; font-size: 14px; font-weight: 800; }
-    .qty-button.add { border-color: var(--green); background: var(--green); color: #fff; }
-    .qty-button:disabled { cursor: not-allowed; opacity: .4; }
-    .drink-card { min-width: 0; padding: 9px; border: 1px solid #d9e8de; border-radius: 11px; background: linear-gradient(145deg, #f7fff7, #eef8ef); }
+    .drink-card { min-width: 0; padding: 9px; border: 1px solid #d9e8de; border-radius: 11px; background: linear-gradient(145deg, #f7fff7, #eef8ef); color: inherit; cursor: pointer; font: inherit; text-align: center; transition: border-color .15s, background .15s, transform .15s; }
+    .drink-card:not(:disabled):hover { transform: translateY(-1px); border-color: #80b991; }
+    .drink-card:focus-visible { outline: 3px solid #e5a93c; outline-offset: 2px; }
+    .drink-card.selected { border-color: var(--green); background: linear-gradient(145deg, #effbef, #dff2e2); box-shadow: inset 0 0 0 1px var(--green); }
+    .drink-card:disabled { cursor: not-allowed; }
     .drink-topline { min-height: 76px; display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; gap: 3px; text-align: center; }
     .drink-name { font-size: 9px; font-weight: 900; }
     .drink-emoji { font-size: 54px; line-height: 1; }
@@ -435,6 +436,8 @@
     .drink-note { margin-top: 3px; color: var(--muted); font-size: 7px; }
     .drink-control { display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-top: 7px; }
     .drink-lock { color: #867a6e; font-size: 7px; font-weight: 800; }
+    .drink-select-indicator { width: 25px; height: 25px; display: grid; flex: 0 0 25px; place-items: center; border: 1px solid #eadfd2; border-radius: 50%; background: #fff; color: var(--ink); font-size: 14px; font-weight: 800; }
+    .drink-card.selected .drink-select-indicator { border-color: var(--green); background: var(--green); color: #fff; }
     .sanitation-panel { padding: 14px 18px; }
     .sanitation-row { display: grid; grid-template-columns: 1fr auto; gap: 7px 10px; align-items: center; margin-top: 11px; }
     .sanitation-label { color: #685547; font-size: 9px; font-weight: 850; }
@@ -844,7 +847,6 @@
       .drink-emoji { font-size: 22px; }
       .drink-image { width: 22px; height: 22px; }
       .drink-name { font-size: 6px; line-height: 1.05; }
-      .drink-price, .drink-control, .drink-lock { display: none; }
       .order-station { justify-content: flex-start; }
       .sauce-panel { flex: 0 0 auto; }
       .sauce-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
@@ -1094,7 +1096,9 @@
       .drink-emoji { font-size: 22px; }
       .drink-image { width: 22px; height: 22px; }
       .drink-name { font-size: 6px; line-height: 1.05; white-space: normal; }
-      .drink-price, .drink-control, .drink-lock { display: none; }
+      .drink-price, .drink-lock { display: none; }
+      .drink-control { display: flex; justify-content: center; margin-top: 0; }
+      .drink-select-indicator { width: 20px; height: 20px; flex-basis: 20px; font-size: 11px; }
       .sauce-panel { grid-column: 1; grid-row: 2; }
       .sauce-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
       .sauce-button { min-width: 0; min-height: 36px; gap: 1px; padding: 3px 2px; font-size: 6px; line-height: 1.05; white-space: normal; }
@@ -2865,8 +2869,15 @@
         DRINKS.forEach(drink => {
           const unlocked = state.unlockedDrinks.includes(drink.id);
           const selected = trayDrink === drink.id;
-          const card = document.createElement("article");
-          card.className = `drink-card${unlocked ? "" : " locked"}`;
+          const card = document.createElement("button");
+          card.type = "button";
+          card.className = `drink-card${unlocked ? "" : " locked"}${selected ? " selected" : ""}`;
+          card.disabled = !unlocked || !order || customerTransitioning || state.dayClosed || (!selected && preparedTotal() >= trayCapacity());
+          if (unlocked) card.dataset.drink = drink.id;
+          card.setAttribute("aria-pressed", String(selected));
+          card.setAttribute("aria-label", unlocked
+            ? `${selected ? (state.language === "tl" ? "Alisin" : "Remove") : (state.language === "tl" ? "Idagdag" : "Add")} ${drink.name}${selected ? (state.language === "tl" ? " sa combo" : " from combo") : (state.language === "tl" ? " sa combo" : " to combo")}`
+            : `${drink.name} ${state.language === "tl" ? "mabubuksan sa antas" : "unlocks at level"} ${drink.unlock}`);
           const top = document.createElement("div");
           top.className = "drink-topline";
           const name = document.createElement("span");
@@ -2888,14 +2899,11 @@
           const lock = document.createElement("span");
           lock.className = "drink-lock";
           lock.textContent = unlocked ? (selected ? (state.language === "tl" ? "Kasama sa combo ✓" : "In the combo ✓") : (state.language === "tl" ? "Palamig" : "Cold drink")) : `🔒 ${state.language === "tl" ? "Antas" : "Level"} ${drink.unlock}`;
-          const button = document.createElement("button");
-          button.className = `qty-button${selected ? " add" : ""}`;
-          button.type = "button";
-          button.textContent = selected ? "✓" : "+";
-          button.disabled = !unlocked || !order || customerTransitioning || state.dayClosed || (!selected && preparedTotal() >= trayCapacity());
-          button.setAttribute("aria-label", unlocked ? `${selected ? (state.language === "tl" ? "Alisin" : "Remove") : (state.language === "tl" ? "Idagdag" : "Add")} ${drink.name}` : `${drink.name} ${state.language === "tl" ? "mabubuksan sa antas" : "unlocks at level"} ${drink.unlock}`);
-          if (unlocked) button.dataset.drink = drink.id;
-          control.append(lock, button);
+          const indicator = document.createElement("span");
+          indicator.className = "drink-select-indicator";
+          indicator.setAttribute("aria-hidden", "true");
+          indicator.textContent = !unlocked ? "🔒" : selected ? "✓" : "+";
+          control.append(lock, indicator);
           card.append(top, price, control);
           grid.append(card);
         });
