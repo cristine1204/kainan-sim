@@ -1,4 +1,4 @@
-const CACHE_NAME = "kainan-sim-v25";
+const CACHE_NAME = "kainan-sim-v26";
 const APP_SHELL = [
   "./",
   "./index.html",

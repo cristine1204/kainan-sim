@@ -25,7 +25,7 @@
   let speechUnlocked = false;
   let music = createMusic();
   let speechUnavailableNotified = false;
-  let speechVoiceFallbackNotified = false;
+  let speechVoiceUnavailableNotified = false;
   let daySummaryActive = false;
   let generatedAudioContext = null;
 
@@ -66,11 +66,12 @@
     const voice = voices.find(candidate => /^(fil|tl)-ph$/i.test(candidate.lang))
       || voices.find(candidate => /^(fil|tl)-/i.test(candidate.lang));
     if (voice) return voice;
-    if (!speechVoiceFallbackNotified && voices.length) {
-      console.warn("No Filipino speech voice is installed; using the device's default voice.");
-      speechVoiceFallbackNotified = true;
+    if (!speechVoiceUnavailableNotified) {
+      console.warn("No Filipino or Tagalog speech voice is installed; install one in the device's text-to-speech settings.");
+      speechVoiceUnavailableNotified = true;
+      window.dispatchEvent(new CustomEvent("kainan-speech-voice-unavailable"));
     }
-    return voices.find(candidate => candidate.default) || voices[0] || null;
+    return null;
   }
 
   function unlockSpeech() {
@@ -120,6 +121,7 @@
 
     const utterance = new window.SpeechSynthesisUtterance(text);
     const voice = customerVoice(synthesis);
+    if (!voice) return false;
     utterance.lang = voice?.lang || "fil-PH";
     if (voice) utterance.voice = voice;
     utterance.volume = 1.0;

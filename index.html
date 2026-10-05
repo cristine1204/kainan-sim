@@ -138,10 +138,6 @@
     .bubble-icons { display: flex; flex-wrap: wrap; gap: 3px; }
     .bubble-item { padding: 2px 4px; border-radius: 99px; background: #f7eddd; font-size: 11px; font-weight: 850; white-space: nowrap; }
     .bubble-item img { width: 18px; height: 18px; display: block; object-fit: contain; }
-    .order-speech-button { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; padding: 8px 12px; border: 1px solid #dfb979; border-radius: 10px; background: #fff2d6; color: #70421f; cursor: pointer; font: inherit; font-size: 12px; font-weight: 850; touch-action: manipulation; }
-    .order-speech-button:hover { background: #ffe8b7; }
-    .order-speech-button:focus-visible { outline: 3px solid #397394; outline-offset: 2px; }
-    .order-speech-button[hidden] { display: none; }
     .customer-scene.is-arriving .customer-order-bubble { animation: bubble-pop .48s .22s cubic-bezier(.2,1.4,.55,1) both; }
     .customer-scene.is-rejecting { animation: cart-reject .58s ease-in-out both; }
     .customer-scene.is-rejecting .customer-order-bubble { border-color: #ffd1c9; background: #fff0ed; color: #a13530; }
@@ -1464,7 +1460,7 @@
             <div class="scene-counter" aria-hidden="true"></div>
             <span class="customer-nametag" id="customer-name">Your new suki</span>
           </div>
-          <div class="order-card"><div class="micro-label">ORDER NI SUKI</div><div class="order-text" id="order-description" aria-live="polite">Loading your next order...</div><button class="order-speech-button" id="speak-order-button" type="button" hidden>🔊 Pakinggan ang order</button></div>
+          <div class="order-card"><div class="micro-label">ORDER NI SUKI</div><div class="order-text" id="order-description" aria-live="polite">Loading your next order...</div></div>
           <div class="vip-banner" id="vip-banner" hidden></div>
           <div class="patience-row"><span>INGATAN ANG PASENSYA</span><span class="patience-value" id="patience-label">100%</span></div>
           <div class="patience-track" id="patience-track" role="progressbar" aria-label="Customer patience" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div class="patience-fill" id="patience-fill"></div></div>
@@ -1925,7 +1921,6 @@
       let bgmVolume = 100;
       let sfxVolume = 100;
       let daySummaryActive = false;
-      let orderSpeechText = "";
       let pendingResetAction = null;
       let resetReturnFocus = null;
       let isResettingProgress = false;
@@ -2149,20 +2144,6 @@
         });
         if (customerOrder.drink) items.push(`isang ${drinkFor(customerOrder.drink).name}`);
         return `Pabili po ng ${items.join(" at ")}!`;
-      }
-
-      function currentOrderSpeech() {
-        if (orderSpeechText || !order) return orderSpeechText;
-        if (!order.creditOffer) {
-          orderSpeechText = customerOrderSpeech(order);
-          return orderSpeechText;
-        }
-        const gender = customerGender(order.customer);
-        const creditLines = gender === "female"
-          ? ["Ate, pautang muna nitong pagkain, wala pa sahod eh!", "Pwedeng palista muna nitong order ko? Babayaran ko rin!"]
-          : ["Boss, pautang muna nitong order ko, sa katapusan na lang!", "Pards, list mo muna 'tong tusok-tusok, bukas bayad!"];
-        orderSpeechText = creditLines[Math.floor(Math.random() * creditLines.length)];
-        return orderSpeechText;
       }
 
       function playMusicNote() {
@@ -2860,7 +2841,6 @@
         let sprite = $("customer-sprite");
         const scene = document.querySelector(".customer-scene");
         if (!order) {
-          $("speak-order-button").hidden = true;
           avatarContainer.innerHTML = "";
           $("customer-name").textContent = state.language === "tl" ? "Heto na ang susunod na suki..." : "The next customer is on the way...";
           $("order-description").textContent = state.language === "tl" ? "Sandali lang, naghahanda na ang susunod mong customer." : "Just a moment, your next customer is getting ready.";
@@ -2877,9 +2857,6 @@
           sprite = $("customer-sprite");
         }
         $("customer-name").textContent = order.customer;
-        $("speak-order-button").hidden = false;
-        $("speak-order-button").disabled = customerTransitioning || daySummaryActive;
-        $("speak-order-button").textContent = state.language === "tl" ? "🔊 Pakinggan ang order" : "🔊 Hear the order";
         if (sprite) {
           const avatar = customerAvatarId(order.customer, order.vip?.id);
           $("customer-avatar-use").setAttribute("href", `#avatar-${avatar}`);
@@ -3242,7 +3219,15 @@
           sprite.classList.remove("arriving");
           if (order && !customerTransitioning && patience > 0) {
             sprite.classList.add("waiting-idle");
-            AudioManager.speakCustomer(currentOrderSpeech(), customerGender(order.customer));
+            if (order.creditOffer) {
+              const gender = customerGender(order.customer);
+              const creditLines = gender === "female"
+                ? ["Ate, pautang muna nitong pagkain, wala pa sahod eh!", "Pwedeng palista muna nitong order ko? Babayaran ko rin!"]
+                : ["Boss, pautang muna nitong order ko, sa katapusan na lang!", "Pards, list mo muna 'tong tusok-tusok, bukas bayad!"];
+              AudioManager.speakCustomer(creditLines[Math.floor(Math.random() * creditLines.length)], gender);
+            } else {
+              AudioManager.speakCustomer(customerOrderSpeech(order), customerGender(order.customer));
+            }
           }
           arrivalAnimationTimer = null;
         }, 760);
@@ -3363,7 +3348,6 @@
         $("customer-avatar-container").innerHTML = "";
         $("customer-fx").replaceChildren();
         order = null;
-        orderSpeechText = "";
         tray = {};
         trayDrink = null;
         selectedSauce = null;
@@ -4306,6 +4290,12 @@
       }
 
       function wireEvents() {
+        window.addEventListener("kainan-speech-voice-unavailable", () => announce(
+          state.language === "tl"
+            ? "Walang Tagalog voice sa phone. Mag-install ng Filipino/Tagalog text-to-speech voice sa Settings para marinig ang order."
+            : "No Filipino voice is installed on this phone. Install a Filipino/Tagalog text-to-speech voice in Settings to hear customer orders.",
+          "error"
+        ), { once: true });
         document.querySelectorAll("[data-export-save]").forEach(button => {
           button.addEventListener("click", () => { void exportSave(button); });
         });
@@ -4335,12 +4325,6 @@
         });
         $("clear-button").addEventListener("click", clearTray);
         $("serve-button").addEventListener("click", serveOrder);
-        $("speak-order-button").addEventListener("click", () => {
-          if (order && !customerTransitioning && !daySummaryActive) {
-            AudioManager.unlockSpeech();
-            AudioManager.speakCustomer(currentOrderSpeech(), customerGender(order.customer));
-          }
-        });
         $("settings-button").addEventListener("click", () => openSetup(true));
         $("new-game-button").addEventListener("click", startNewGame);
         $("continue-button").addEventListener("click", continueGame);
