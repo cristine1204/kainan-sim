@@ -240,12 +240,15 @@
     .sauce-panel { padding: 10px; }
     .sauce-grid { display: grid; grid-template-columns: 1fr; gap: 5px; margin-top: 6px; }
     .sauce-button { min-height: 38px; display: flex; align-items: center; justify-content: flex-start; gap: 8px; padding: 6px 9px; border: 1px solid #eee5db; border-radius: 10px; background: #fbf8f4; cursor: pointer; font-size: 9px; font-weight: 800; text-align: left; transition: border .15s, background .15s, transform .15s; }
-    .sauce-button > span:first-child { flex: 0 0 30px; font-size: 28px; line-height: 1; text-align: center; }
+    .sauce-button > span:first-child { position: relative; display: grid; width: 30px; height: 30px; flex: 0 0 30px; place-items: center; font-size: 28px; line-height: 1; text-align: center; }
+    .sauce-artwork { display: block; width: 100%; height: 100%; object-fit: contain; }
+    .sauce-selected-check { position: absolute; right: -3px; bottom: -3px; display: grid; width: 13px; height: 13px; place-items: center; border: 1px solid white; border-radius: 50%; background: #2b9348; color: white; font-size: 9px; font-style: normal; font-weight: 900; line-height: 1; }
+    .sauce-locked-badge { position: absolute; right: -3px; bottom: -3px; display: grid; width: 13px; height: 13px; place-items: center; border: 1px solid white; border-radius: 50%; background: #716961; color: white; font-size: 8px; line-height: 1; }
     .sauce-button > span:last-child { min-width: 0; }
     .sauce-button:hover:not(:disabled) { transform: translateY(-1px); border-color: #dfb884; }
     .sauce-button.selected { border: 2px solid var(--green); color: var(--green-dark); background: #eef8ed; box-shadow: 0 0 0 2px rgb(43 147 72 / 10%); }
     .sauce-button:disabled { cursor: not-allowed; opacity: .54; }
-    .sauce-locked { color: #8e837a; filter: grayscale(1); background: #f1efec; }
+    .sauce-locked { color: #8e837a; background: #f1efec; }
 
     .serve-button { width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 12px; border: 0; border-radius: 11px; background: var(--green); color: white; box-shadow: 0 4px 9px rgb(43 147 72 / 16%); cursor: pointer; font-size: 12px; font-weight: 900; transition: transform .15s, background .15s, box-shadow .15s, opacity .15s; }
     .serve-button:hover:not(:disabled) { transform: translateY(-1px); background: var(--green-dark); box-shadow: 0 6px 13px rgb(43 147 72 / 22%); }
@@ -568,7 +571,7 @@
       .clear-button { padding: 4px 6px; font-size: 7px; }
       .sauce-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
       .sauce-button { min-height: 46px; justify-content: flex-start; gap: 3px; padding: 4px 3px; font-size: 7.5px; line-height: 1.15; }
-      .sauce-button > span:first-child { flex-basis: 24px; font-size: 24px; }
+      .sauce-button > span:first-child { width: 24px; height: 24px; flex-basis: 24px; font-size: 24px; }
       .serve-button { min-height: 37px; padding: 7px; font-size: 10px; }
       .order-station { gap: 6px; }
       .workbench-footer { align-items: center; gap: 6px; }
@@ -661,7 +664,7 @@
       .station-head .shift-badge { display: none; }
       .workbench-footer .order-summary { display: none; }
       .sauce-button { min-height: 42px; font-size: 7px; }
-      .sauce-button > span:first-child { flex-basis: 24px; font-size: 24px; }
+      .sauce-button > span:first-child { width: 24px; height: 24px; flex-basis: 24px; font-size: 24px; }
       .food-panel, .tray-panel, .sauce-panel { padding: 6px; }
       .food-art { height: 30px; }
       .food-art .food-emoji { font-size: 20px; }
@@ -736,7 +739,7 @@
       .sauce-panel { order: 4; padding: 12px; }
       .sauce-grid { grid-template-columns: minmax(0, 1fr); gap: 7px; }
       .sauce-button { min-height: 52px; justify-content: flex-start; gap: 10px; padding: 8px 12px; font-size: 12px; }
-      .sauce-button > span:first-child { flex-basis: 34px; font-size: 30px; }
+      .sauce-button > span:first-child { width: 34px; height: 34px; flex-basis: 34px; font-size: 30px; }
       .tray-panel { order: 5; padding: 12px; }
       .tray-content { grid-template-columns: 68px minmax(0, 1fr); min-height: 78px; gap: 8px; padding: 8px; }
       .cup-wrap { min-height: 68px; }
@@ -855,7 +858,7 @@
       .sauce-panel { flex: 0 0 auto; }
       .sauce-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
       .sauce-button { min-height: 35px; gap: 1px; padding: 3px 1px; font-size: 6px; line-height: 1; }
-      .sauce-button > span:first-child { flex-basis: auto; font-size: 17px; }
+      .sauce-button > span:first-child { width: 17px; height: 17px; flex-basis: 17px; font-size: 17px; }
       .tray-panel { flex: 1 1 auto; }
       .tray-content { grid-template-columns: 34px minmax(0, 1fr); gap: 3px; min-height: 0; margin-top: 2px; padding: 3px; }
       .cup-wrap { min-height: 35px; }
@@ -881,7 +884,7 @@
       .drink-emoji { font-size: 17px; }
       .drink-image { width: 17px; height: 17px; }
       .sauce-button { min-height: 29px; }
-      .sauce-button > span:first-child { font-size: 14px; }
+      .sauce-button > span:first-child { width: 14px; height: 14px; font-size: 14px; }
       .serve-button { min-height: 34px; }
     }
     @media (max-width: 768px) {
@@ -945,7 +948,7 @@
       .food-price { font-size: 10px; }
       .sauce-grid { grid-template-columns: minmax(0, 1fr); gap: 7px; }
       .sauce-button { min-height: 52px; justify-content: flex-start; gap: 10px; padding: 8px 12px; font-size: 12px; white-space: normal; }
-      .sauce-button > span:first-child { flex-basis: 34px; font-size: 30px; }
+      .sauce-button > span:first-child { width: 34px; height: 34px; flex-basis: 34px; font-size: 30px; }
       .tray-content { grid-template-columns: 68px minmax(0, 1fr); min-height: 78px; gap: 8px; padding: 8px; }
       .cup-wrap { min-height: 68px; }
       .tray-detail-title, .tray-total { font-size: 9px; white-space: normal; }
@@ -1106,7 +1109,7 @@
       .sauce-panel { grid-column: 1; grid-row: 2; }
       .sauce-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
       .sauce-button { min-width: 0; min-height: 36px; gap: 1px; padding: 3px 2px; font-size: 6px; line-height: 1.05; white-space: normal; }
-      .sauce-button > span:first-child { flex-basis: auto; font-size: 17px; }
+      .sauce-button > span:first-child { width: 17px; height: 17px; flex-basis: 17px; font-size: 17px; }
       .tray-panel { min-height: 0; grid-column: 2; grid-row: 2 / span 2; }
       .tray-content { grid-template-columns: 34px minmax(0, 1fr); gap: 3px; min-height: 0; margin-top: 2px; padding: 3px; }
       .cup-wrap { min-height: 35px; }
@@ -1147,7 +1150,7 @@
       .drink-emoji { font-size: 17px; }
       .drink-image { width: 17px; height: 17px; }
       .sauce-button { min-height: 30px; }
-      .sauce-button > span:first-child { font-size: 14px; }
+      .sauce-button > span:first-child { width: 14px; height: 14px; font-size: 14px; }
       .serve-button { min-height: 32px; }
     }
     @media (max-width: 360px) {
@@ -1193,7 +1196,7 @@
       .sauce-panel .subhead-row, .tray-panel .subhead-row { display: none; }
       .sauce-grid { gap: 2px; }
       .sauce-button { min-height: 21px; padding: 1px 2px; font-size: 5px; }
-      .sauce-button > span:first-child { font-size: 10px; }
+      .sauce-button > span:first-child { width: 10px; height: 10px; font-size: 10px; }
       .tray-panel { grid-column: 2; grid-row: 2; padding: 3px; }
       .tray-content { height: 44px; min-height: 0; grid-template-columns: 22px minmax(0, 1fr); gap: 2px; margin-top: 0; padding: 2px; }
       .cup-wrap { min-height: 0; }
@@ -1663,9 +1666,9 @@
         { id: "melon", name: "Melon Drink", emoji: "🍈", image: "assets/drinks/melon-juice.png", unlock: 5, price: 20 }
       ];
       const SAUCES = [
-        { id: "sweet", name: "Sweet & Sour", emoji: "🍯", unlock: 1 },
-        { id: "spicy", name: "Spicy Sauce", emoji: "🌶️", unlock: 3 },
-        { id: "vinegar", name: "Special Vinegar", emoji: "🧅", unlock: 6 }
+        { id: "sweet", name: "Sweet & Sour", emoji: "🍯", image: "assets/sauces/sweet-sour.png", unlock: 1 },
+        { id: "spicy", name: "Spicy Sauce", emoji: "🌶️", image: "assets/sauces/spicy.png", unlock: 3 },
+        { id: "vinegar", name: "Special Vinegar", emoji: "🧅", image: "assets/sauces/vinegar.png", unlock: 6 }
       ];
       const CUSTOMER_NAMES = ["Aling Nena", "Jun-jun", "Maya", "Manong Boy", "Tita Leni", "Carlo", "Bebeng", "Ate Mercy", "Mang Tonyo", "Mika"];
       const QUEST_DEFINITIONS = [
@@ -2824,7 +2827,7 @@
         });
         const sauce = SAUCES.find(item => item.id === order.sauce);
         const orderPhrase = requirements.join(" + ");
-        const orderDescription = `${orderPhrase}${order.drink ? ` + 1 ${drinkFor(order.drink).name}` : ""} ${state.language === "tl" ? "na may" : "with"} ${sauce.name} ${sauce.emoji}`;
+        const orderDescription = `${orderPhrase}${order.drink ? ` + 1 ${drinkFor(order.drink).name}` : ""} ${state.language === "tl" ? "na may" : "with"} ${sauce.name}`;
         $("order-description").textContent = orderDescription;
         const bubble = $("customer-order-bubble");
         bubble.hidden = false;
@@ -2929,9 +2932,29 @@
           button.disabled = !unlocked || !order || customerTransitioning || state.dayClosed;
           button.setAttribute("aria-pressed", String(selectedSauce === sauce.id));
           button.setAttribute("aria-label", unlocked ? `${sauce.name}${selectedSauce === sauce.id ? (state.language === "tl" ? ", napili" : ", selected") : ""}` : `${sauce.name}, ${state.language === "tl" ? "mabubuksan sa antas" : "unlocks at level"} ${sauce.unlock}`);
-          button.innerHTML = unlocked
-            ? `<span aria-hidden="true">${selectedSauce === sauce.id ? "✅" : sauce.emoji}</span><span>${sauce.name}${selectedSauce === sauce.id ? (state.language === "tl" ? " · Napili" : " · Selected") : ""}</span>`
-            : `<span aria-hidden="true">🔒</span><span>${state.language === "tl" ? `Mabubuksan sa Antas ${sauce.unlock}` : `Unlocks at Level ${sauce.unlock}`}</span>`;
+          const icon = document.createElement("span");
+          icon.setAttribute("aria-hidden", "true");
+          if (sauce.image) {
+            icon.append(createMenuArtwork(sauce, "sauce-artwork"));
+          } else {
+            icon.textContent = sauce.emoji;
+          }
+          if (unlocked && selectedSauce === sauce.id) {
+            const selected = document.createElement("i");
+            selected.className = "sauce-selected-check";
+            selected.textContent = "✓";
+            icon.append(selected);
+          } else if (!unlocked) {
+            const lock = document.createElement("i");
+            lock.className = "sauce-locked-badge";
+            lock.textContent = "🔒";
+            icon.append(lock);
+          }
+          const label = document.createElement("span");
+          label.textContent = unlocked
+            ? `${sauce.name}${selectedSauce === sauce.id ? (state.language === "tl" ? " · Napili" : " · Selected") : ""}`
+            : (state.language === "tl" ? `Mabubuksan sa Antas ${sauce.unlock}` : `Unlocks at Level ${sauce.unlock}`);
+          button.replaceChildren(icon, label);
           if (unlocked) button.dataset.sauce = sauce.id;
           grid.append(button);
         });
@@ -3029,7 +3052,7 @@
           const sauce = SAUCES.find(item => item.id === selectedSauce);
           const chip = document.createElement("span");
           chip.className = "tray-chip sauce-chip";
-          chip.textContent = `${sauce.emoji} ${sauce.name}`;
+          chip.append(createMenuArtwork(sauce, "menu-artwork"), ` ${sauce.name}`);
           contents.append(chip);
         }
         if (trayDrink) {
