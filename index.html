@@ -216,12 +216,11 @@
 
     .tray-panel { padding: 10px; }
     .tray-content { display: grid; grid-template-columns: 74px minmax(0, 1fr); align-items: center; gap: 8px; min-height: 78px; margin-top: 6px; padding: 7px; border-radius: 11px; background: #f5ece0; }
-    .cup-wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 5px; min-height: 85px; }
-    .skewer { position: relative; display: grid; width: 30px; height: 67px; place-items: start center; padding-top: 6px; border-radius: 12px 12px 8px 8px; background: #fff9eb; box-shadow: inset 0 -5px 0 #e5d0ae, 0 2px 5px rgb(81 57 36 / 8%); }
-    .skewer::before { position: absolute; top: 8px; bottom: 9px; left: 50%; z-index: 0; border-left: 2px solid #ba7b42; content: ""; }
-    .skewer-items { position: relative; z-index: 1; display: grid; justify-items: center; }
-    .skewer-art { display: grid; width: 20px; height: 17px; place-items: center; object-fit: contain; font-size: 14px; line-height: 17px; filter: drop-shadow(0 1px 0 rgb(80 45 21 / 12%)); }
-    .skewer-quantity { position: absolute; z-index: 2; right: -9px; bottom: -7px; min-width: 15px; padding: 1px 3px; border-radius: 99px; background: #2b9348; color: #fff; font-size: 7px; font-weight: 900; line-height: 1.2; text-align: center; }
+    .cup-wrap { position: relative; isolation: isolate; display: flex; flex-wrap: wrap; align-items: flex-end; align-content: flex-end; justify-content: center; gap: 0; min-height: 85px; padding: 13px 4px 6px; overflow: visible; border: 1px solid #e4d0b1; border-radius: 7px 7px 15px 15px; background: linear-gradient(90deg, #ead8bc 0%, #fffaf0 20%, #fffaf0 80%, #ead8bc 100%); box-shadow: inset 0 3px 0 #fffdf6, inset 0 -6px 0 #e3ceb0, 0 2px 5px rgb(81 57 36 / 8%); }
+    .skewer { position: relative; display: grid; width: clamp(14px, 2.5vw, 24px); height: auto; min-height: 0; flex: 0 0 auto; align-self: flex-end; place-items: start center; padding: 0 0 3px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+    .skewer::before { position: absolute; top: 2px; bottom: 0; left: 50%; z-index: 0; border-left: 2px solid #ba7b42; content: ""; }
+    .skewer-items { position: relative; z-index: 1; display: grid; justify-items: center; gap: 0; }
+    .cup-wrap > .skewer .skewer-art { display: grid; width: min(20px, 100%); height: 15px; place-items: center; object-fit: contain; font-size: 12px; line-height: 15px; filter: drop-shadow(0 1px 0 rgb(80 45 21 / 12%)); }
     .cup-drink { position: relative; z-index: 1; display: grid; width: 28px; justify-items: center; gap: 2px; color: #527456; font-size: 6px; font-weight: 850; line-height: 1.1; text-align: center; }
     .cup-drink img { width: 26px; height: 34px; object-fit: contain; }
     .cup-empty { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #9b8d7c; font-size: 9px; font-weight: 650; text-align: center; }
@@ -560,7 +559,7 @@
       .food-count { min-width: 25px; padding: 2px 4px; font-size: 8px; }
       .tray-content { grid-template-columns: 52px minmax(0, 1fr); gap: 5px; min-height: 62px; margin-top: 4px; padding: 5px; }
       .cup-wrap { min-height: 55px; }
-      .skewer { width: 21px; height: 48px; }
+      .skewer { width: 21px; }
       .skewer-art { font-size: 12px; line-height: 14px; }
       .tray-detail-title, .tray-total { font-size: 7px; }
       .tray-items { min-height: 18px; margin-top: 3px; gap: 3px; }
@@ -860,7 +859,7 @@
       .tray-panel { flex: 1 1 auto; }
       .tray-content { grid-template-columns: 34px minmax(0, 1fr); gap: 3px; min-height: 0; margin-top: 2px; padding: 3px; }
       .cup-wrap { min-height: 35px; }
-      .skewer { width: 18px; height: 32px; }
+      .skewer { width: 18px; }
       .skewer-art { font-size: 9px; line-height: 11px; }
       .tray-detail-title { display: none; }
       .tray-items { min-height: 13px; margin-top: 2px; gap: 2px; }
@@ -1111,7 +1110,7 @@
       .tray-panel { min-height: 0; grid-column: 2; grid-row: 2 / span 2; }
       .tray-content { grid-template-columns: 34px minmax(0, 1fr); gap: 3px; min-height: 0; margin-top: 2px; padding: 3px; }
       .cup-wrap { min-height: 35px; }
-      .skewer { width: 18px; height: 32px; }
+      .skewer { width: 18px; }
       .skewer-art { font-size: 9px; line-height: 11px; }
       .tray-detail-title { display: none; }
       .tray-items { min-height: 13px; margin-top: 2px; gap: 2px; }
@@ -1198,7 +1197,7 @@
       .tray-panel { grid-column: 2; grid-row: 2; padding: 3px; }
       .tray-content { height: 44px; min-height: 0; grid-template-columns: 22px minmax(0, 1fr); gap: 2px; margin-top: 0; padding: 2px; }
       .cup-wrap { min-height: 0; }
-      .skewer { width: 14px; height: 25px; }
+      .skewer { width: 14px; }
       .skewer-art { font-size: 7px; line-height: 9px; }
       .tray-items { min-height: 0; }
       .tray-chip, .tray-total, .clear-button { font-size: 5px; }
@@ -1208,7 +1207,6 @@
       .prep-grid { grid-template-rows: minmax(0, 1fr) 42px; }
       .sauce-button { min-height: 16px; }
       .tray-content { height: 34px; }
-      .skewer { height: 21px; }
     }
     @media (max-width: 768px) {
       #home-screen { height: 100dvh; overflow: hidden; align-items: stretch; justify-content: stretch; }
@@ -3054,19 +3052,12 @@
             if (quantity < 1) return;
             const skewer = document.createElement("div");
             skewer.className = "skewer";
-            skewer.setAttribute("aria-label", `${quantity} ${food.name}${quantity > 1 ? "s" : ""}`);
+            skewer.setAttribute("role", "img");
+            skewer.setAttribute("aria-label", `${quantity} ${food.name}${quantity > 1 ? "s" : ""} on a skewer in the paper cup`);
             const items = document.createElement("span");
             items.className = "skewer-items";
-            const displayedPieces = Math.min(quantity, 3);
-            for (let index = 0; index < displayedPieces; index += 1) {
+            for (let index = 0; index < quantity; index += 1) {
               items.append(createMenuArtwork(food, "skewer-art"));
-            }
-            if (quantity > 1) {
-              const count = document.createElement("span");
-              count.className = "skewer-quantity";
-              count.textContent = `×${quantity}`;
-              count.setAttribute("aria-hidden", "true");
-              items.append(count);
             }
             skewer.append(items);
             preview.append(skewer);
