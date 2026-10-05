@@ -75,12 +75,6 @@
     .location-select-wrapper::before { position: absolute; z-index: 1; top: 50%; left: 10px; transform: translateY(-50%); color: #8b4513; content: "📍"; pointer-events: none; }
     .location-select-wrapper::after { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); color: #8b4513; content: "▼"; font-size: 9px; pointer-events: none; }
     .location-popover .location-select { width: 100%; max-width: none; min-height: 42px; padding: 8px 30px; appearance: none; -webkit-appearance: none; border: 2px solid #e2a85c; border-radius: 12px; background: #fff8ea; color: #68421d; font-size: 11px; }
-    .save-transfer { display: grid; gap: 7px; margin-top: 15px; padding: 12px; border: 1px solid var(--line); border-radius: 11px; background: #fffdf9; }
-    .save-transfer > strong { font-size: 11px; }
-    .save-transfer > p { margin: 0; color: var(--muted); font-size: 9px; line-height: 1.4; }
-    .save-code-input { width: 100%; min-height: 62px; resize: vertical; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: white; color: var(--ink); font: 10px/1.4 ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
-    .save-transfer-actions { display: flex; gap: 7px; }
-    .save-transfer-actions .tool-button { flex: 1; min-height: 34px; padding: 6px; font-size: 9px; }
     .tool-spacer { flex: 1; }
 
     .progress-wrap { height: 49px; display: flex; align-items: center; gap: 13px; }
@@ -272,6 +266,24 @@
     #credit-offer-modal { z-index: 16; }
     .modal-backdrop[hidden] { display: none; }
     #reset-confirm-modal { z-index: 9999; backdrop-filter: blur(4px); }
+    #home-settings-modal { overflow: hidden; padding: clamp(10px, 3dvh, 18px); }
+    #home-settings-modal .modal { display: grid; align-content: center; gap: clamp(8px, 1.6dvh, 14px); max-height: calc(100dvh - 2 * clamp(10px, 3dvh, 18px)); overflow-y: auto; padding: clamp(16px, 3.5dvh, 24px); }
+    #home-settings-modal .modal-header { margin: 0; }
+    #home-settings-modal .modal-emblem { width: clamp(40px, 7dvh, 58px); height: clamp(40px, 7dvh, 58px); margin-bottom: clamp(5px, 1dvh, 12px); border-radius: 15px; font-size: clamp(22px, 4dvh, 30px); }
+    #home-settings-modal .home-settings { gap: clamp(6px, 1dvh, 9px); margin: 0; }
+    #home-settings-modal .language-setting { min-height: 42px; margin: 0; padding: 8px 10px; }
+    #home-settings-modal .settings-reset { min-height: 40px; margin: 0; }
+    #home-settings-modal .modal-submit { min-height: 40px; margin: 0; }
+    @media (max-height: 440px) {
+      #home-settings-modal .modal { gap: 6px; padding: 10px 16px; }
+      #home-settings-modal .modal-emblem { display: none; }
+      #home-settings-modal .modal h2 { margin: 2px 0; font-size: 18px; }
+      #home-settings-modal .modal-description { font-size: 10px; }
+      #home-settings-modal .volume-control { gap: 2px; font-size: 9px; }
+      #home-settings-modal .language-setting { min-height: 34px; padding: 5px 8px; font-size: 10px; }
+      #home-settings-modal .language-setting select { padding: 4px 7px; }
+      #home-settings-modal .settings-reset, #home-settings-modal .modal-submit { min-height: 34px; padding: 6px 10px; }
+    }
     .reset-confirm-card { width: min(440px, 100%); max-height: calc(100dvh - 24px); overflow-y: auto; padding: clamp(18px, 5vw, 28px); border: 1px solid #f0dfc2; border-radius: 19px; background: linear-gradient(160deg, #fffdf8, #fff7eb); box-shadow: 0 25px 75px rgb(74 47 27 / 24%); animation: popIn .24s cubic-bezier(.2, 1.25, .45, 1) both; }
     .reset-confirm-card .modal-header { margin-bottom: 18px; }
     .reset-confirm-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 9px; }
@@ -1616,16 +1628,7 @@
         <label class="volume-control" for="settings-sfx-volume"><span class="volume-label"><span id="settings-sfx-label">🔔 Sound Effects (SFX)</span><output id="settings-sfx-value">100%</output></span><input id="settings-sfx-volume" type="range" min="0" max="100" step="1" value="100"></label>
       </div>
       <label class="language-setting" for="language-select"><span>🌐 Language / Wika</span><select id="language-select"><option value="en">English</option><option value="tl">Tagalog</option></select></label>
-      <div class="save-transfer">
-        <strong data-i18n="save-code-title">Save transfer</strong>
-        <p data-i18n="save-code-hint">Copy this code to move your progress to another device.</p>
-        <textarea class="save-code-input" rows="3" aria-label="Save code" spellcheck="false"></textarea>
-        <div class="save-transfer-actions">
-          <button class="tool-button export-save-button" data-i18n="save-export" data-export-save type="button">Export Save Code</button>
-          <button class="tool-button" data-i18n="save-import" data-import-save type="button">Import Save Code</button>
-        </div>
-      </div>
-      <button class="settings-reset" id="home-reset-button" type="button" style="margin-top:14px">🗑️ Reset Game Progress</button>
+      <button class="settings-reset" id="home-reset-button" type="button">🗑️ Reset Game Progress</button>
       <button class="modal-submit" data-close-modal="home-settings-modal" type="button">✖ Close Settings</button>
     </section>
   </div>
@@ -2330,10 +2333,6 @@
           ["#reset-confirm-description", "Are you sure you want to return to Level 1? Your current saved progress will be erased.", "Sigurado ka bang gusto mong bumalik sa Level 1? Mabubura ang iyong kasalukuyang na-save na progress."],
           ["#reset-confirm-accept", "🗑️ Yes, Start Over", "🗑️ Oo, Ulitin"],
           ["#reset-confirm-cancel", "❌ Cancel", "❌ Huwag Muna / Cancel"],
-          ["[data-i18n='save-code-title']", "Save transfer", "Paglipat ng Save"],
-          ["[data-i18n='save-code-hint']", "Copy this code to move your progress to another device.", "Kopyahin ang code para mailipat ang progress sa ibang device."],
-          ["[data-i18n='save-export']", "Export Save Code", "I-export ang Save Code"],
-          ["[data-i18n='save-import']", "Import Save Code", "I-import ang Save Code"],
           ["#inspection-title", "🚨 BARANGAY HEALTH INSPECTOR ARRIVED!", "🚨 DUMATING ANG INSPEKTOR NG BARANGAY!"],
           ["#inspection-description", "Orders are paused while the inspector checks your cart.", "Pansamantalang hihinto ang bentahan habang sinusuri ang iyong kariton."],
           ["#inspection-dismiss", "OK, Back to Selling!", "Sige, balik sa benta!"],
@@ -2387,9 +2386,6 @@
         document.querySelectorAll("[data-i18n]").forEach(element => {
           const translations = labels[element.dataset.i18n];
           if (translations) element.textContent = translations[isTl ? 1 : 0];
-        });
-        document.querySelectorAll(".save-code-input").forEach(input => {
-          input.placeholder = isTl ? "I-paste rito ang save code…" : "Paste a save code here…";
         });
         $("home-settings-modal").querySelector(".modal-description").id = "home-settings-description";
         const modalDescriptions = {
@@ -4202,93 +4198,6 @@
         });
       }
 
-      async function exportSave(button) {
-        const textarea = button.closest(".save-transfer").querySelector(".save-code-input");
-        const code = JSON.stringify(state);
-        textarea.value = code;
-        textarea.focus();
-        textarea.select();
-        if (!navigator.clipboard?.writeText) {
-          announce(state.language === "tl"
-            ? "Naka-select ang save code. Kopyahin ito at i-paste sa kabilang device."
-            : "The save code is selected. Copy it and paste it on your other device.", "info");
-          return;
-        }
-        try {
-          await navigator.clipboard.writeText(code);
-          announce(state.language === "tl" ? "Nakopya na ang save code." : "Save code copied to the clipboard.", "success");
-        } catch (error) {
-          console.error("Unable to copy the Kainan Sim save code.", error);
-          announce(state.language === "tl"
-            ? "Naka-select ang save code. Kopyahin ito at i-paste sa kabilang device."
-            : "Clipboard access was unavailable. The save code is selected for you to copy.", "info");
-        }
-      }
-
-      function importSave(button) {
-        const textarea = button.closest(".save-transfer").querySelector(".save-code-input");
-        let imported;
-        try {
-          imported = JSON.parse(textarea.value);
-        } catch {
-          announce(state.language === "tl" ? "Hindi valid ang save code. Suriin at subukan ulit." : "That save code is not valid JSON. Check it and try again.", "error");
-          return;
-        }
-        if (!imported || typeof imported !== "object" || Array.isArray(imported)) {
-          announce(state.language === "tl" ? "Hindi valid ang save code." : "That save code is not valid.", "error");
-          return;
-        }
-        const source = imported.progress && typeof imported.progress === "object" && !Array.isArray(imported.progress)
-          ? { ...imported.progress, ...imported }
-          : imported;
-        const knownFields = ["level", "currentLevel", "coins", "totalCoins", "vendor", "selectedVendor", "setupComplete", "unlockedItems", "unlockedFoods"];
-        if (!knownFields.some(key => Object.hasOwn(source, key))) {
-          announce(state.language === "tl" ? "Hindi makilala ang laman ng save code." : "The save code does not contain a recognized Kainan Sim save.", "error");
-          return;
-        }
-        if (!window.confirm(state.language === "tl"
-          ? "Palitan ang kasalukuyang progress gamit ang save code na ito?"
-          : "Replace this device's current progress with the save code?")) return;
-
-        window.clearTimeout(arrivalTimer);
-        window.clearTimeout(arrivalAnimationTimer);
-        clearCustomerExitRemoval();
-        arrivalTimer = null;
-        arrivalAnimationTimer = null;
-        customerTransitioning = false;
-        state = normalizeState(imported);
-        savedProgressExists = state.setupComplete || state.served > 0 || state.level > 1 || state.coins > 0;
-        served = state.served;
-        streak = state.streak;
-        order = null;
-        tray = {};
-        trayDrink = null;
-        selectedSauce = null;
-        customerMood = "waiting";
-        $("customer-avatar-container").innerHTML = "";
-        $("customer-scene").classList.remove("is-arriving", "is-rejecting", "is-celebrating");
-        $("setup-modal").hidden = true;
-        isSetupEditing = false;
-        drinkPanelAutoOpened = state.unlockedDrinks.length > 0;
-        currentWeather = "sunny";
-        weatherSeconds = 60;
-        rushSeconds = 0;
-        setScreenMode(SCREEN_MODE.MENU);
-        setLanguage(state.language);
-        updateHomeSave();
-        try {
-          LEGACY_STORAGE_KEYS.forEach(key => window.localStorage.removeItem(key));
-          window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
-        } catch (error) {
-          console.error("Unable to clear legacy Kainan Sim data after importing a save.", error);
-          announce(state.language === "tl"
-            ? "Na-import ang save, pero hindi maalis ang lumang backup data."
-            : "The save was imported, but old backup data could not be cleared.", "error");
-          return;
-        }
-        announce(state.language === "tl" ? "Na-import na ang save code sa device na ito." : "Save code imported on this device.", "success");
-      }
-
       function wireEvents() {
         window.addEventListener("kainan-speech-voice-unavailable", () => announce(
           state.language === "tl"
@@ -4296,12 +4205,6 @@
             : "No Filipino voice is installed on this phone. Install a Filipino/Tagalog text-to-speech voice in Settings to hear customer orders.",
           "error"
         ), { once: true });
-        document.querySelectorAll("[data-export-save]").forEach(button => {
-          button.addEventListener("click", () => { void exportSave(button); });
-        });
-        document.querySelectorAll("[data-import-save]").forEach(button => {
-          button.addEventListener("click", () => importSave(button));
-        });
         $("food-grid").addEventListener("click", event => {
           const button = event.target.closest("button[data-food]");
           if (button && !button.disabled) {
