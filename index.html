@@ -4451,6 +4451,7 @@
           $("serve-button").focus();
         });
         document.addEventListener("pointerdown", () => {
+          AudioManager.unlockSpeech();
           if (state.sound.bgm) AudioManager.reinitializeBgm(playMusicNote);
         }, { once: true });
         window.addEventListener("resize", renderTray);

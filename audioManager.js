@@ -21,8 +21,11 @@
   let bgmVolume = 100;
   let sfxVolume = 100;
   let activeUtterance = null;
+  let pendingSpeech = null;
+  let speechUnlocked = false;
   let music = createMusic();
   let speechUnavailableNotified = false;
+  let speechVoiceFallbackNotified = false;
   let daySummaryActive = false;
   let generatedAudioContext = null;
 
@@ -58,6 +61,48 @@
     applyMusicVolume();
   }
 
+  function customerVoice(synthesis) {
+    const voices = synthesis.getVoices();
+    const voice = voices.find(candidate => /^(fil|tl)-ph$/i.test(candidate.lang))
+      || voices.find(candidate => /^(fil|tl)-/i.test(candidate.lang));
+    if (voice) return voice;
+    if (!speechVoiceFallbackNotified && voices.length) {
+      console.warn("No Filipino speech voice is installed; using the device's default voice.");
+      speechVoiceFallbackNotified = true;
+    }
+    return voices.find(candidate => candidate.default) || voices[0] || null;
+  }
+
+  function unlockSpeech() {
+    const synthesis = window.speechSynthesis;
+    if (daySummaryActive || speechUnlocked) return;
+    if (!synthesis || typeof window.SpeechSynthesisUtterance !== "function") {
+      if (!speechUnavailableNotified) {
+        console.warn("Customer voice is unavailable because this browser does not support speech synthesis.");
+        speechUnavailableNotified = true;
+      }
+      return;
+    }
+
+    try {
+      synthesis.getVoices();
+      // Prime speech during this tap; mobile browsers can block later timer-triggered speech.
+      const unlockUtterance = new window.SpeechSynthesisUtterance(" ");
+      const voice = customerVoice(synthesis);
+      unlockUtterance.lang = voice?.lang || "fil-PH";
+      if (voice) unlockUtterance.voice = voice;
+      unlockUtterance.volume = 0;
+      synthesis.speak(unlockUtterance);
+      synthesis.resume();
+      speechUnlocked = true;
+      const queuedSpeech = pendingSpeech;
+      pendingSpeech = null;
+      if (queuedSpeech) speakCustomer(queuedSpeech.text, queuedSpeech.gender);
+    } catch (error) {
+      console.error("Unable to initialize customer speech.", error);
+    }
+  }
+
   function speakCustomer(text, gender) {
     const synthesis = window.speechSynthesis;
     if (daySummaryActive) return false;
@@ -68,11 +113,13 @@
       }
       return false;
     }
+    if (!speechUnlocked) {
+      pendingSpeech = { text, gender };
+      return false;
+    }
 
     const utterance = new window.SpeechSynthesisUtterance(text);
-    const voices = synthesis.getVoices();
-    const voice = voices.find(candidate => /^(fil|tl)-ph$/i.test(candidate.lang))
-      || voices.find(candidate => /^(fil|tl)-/i.test(candidate.lang));
+    const voice = customerVoice(synthesis);
     utterance.lang = voice?.lang || "fil-PH";
     if (voice) utterance.voice = voice;
     utterance.volume = 1.0;
@@ -185,6 +232,7 @@
     setDaySummaryActive(active) {
       daySummaryActive = active === true;
       if (daySummaryActive) {
+        pendingSpeech = null;
         const utterance = activeUtterance;
         activeUtterance = null;
         window.speechSynthesis?.cancel();
@@ -197,7 +245,9 @@
         applyMusicVolume();
       }
     },
+    unlockSpeech,
     cancelCustomerSpeech() {
+      pendingSpeech = null;
       const utterance = activeUtterance;
       activeUtterance = null;
       window.speechSynthesis?.cancel();
