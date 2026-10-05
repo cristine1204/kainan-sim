@@ -1708,7 +1708,7 @@
         unlockedDrinks: [],
         sanitation: 100, jarCovered: true, healthSeal: false,
         language: "en",
-        sound: { bgm: false, sfx: true },
+        sound: { bgm: true, sfx: true },
         upgrades: { pan: false, fryer: false, security: false, timeCharges: 0, training: 0 },
         cosmetics: ["classic"], equippedCosmetic: "classic",
         vehicle: "pedal-trike", vehicleTier: 0, locations: ["quiapo", "plaza"], location: "quiapo",
@@ -1856,10 +1856,65 @@
       let bgmTimer = null;
       let musicStep = 0;
       let savedProgressExists = false;
-      let bgmVolume = 0;
+      let bgmVolume = 100;
       let sfxVolume = 100;
 
       const $ = id => document.getElementById(id);
+      const AUDIO_SOURCES = Object.freeze({
+        sfx_wrong_order: "assets/audio/wrong_order.mp3",
+        sfx_correct_boy: "assets/audio/thank_you_boy.mp3",
+        sfx_correct_woman: "assets/audio/thank_you_woman.mp3",
+        sfx_click: "assets/audio/click_food.mp3",
+        bgm_nature: "assets/audio/nature_bgm.mp3"
+      });
+      const AudioManager = (() => {
+        const effects = Object.fromEntries(
+          Object.entries(AUDIO_SOURCES)
+            .filter(([name]) => name !== "bgm_nature")
+            .map(([name, source]) => {
+              const audio = new Audio(source);
+              audio.preload = "auto";
+              audio.volume = 1.0;
+              return [name, audio];
+            })
+        );
+        const music = new Audio(AUDIO_SOURCES.bgm_nature);
+        music.preload = "auto";
+        music.volume = 1.0;
+        music.loop = true;
+
+        function startPlayback(audio, source, fallback, restart = false) {
+          const onFailure = error => {
+            console.error(`Unable to play audio asset ${source}.`, error);
+            fallback();
+          };
+          try {
+            if (restart) audio.currentTime = 0;
+            const playback = audio.play();
+            if (playback) void playback.catch(onFailure);
+          } catch (error) {
+            onFailure(error);
+          }
+        }
+
+        return {
+          play(name, fallback) {
+            const audio = effects[name];
+            audio.volume = sfxVolume / 100;
+            startPlayback(audio, AUDIO_SOURCES[name], fallback, true);
+          },
+          playBgm(fallback) {
+            if (bgmVolume === 0 || !music.paused) return;
+            music.volume = bgmVolume / 100;
+            startPlayback(music, AUDIO_SOURCES.bgm_nature, fallback);
+          },
+          setVolumes() {
+            Object.values(effects).forEach(audio => { audio.volume = sfxVolume / 100; });
+            music.volume = bgmVolume / 100;
+            if (bgmVolume === 0) music.pause();
+          }
+        };
+      })();
 
       function setScreenMode(mode) {
         if (mode !== SCREEN_MODE.MENU && mode !== SCREEN_MODE.PLAYING) {
@@ -1989,10 +2044,10 @@
           sfxVolume = next;
           state.sound.sfx = next > 0;
         }
+        AudioManager.setVolumes();
         syncVolumeControls();
         if (kind === "bgm" && previous === 0 && next > 0) {
-          getAudioContext();
-          playMusicNote();
+          AudioManager.playBgm(playMusicNote);
         } else if (kind === "bgm" && next === 0) {
           window.clearTimeout(bgmTimer);
           bgmTimer = null;
@@ -2024,6 +2079,12 @@
 
       function playSfx(kind) {
         if (sfxVolume === 0) return;
+        const assetByKind = {
+          click: "sfx_click",
+          error: "sfx_wrong_order",
+          correct_boy: "sfx_correct_boy",
+          correct_woman: "sfx_correct_woman"
+        };
         const notes = {
           click: [[520, .055, { type: "triangle", volume: .035 }]],
           fry: [[180, .16, { type: "sawtooth", endFrequency: 105, volume: .018 }]],
@@ -2035,7 +2096,22 @@
           close: [[784, .18, { type: "sine", volume: .025 }], [659, .24, { type: "sine", delay: .14, volume: .022 }]],
           level: [[523, .15, { type: "triangle", volume: .045 }], [659, .15, { type: "triangle", delay: .13, volume: .045 }], [784, .15, { type: "triangle", delay: .26, volume: .045 }], [1047, .32, { type: "sine", delay: .39, volume: .05 }]]
         };
-        (notes[kind] || []).forEach(([frequency, duration, options]) => tone(frequency, duration, options));
+        const playFallback = () => {
+          (notes[kind] || notes.claim).forEach(([frequency, duration, options]) => tone(frequency, duration, options));
+        };
+        if (assetByKind[kind]) AudioManager.play(assetByKind[kind], playFallback);
+        else playFallback();
+      }
+
+      function playCustomerThanks(customer) {
+        const name = customer.toLocaleLowerCase("en");
+        if (/\b(mang tonyo|manong boy|jun-jun|carlo|bossing|barangay tanod)\b/.test(name)) {
+          playSfx("correct_boy");
+        } else if (/\b(aling nena|ate bebang|bebang|tita leni|maya|ate mercy|bebeng|mika|marites)\b/.test(name)) {
+          playSfx("correct_woman");
+        } else {
+          playSfx("claim");
+        }
       }
 
       function playMusicNote() {
@@ -3223,7 +3299,6 @@
           return;
         }
         tray[id] = next;
-        playSfx("fry");
         if (!state.upgrades.security && order?.vip?.id !== "tanod" && trayTotal() > 0 && Math.random() < .018) {
           const stolen = Object.keys(tray).find(foodId => tray[foodId] > 0);
           if (stolen) {
@@ -3246,7 +3321,6 @@
       function changeDrink(id) {
         if (!state.unlockedDrinks.includes(id) || !order || customerTransitioning || state.dayClosed) return;
         trayDrink = trayDrink === id ? null : id;
-        playSfx("splash");
         renderDrinks();
         renderFood();
         renderTray();
@@ -3401,6 +3475,7 @@
         $("customer-mood").textContent = "🥰";
         showCustomerRewards(onCredit ? baseCoins + drinkPrice + comboBonus : earnedCoins, earnedXp, onCredit);
         if (state.level > previousLevel) showLevelUp(unlocks);
+        playCustomerThanks(order.customer);
         if (!onCredit) playSfx("cash");
         const tipMessage = tip ? ` (may ₱${tip} tip!)` : "";
         const weatherMessage = spicyRainBonus ? ` +₱${spicyRainBonus} rainy spicy bonus!` : "";
@@ -4152,7 +4227,6 @@
           const button = event.target.closest("button[data-sauce]");
           if (!button || button.disabled || customerTransitioning) return;
           selectedSauce = selectedSauce === button.dataset.sauce ? null : button.dataset.sauce;
-          playSfx("splash");
           renderSauces();
           renderTray();
         });
@@ -4284,10 +4358,7 @@
           $("serve-button").focus();
         });
         document.addEventListener("pointerdown", () => {
-          if (state.sound.bgm && bgmTimer === null) {
-            getAudioContext();
-            playMusicNote();
-          }
+          if (state.sound.bgm && bgmTimer === null) AudioManager.playBgm(playMusicNote);
         }, { once: false });
         document.addEventListener("keydown", event => {
           if (event.key !== "Escape") return;
@@ -4334,10 +4405,11 @@
       function init() {
         state = loadProgress();
         drinkPanelAutoOpened = state.unlockedDrinks.length > 0;
-        bgmVolume = readVolume(BGM_VOLUME_KEY, state.sound.bgm ? 100 : 0);
+        bgmVolume = readVolume(BGM_VOLUME_KEY, 100);
         sfxVolume = readVolume(SFX_VOLUME_KEY, state.sound.sfx ? 100 : 0);
         state.sound.bgm = bgmVolume > 0;
         state.sound.sfx = sfxVolume > 0;
+        AudioManager.setVolumes();
         served = state.served;
         streak = state.streak;
         ensureQuestDay();

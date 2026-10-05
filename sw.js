@@ -1,4 +1,4 @@
-const CACHE_NAME = "kainan-sim-v16";
+const CACHE_NAME = "kainan-sim-v17";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -17,7 +17,12 @@ const APP_SHELL = [
   "./assets/foods/calamares.png",
   "./assets/drinks/sago-gulaman.png",
   "./assets/drinks/buko-juice.png",
-  "./assets/drinks/melon-juice.png"
+  "./assets/drinks/melon-juice.png",
+  "./assets/audio/wrong_order.mp3",
+  "./assets/audio/thank_you_boy.mp3",
+  "./assets/audio/thank_you_woman.mp3",
+  "./assets/audio/click_food.mp3",
+  "./assets/audio/nature_bgm.mp3"
 ];
 
 self.addEventListener("install", (event) => {
