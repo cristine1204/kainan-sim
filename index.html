@@ -217,26 +217,26 @@
     .food-count { min-width: 30px; padding: 3px 6px; border-radius: 99px; background: #edf6eb; color: var(--green-dark); text-align: center; font-size: 9px; font-weight: 900; }
     .food-count.empty { background: #f4f0ea; color: #84786b; }
 
-    .tray-panel { padding: 10px; }
-    .tray-content { display: grid; grid-template-columns: 74px minmax(0, 1fr); align-items: center; gap: 8px; min-height: 78px; margin-top: 6px; padding: 7px; border-radius: 11px; background: #f5ece0; }
-    .cup-wrap { position: relative; isolation: isolate; display: flex; flex-wrap: wrap; align-items: flex-end; align-content: flex-end; justify-content: center; gap: 0; min-height: 85px; padding: 13px 4px 6px; overflow: visible; border: 1px solid #e4d0b1; border-radius: 7px 7px 15px 15px; background: linear-gradient(90deg, #ead8bc 0%, #fffaf0 20%, #fffaf0 80%, #ead8bc 100%); box-shadow: inset 0 3px 0 #fffdf6, inset 0 -6px 0 #e3ceb0, 0 2px 5px rgb(81 57 36 / 8%); }
+    .tray-panel { min-width: 0; padding: clamp(6px, 1.2vh, 10px); overflow: hidden; }
+    .tray-content { position: relative; display: grid; grid-template-columns: clamp(74px, 12vw, 104px) minmax(0, 1fr); align-items: center; gap: clamp(5px, 1vw, 8px); min-height: clamp(82px, 13dvh, 136px); margin-top: 6px; padding: clamp(5px, 1vh, 8px); overflow: hidden; border-radius: 11px; background: #f5ece0; }
+    .cup-wrap { position: relative; isolation: isolate; display: flex; flex-wrap: wrap; align-items: center; align-content: center; justify-content: center; gap: 0; width: 100%; height: clamp(70px, 12dvh, 128px); max-height: 25vh; min-height: 0; padding: clamp(5px, 1vh, 10px) 4px; overflow: hidden; border: 1px solid #e4d0b1; border-radius: 7px 7px 15px 15px; background: linear-gradient(90deg, #ead8bc 0%, #fffaf0 20%, #fffaf0 80%, #ead8bc 100%); box-shadow: inset 0 3px 0 #fffdf6, inset 0 -6px 0 #e3ceb0, 0 2px 5px rgb(81 57 36 / 8%); }
     .skewer { position: relative; display: grid; width: clamp(14px, 2.5vw, 24px); height: auto; min-height: 0; flex: 0 0 auto; align-self: flex-end; place-items: start center; padding: 0 0 3px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
     .skewer::before { position: absolute; top: 2px; bottom: 0; left: 50%; z-index: 0; border-left: 2px solid #ba7b42; content: ""; }
-    .skewer-items { position: relative; z-index: 1; display: grid; justify-items: center; gap: 0; }
-    .cup-wrap > .skewer .skewer-art { display: grid; width: min(20px, 100%); height: 15px; place-items: center; object-fit: contain; font-size: 12px; line-height: 15px; filter: drop-shadow(0 1px 0 rgb(80 45 21 / 12%)); }
+    .skewer-items { position: relative; z-index: 1; display: flex; flex-direction: column-reverse; align-items: center; gap: 0; max-height: 25vh; overflow: hidden; }
+    .cup-wrap > .skewer .skewer-art { display: grid; width: var(--sprite-size, 32px); height: var(--sprite-size, 32px); max-height: 25vh; flex: 0 0 auto; place-items: center; object-fit: contain; font-size: 12px; line-height: 1; filter: drop-shadow(0 1px 0 rgb(80 45 21 / 12%)); }
     .cup-drink { position: relative; z-index: 1; display: grid; width: 28px; justify-items: center; gap: 2px; color: #527456; font-size: 6px; font-weight: 850; line-height: 1.1; text-align: center; }
     .cup-drink img { width: 26px; height: 34px; object-fit: contain; }
     .cup-empty { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #9b8d7c; font-size: 9px; font-weight: 650; text-align: center; }
     .cup-empty span:first-child { font-size: 26px; filter: grayscale(.15); }
-    .tray-details { min-width: 0; }
+    .tray-details { position: relative; display: flex; min-width: 0; height: 100%; flex-direction: column; justify-content: flex-start; padding-bottom: 25px; }
     .tray-detail-title { color: #796757; font-size: 8px; font-weight: 900; letter-spacing: .6px; }
-    .tray-items { display: flex; flex-wrap: wrap; gap: 5px; min-height: 24px; margin-top: 6px; }
-    .tray-chip { padding: 5px 7px; border: 1px solid #ead8bf; border-radius: 99px; background: white; color: #594a3e; font-size: 8px; font-weight: 800; }
+    .tray-items { display: flex; flex-wrap: wrap; align-content: flex-start; gap: clamp(2px, .5vw, 5px); min-height: 0; max-height: 7em; margin-top: 5px; padding: 3px; overflow: hidden; border: 1px solid #eadfce; border-radius: 9px; background: rgb(255 253 248 / 72%); }
+    .tray-chip { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; padding: clamp(2px, .5vw, 4px) clamp(4px, .7vw, 7px); border: 1px solid #ead8bf; border-radius: 99px; background: white; color: #594a3e; font-size: clamp(7px, .75vw, 9px); font-weight: 800; line-height: 1.2; }
     .tray-chip img { width: 15px; height: 15px; vertical-align: middle; object-fit: contain; }
     .tray-chip.sauce-chip { border-color: #f3bbc2; color: #b6324c; background: #fff1f3; }
-    .tray-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
-    .tray-total { color: #806d5d; font-size: 9px; font-weight: 750; }
-    .clear-button { padding: 6px 9px; border: 1px solid #e9ddd0; border-radius: 8px; background: white; color: #766659; cursor: pointer; font-size: 9px; font-weight: 750; }
+    .tray-actions { position: absolute; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: space-between; gap: 5px; }
+    .tray-total { min-width: 0; overflow: hidden; color: #806d5d; font-size: clamp(7px, .75vw, 9px); font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+    .clear-button { flex: 0 0 auto; padding: clamp(3px, .6vw, 6px) clamp(5px, .8vw, 9px); border: 1px solid #e9ddd0; border-radius: 8px; background: white; color: #766659; cursor: pointer; font-size: clamp(7px, .75vw, 9px); font-weight: 750; }
     .clear-button:hover:not(:disabled) { color: var(--terracotta); border-color: #e8b09c; }
     .clear-button:disabled { cursor: not-allowed; opacity: .48; }
 
@@ -271,6 +271,14 @@
     #level-modal { z-index: 15; }
     #credit-offer-modal { z-index: 16; }
     .modal-backdrop[hidden] { display: none; }
+    #reset-confirm-modal { z-index: 9999; backdrop-filter: blur(4px); }
+    .reset-confirm-card { width: min(440px, 100%); max-height: calc(100dvh - 24px); overflow-y: auto; padding: clamp(18px, 5vw, 28px); border: 1px solid #f0dfc2; border-radius: 19px; background: linear-gradient(160deg, #fffdf8, #fff7eb); box-shadow: 0 25px 75px rgb(74 47 27 / 24%); animation: popIn .24s cubic-bezier(.2, 1.25, .45, 1) both; }
+    .reset-confirm-card .modal-header { margin-bottom: 18px; }
+    .reset-confirm-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 9px; }
+    .reset-confirm-actions .modal-submit { min-height: 44px; margin: 0; padding: 9px; font-size: clamp(10px, 2.8vw, 12px); }
+    .reset-confirm-actions .reset-cancel { border: 1px solid #eaded0; background: white; color: #665548; }
+    .reset-confirm-actions .reset-cancel:hover { background: #fffaf4; }
+    @keyframes popIn { from { opacity: 0; transform: translateY(8px) scale(.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
     #day-report-modal { z-index: 18; }
     .modal { width: min(540px, 100%); max-height: calc(100vh - 36px); overflow-y: auto; padding: 27px; border: 1px solid #eee2d3; border-radius: 19px; background: white; box-shadow: 0 25px 75px rgb(0 0 0 / 22%); }
     .modal-header { text-align: center; }
@@ -566,8 +574,8 @@
       .food-price { font-size: 7px; }
       .food-controls { margin-top: 3px; }
       .food-count { min-width: 25px; padding: 2px 4px; font-size: 8px; }
-      .tray-content { grid-template-columns: 52px minmax(0, 1fr); gap: 5px; min-height: 62px; margin-top: 4px; padding: 5px; }
-      .cup-wrap { min-height: 55px; }
+      .tray-content { grid-template-columns: clamp(52px, 14vw, 82px) minmax(0, 1fr); gap: 5px; min-height: 0; margin-top: 4px; padding: 5px; }
+      .cup-wrap { height: 100%; min-height: 0; }
       .skewer { width: 21px; }
       .skewer-art { font-size: 12px; line-height: 14px; }
       .tray-detail-title, .tray-total { font-size: 7px; }
@@ -618,6 +626,7 @@
       .drink-name { font-size: 8px; }
       .drink-emoji { font-size: 50px; line-height: 1; }
     }
+
     @media (max-width: 370px) {
       body { min-width: 0; }
       .app { padding: 0 10px 14px; }
@@ -1269,6 +1278,30 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     }
+    @media (max-width: 768px) {
+      .tray-panel { min-height: 0; padding: clamp(3px, .8dvh, 7px); }
+      .tray-content { height: min(25vh, clamp(50px, 22dvh, 190px)); min-height: 0; grid-template-columns: clamp(52px, 18vw, 92px) minmax(0, 1fr); gap: clamp(3px, .8vw, 6px); margin-top: 2px; padding: clamp(2px, .6dvh, 5px); }
+      .cup-wrap { height: 100%; max-height: 25vh; min-height: 0; align-items: center; justify-content: center; padding: clamp(2px, .6dvh, 6px) 2px; overflow: hidden; }
+      .skewer { width: clamp(20px, 8vw, 38px); height: 100%; align-self: center; place-items: center; padding: 0; }
+      .skewer::before { top: 0; bottom: 0; }
+      .cup-wrap > .skewer .skewer-art { width: var(--sprite-size, clamp(20px, 4.5vh, 36px)); height: var(--sprite-size, clamp(20px, 4.5vh, 36px)); max-height: 25vh; }
+      .cup-empty { gap: clamp(1px, .5vh, 4px); font-size: clamp(6px, 1.1vh, 9px); }
+      .cup-empty span:first-child { font-size: clamp(18px, 4vh, 30px); }
+      .tray-details { min-height: 0; padding-bottom: 19px; }
+      .tray-detail-title { font-size: clamp(6px, 1vh, 8px); }
+      .tray-items { max-height: 5em; margin-top: 2px; padding: 2px; }
+      .tray-chip { padding: clamp(1px, .35vh, 3px) clamp(3px, .6vw, 5px); font-size: clamp(6px, .9vh, 8px); }
+      .tray-actions { gap: 2px; }
+      .tray-total { font-size: clamp(6px, .9vh, 8px); }
+      .clear-button { padding: clamp(2px, .4vh, 4px) clamp(3px, .8vw, 6px); font-size: clamp(6px, .9vh, 8px); }
+    }
+    @media (max-width: 768px) and (max-height: 440px) {
+      .tray-panel { padding: 2px; }
+      .tray-content { height: min(25vh, clamp(22px, 8.5dvh, 32px)); margin-top: 0; padding: 1px; }
+      .tray-details { padding-bottom: 18px; }
+      .tray-items { max-height: 3em; }
+      .clear-button { height: clamp(16px, 5vh, 22px); min-height: 0; padding: 1px 3px; font-size: clamp(6px, 1.5vh, 7px); }
+    }
   </style>
 </head>
 <body>
@@ -1597,6 +1630,21 @@
     </section>
   </div>
 
+  <div class="modal-backdrop" id="reset-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="reset-confirm-title" aria-describedby="reset-confirm-description" hidden>
+    <section class="reset-confirm-card">
+      <div class="modal-header">
+        <div class="modal-emblem" aria-hidden="true">🔄</div>
+        <div class="modal-eyebrow">KAINAN SIM</div>
+        <h2 id="reset-confirm-title">Reset Progress?</h2>
+        <p class="modal-description" id="reset-confirm-description">Are you sure you want to return to Level 1? Your current saved progress will be erased.</p>
+      </div>
+      <div class="reset-confirm-actions">
+        <button class="modal-submit" id="reset-confirm-accept" type="button">🗑️ Yes, Start Over</button>
+        <button class="modal-submit reset-cancel" id="reset-confirm-cancel" type="button">❌ Cancel</button>
+      </div>
+    </section>
+  </div>
+
   <div class="modal-backdrop" id="install-help-modal" role="dialog" aria-modal="true" aria-labelledby="install-title" hidden>
     <section class="modal">
       <div class="modal-header"><div class="modal-emblem" aria-hidden="true">📲</div><div class="modal-eyebrow">KAINAN SIM</div><h2 id="install-title">Install Kainan Sim</h2><p class="modal-description" id="install-description">Install this game for quick access and offline play.</p></div>
@@ -1873,6 +1921,9 @@
       let bgmVolume = 100;
       let sfxVolume = 100;
       let daySummaryActive = false;
+      let pendingResetAction = null;
+      let resetReturnFocus = null;
+      let isResettingProgress = false;
 
       const $ = id => document.getElementById(id);
       const AudioManager = window.AudioManager;
@@ -2109,6 +2160,12 @@
       }
 
       function persist() {
+        if (isResettingProgress) return true;
+        if (!hasSavedGame()) {
+          savedProgressExists = false;
+          if ($("continue-button")) updateHomeSave();
+          return true;
+        }
         try {
           const serialized = JSON.stringify(state);
           window.localStorage.setItem(STORAGE_KEY, serialized);
@@ -2269,6 +2326,10 @@
           ["#settings-sfx-label", "🔔 Sound Effects (SFX)", "🔔 Mga Epekto ng Tunog (SFX)"],
           ["label[for='language-select'] span", "🌐 Language", "🌐 Wika"],
           ["#home-reset-button", "🗑️ Reset Game Progress", "🗑️ I-reset ang Laro"],
+          ["#reset-confirm-title", "Reset Progress?", "🔄 Bagong Simula?"],
+          ["#reset-confirm-description", "Are you sure you want to return to Level 1? Your current saved progress will be erased.", "Sigurado ka bang gusto mong bumalik sa Level 1? Mabubura ang iyong kasalukuyang na-save na progress."],
+          ["#reset-confirm-accept", "🗑️ Yes, Start Over", "🗑️ Oo, Ulitin"],
+          ["#reset-confirm-cancel", "❌ Cancel", "❌ Huwag Muna / Cancel"],
           ["[data-i18n='save-code-title']", "Save transfer", "Paglipat ng Save"],
           ["[data-i18n='save-code-hint']", "Copy this code to move your progress to another device.", "Kopyahin ang code para mailipat ang progress sa ibang device."],
           ["[data-i18n='save-export']", "Export Save Code", "I-export ang Save Code"],
@@ -2394,7 +2455,6 @@
           if (!savedCandidates.length) {
             savedProgressExists = false;
             state = initialState();
-            persist();
             return state;
           }
           const loadedCandidates = [];
@@ -2443,7 +2503,7 @@
         state.quests = defaultQuests(today);
         state.streak = 0;
         streak = 0;
-        persist();
+        if (hasSavedGame()) persist();
         return true;
       }
 
@@ -3046,6 +3106,8 @@
         }
         const preview = $("cup-preview");
         preview.replaceChildren();
+        const cupStyle = window.getComputedStyle(preview);
+        const spriteSpace = preview.clientHeight - parseFloat(cupStyle.paddingTop) - parseFloat(cupStyle.paddingBottom);
         if (total === 0 && !trayDrink) {
           const empty = document.createElement("div");
           empty.className = "cup-empty";
@@ -3057,6 +3119,8 @@
             if (quantity < 1) return;
             const skewer = document.createElement("div");
             skewer.className = "skewer";
+            const spriteSize = Math.min(36, Math.max(8, spriteSpace / quantity));
+            skewer.style.setProperty("--sprite-size", `${spriteSize}px`);
             skewer.setAttribute("role", "img");
             skewer.setAttribute("aria-label", `${quantity} ${food.name}${quantity > 1 ? "s" : ""} on a skewer in the paper cup`);
             const items = document.createElement("span");
@@ -4016,34 +4080,37 @@
         setLanguage(state.language);
       }
 
-      function resetProgress() {
-        const confirmed = window.confirm(state.language === "tl"
-          ? "Sigurado ka bang i-reset ang lahat ng progress, barya, level, at settings ng tindero? Hindi na ito maibabalik."
-          : "Are you sure you want to reset all progress, coins, levels, and vendor settings? This cannot be undone.");
-        if (!confirmed) return;
-        clearCustomerExitRemoval();
-        window.localStorage.removeItem(STORAGE_KEY);
-        LEGACY_STORAGE_KEYS.forEach(key => window.localStorage.removeItem(key));
-        window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
+      function clearGameProgressStorage() {
+        [STORAGE_KEY, ...LEGACY_STORAGE_KEYS, EQUIPPED_COSMETICS_KEY].forEach(key => window.localStorage.removeItem(key));
         savedProgressExists = false;
-        state = initialState();
-        window.clearTimeout(bgmTimer);
-        bgmTimer = null;
-        currentWeather = "sunny";
-        weatherSeconds = 60;
-        rushSeconds = 0;
-        state.inspectionAtSeconds = 120 + Math.floor(Math.random() * 61);
-        served = 0;
-        streak = 0;
-        order = null;
-        tray = {};
-        trayDrink = null;
-        selectedSauce = null;
-        renderAll();
-        updateHomeSave();
-        $("setup-modal").hidden = true;
-        announce("Na-reset na ang progress mo. Pumili ng bagong vendor para magsimula ulit.", "info");
-        openSetup(false);
+      }
+
+      function openResetConfirmation(action) {
+        if (!["new-game", "in-game", "home"].includes(action)) throw new Error(`Unknown reset action: ${action}`);
+        pendingResetAction = action;
+        resetReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        $("reset-confirm-modal").hidden = false;
+        $("reset-confirm-cancel").focus();
+      }
+
+      function closeResetConfirmation(restoreFocus = true) {
+        if (isResettingProgress) return;
+        $("reset-confirm-modal").hidden = true;
+        pendingResetAction = null;
+        if (restoreFocus && resetReturnFocus?.isConnected) resetReturnFocus.focus();
+        resetReturnFocus = null;
+      }
+
+      function confirmReset() {
+        const action = pendingResetAction;
+        if (!action || isResettingProgress) return;
+        isResettingProgress = true;
+        $("reset-confirm-accept").disabled = true;
+        $("reset-confirm-cancel").disabled = true;
+        AudioManager.playSFX("reset");
+        clearGameProgressStorage();
+        [BGM_VOLUME_KEY, SFX_VOLUME_KEY].forEach(key => window.localStorage.removeItem(key));
+        window.setTimeout(() => window.location.reload(), 240);
       }
 
       function hasSavedGame() {
@@ -4064,13 +4131,15 @@
       }
 
       function startNewGame() {
-        if ((savedProgressExists || hasSavedGame()) && !window.confirm(state.language === "tl"
-          ? "Magsisimula ka ba sa Antas 1? Mabubura ang lumang save file."
-          : "Start again at Level 1? Your previous save will be deleted.")) return;
-        window.localStorage.removeItem(STORAGE_KEY);
-        LEGACY_STORAGE_KEYS.forEach(key => window.localStorage.removeItem(key));
-        window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
-        savedProgressExists = false;
+        if (savedProgressExists || hasSavedGame()) {
+          openResetConfirmation("new-game");
+          return;
+        }
+        beginNewGame();
+      }
+
+      function beginNewGame() {
+        clearGameProgressStorage();
         window.clearTimeout(arrivalTimer);
         window.clearTimeout(arrivalAnimationTimer);
         window.clearTimeout(bgmTimer);
@@ -4118,46 +4187,6 @@
         syncVolumeControls();
         $("language-select").value = state.language;
         $("home-settings-modal").hidden = false;
-      }
-
-      function resetHomeProgress() {
-        if (!window.confirm(state.language === "tl"
-          ? "Sigurado ka bang burahin ang buong save file at magsimula ulit? Hindi na ito maibabalik."
-          : "Are you sure you want to erase your entire save and start over? This cannot be undone.")) return;
-        clearCustomerExitRemoval();
-        window.localStorage.removeItem(STORAGE_KEY);
-        LEGACY_STORAGE_KEYS.forEach(key => window.localStorage.removeItem(key));
-        window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
-        savedProgressExists = false;
-        window.clearTimeout(arrivalTimer);
-        window.clearTimeout(arrivalAnimationTimer);
-        window.clearTimeout(bgmTimer);
-        bgmTimer = null;
-        arrivalAnimationTimer = null;
-        customerTransitioning = false;
-        state = initialState();
-        served = 0;
-        streak = 0;
-        order = null;
-        tray = {};
-        trayDrink = null;
-        selectedSauce = null;
-        currentWeather = "sunny";
-        weatherSeconds = 60;
-        rushSeconds = 0;
-        state.inspectionAtSeconds = 120 + Math.floor(Math.random() * 61);
-        renderAll();
-        updateHomeSave();
-        setScreenMode(SCREEN_MODE.MENU);
-        $("home-settings-modal").hidden = true;
-        renderHomeArt();
-        setLanguage(state.language);
-        window.localStorage.removeItem(STORAGE_KEY);
-        LEGACY_STORAGE_KEYS.forEach(key => window.localStorage.removeItem(key));
-        window.localStorage.removeItem(EQUIPPED_COSMETICS_KEY);
-        savedProgressExists = false;
-        updateHomeSave();
-        announce("Na-reset na ang lahat. Handa ka nang magsimula ulit.", "info");
       }
 
       function renderHomeArt() {
@@ -4301,7 +4330,7 @@
         $("settings-bgm-volume").addEventListener("input", event => setVolume("bgm", event.target.value));
         $("header-sfx-volume").addEventListener("input", event => setVolume("sfx", event.target.value));
         $("settings-sfx-volume").addEventListener("input", event => setVolume("sfx", event.target.value));
-        $("home-reset-button").addEventListener("click", resetHomeProgress);
+        $("home-reset-button").addEventListener("click", () => openResetConfirmation("home"));
         $("clean-oil-button").addEventListener("click", cleanOil);
         $("jar-cover-button").addEventListener("click", () => {
           state.jarCovered = !state.jarCovered;
@@ -4394,7 +4423,12 @@
         }));
         $("setup-submit").addEventListener("click", saveSetup);
         $("setup-home-button").addEventListener("click", returnHomeFromSetup);
-        $("reset-progress-button").addEventListener("click", resetProgress);
+        $("reset-progress-button").addEventListener("click", () => openResetConfirmation("in-game"));
+        $("reset-confirm-accept").addEventListener("click", confirmReset);
+        $("reset-confirm-cancel").addEventListener("click", () => closeResetConfirmation());
+        $("reset-confirm-modal").addEventListener("click", event => {
+          if (event.target === event.currentTarget) closeResetConfirmation();
+        });
         $("setup-cancel").addEventListener("click", () => {
           $("setup-modal").hidden = true;
           isSetupEditing = false;
@@ -4419,8 +4453,15 @@
         document.addEventListener("pointerdown", () => {
           if (state.sound.bgm) AudioManager.reinitializeBgm(playMusicNote);
         }, { once: true });
+        window.addEventListener("resize", renderTray);
         document.addEventListener("keydown", event => {
           if (event.key !== "Escape") return;
+          if (!$("reset-confirm-modal").hidden) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            if (!isResettingProgress) closeResetConfirmation();
+            return;
+          }
           if (!$("credit-reminder-modal").hidden) {
             closeCreditReminder();
             return;

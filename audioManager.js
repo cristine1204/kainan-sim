@@ -112,6 +112,10 @@
         { frequency: 784, endFrequency: 1046.5, duration: 0.24, delay: 0 },
         { frequency: 1046.5, endFrequency: 1396.9, duration: 0.3, delay: 0.16 },
         { frequency: 880, duration: 0.34, delay: 0.45 }
+      ],
+      reset: [
+        { frequency: 659.25, endFrequency: 523.25, duration: 0.1, delay: 0 },
+        { frequency: 523.25, endFrequency: 392, duration: 0.1, delay: 0.08 }
       ]
     };
     const pattern = patterns[name];
