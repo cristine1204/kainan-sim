@@ -1,7 +1,8 @@
-const CACHE_NAME = "kainan-sim-v19";
+const CACHE_NAME = "kainan-sim-v20";
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./audioManager.js",
   "./manifest.json",
   "./manifest.webmanifest",
   "./icon.svg",

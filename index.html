@@ -1626,6 +1626,7 @@
     </section>
   </div>
 
+  <script src="./audioManager.js"></script>
   <script>
     (() => {
       "use strict";
@@ -1861,71 +1862,7 @@
       let sfxVolume = 100;
 
       const $ = id => document.getElementById(id);
-      const AUDIO_SOURCES = Object.freeze({
-        sfx_wrong_order: "assets/audio/wrong_order.mp3",
-        sfx_correct_boy: "assets/audio/thank_you_boy.mp3",
-        sfx_correct_woman: "assets/audio/thank_you_woman.mp3",
-        sfx_click: "assets/audio/click_food.mp3",
-        bgm_musical: "assets/audio/bgm_musical.mp3"
-      });
-      const AudioManager = (() => {
-        const effects = Object.fromEntries(
-          Object.entries(AUDIO_SOURCES)
-            .filter(([name]) => name !== "bgm_musical")
-            .map(([name, source]) => {
-              const audio = new Audio(source);
-              audio.preload = "auto";
-              audio.volume = 1.0;
-              return [name, audio];
-            })
-        );
-        function createMusic() {
-          const audio = new Audio(AUDIO_SOURCES.bgm_musical);
-          audio.preload = "auto";
-          audio.volume = 1.0;
-          audio.loop = true;
-          return audio;
-        }
-        let music = createMusic();
-
-        function startPlayback(audio, source, fallback, restart = false) {
-          const onFailure = error => {
-            console.error(`Unable to play audio asset ${source}.`, error);
-            fallback();
-          };
-          try {
-            if (restart) audio.currentTime = 0;
-            const playback = audio.play();
-            if (playback) void playback.catch(onFailure);
-          } catch (error) {
-            onFailure(error);
-          }
-        }
-
-        return {
-          play(name, fallback) {
-            const audio = effects[name];
-            audio.volume = sfxVolume / 100;
-            startPlayback(audio, AUDIO_SOURCES[name], fallback, true);
-          },
-          playBgm(fallback) {
-            if (bgmVolume === 0 || !music.paused) return;
-            music.volume = bgmVolume / 100;
-            startPlayback(music, AUDIO_SOURCES.bgm_musical, fallback);
-          },
-          reinitializeBgm(fallback) {
-            music.pause();
-            music = createMusic();
-            music.load();
-            if (bgmVolume > 0) startPlayback(music, AUDIO_SOURCES.bgm_musical, fallback);
-          },
-          setVolumes() {
-            Object.values(effects).forEach(audio => { audio.volume = sfxVolume / 100; });
-            music.volume = bgmVolume / 100;
-            if (bgmVolume === 0) music.pause();
-          }
-        };
-      })();
+      const AudioManager = window.AudioManager;
 
       function setScreenMode(mode) {
         if (mode !== SCREEN_MODE.MENU && mode !== SCREEN_MODE.PLAYING) {
@@ -2055,7 +1992,7 @@
           sfxVolume = next;
           state.sound.sfx = next > 0;
         }
-        AudioManager.setVolumes();
+        AudioManager.setVolumes(bgmVolume, sfxVolume);
         syncVolumeControls();
         if (kind === "bgm" && previous === 0 && next > 0) {
           AudioManager.playBgm(playMusicNote);
@@ -2068,7 +2005,7 @@
       }
 
       function tone(frequency, duration, options = {}) {
-        const level = options.music ? bgmVolume : sfxVolume;
+        const level = options.music ? AudioManager.getBgmVolume() : sfxVolume;
         if (level === 0) return;
         const context = getAudioContext();
         if (!context) return;
@@ -2115,14 +2052,26 @@
       }
 
       function playCustomerThanks(customer) {
+        const gender = customerGender(customer);
+        const lines = gender === "female"
+          ? ["Salamat po!", "Thank you po!", "Salamat, sarap!"]
+          : ["Salamat boss!", "Salamat pards!", "Salamat po!"];
+        AudioManager.speakCustomer(lines[Math.floor(Math.random() * lines.length)], gender);
+      }
+
+      function customerGender(customer) {
         const name = customer.toLocaleLowerCase("en");
-        if (/\b(mang tonyo|manong boy|jun-jun|carlo|bossing|barangay tanod)\b/.test(name)) {
-          playSfx("correct_boy");
-        } else if (/\b(aling nena|ate bebang|bebang|tita leni|maya|ate mercy|bebeng|mika|marites)\b/.test(name)) {
-          playSfx("correct_woman");
-        } else {
-          playSfx("claim");
-        }
+        if (/\b(aling nena|ate bebang|bebang|tita leni|maya|ate mercy|bebeng|mika|marites|tsismosa marites)\b/.test(name)) return "female";
+        return "male";
+      }
+
+      function customerOrderSpeech(customerOrder) {
+        const items = Object.entries(customerOrder.items).map(([id, quantity]) => {
+          const item = foodFor(id);
+          return `${quantity > 1 ? `${quantity} ` : ""}${item.name}`;
+        });
+        if (customerOrder.drink) items.push(`isang ${drinkFor(customerOrder.drink).name}`);
+        return `Pabili po ng ${items.join(" at ")}!`;
       }
 
       function playMusicNote() {
@@ -3181,7 +3130,10 @@
         arrivalAnimationTimer = window.setTimeout(() => {
           scene.classList.remove("is-arriving");
           sprite.classList.remove("arriving");
-          if (order && !customerTransitioning && patience > 0) sprite.classList.add("waiting-idle");
+          if (order && !customerTransitioning && patience > 0) {
+            sprite.classList.add("waiting-idle");
+            AudioManager.speakCustomer(customerOrderSpeech(order), customerGender(order.customer));
+          }
           arrivalAnimationTimer = null;
         }, 760);
       }
@@ -3267,6 +3219,11 @@
         $("customer-bubble-label").textContent = reason === "impatience"
           ? (state.language === "tl" ? "BILIS!" : "HURRY!")
           : (state.language === "tl" ? "MALI!" : "WRONG!");
+        const gender = customerGender(order.customer);
+        const complaints = gender === "female"
+          ? ["Mali naman po binigay mo!", "Kuya, mali po 'to!"]
+          : ["Mali naman ang binigay mo boss!", "Ano ba 'yan, mali 'to!"];
+        AudioManager.speakCustomer(complaints[Math.floor(Math.random() * complaints.length)], gender);
         playSfx("error");
         announce(reason === "impatience"
           ? (state.language === "tl"
@@ -4433,7 +4390,7 @@
         sfxVolume = readVolume(SFX_VOLUME_KEY, state.sound.sfx ? 100 : 0);
         state.sound.bgm = true;
         state.sound.sfx = sfxVolume > 0;
-        AudioManager.setVolumes();
+        AudioManager.setVolumes(bgmVolume, sfxVolume);
         served = state.served;
         streak = state.streak;
         ensureQuestDay();
