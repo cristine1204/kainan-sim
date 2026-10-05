@@ -190,7 +190,7 @@
     .food-card { position: relative; min-width: 0; overflow: hidden; padding: 0; border: 1px solid #edddc5; border-radius: 13px; background: #fffdf5; color: inherit; text-align: left; cursor: pointer; transition: transform .15s, box-shadow .15s, border-color .15s; }
     .food-card:not(.locked):hover { transform: translateY(-2px); border-color: #e6b55c; box-shadow: 0 8px 17px rgb(135 92 38 / 10%); }
     .food-card.prepping .food-art { animation: frying .38s ease-in-out; }
-    .food-card.locked { border-color: #ded8d0; background: #f5f3f0; color: #827d77; filter: grayscale(1); cursor: not-allowed; }
+    .food-card.locked { border-color: #ded8d0; background: #f5f3f0; color: #827d77; cursor: not-allowed; }
     .food-card:disabled { cursor: not-allowed; }
     .food-art { position: relative; height: 76px; display: grid; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 50% 91%, #f1cd89 0 23%, transparent 24%), linear-gradient(135deg, #f4e4c2, #fff9eb); }
     .food-art::before { position: absolute; right: 0; bottom: 12px; left: 0; height: 8px; border-radius: 50%; background: #bd8755; content: ""; }
@@ -198,7 +198,7 @@
     .food-art .food-emoji { position: relative; z-index: 1; font-size: 42px; filter: drop-shadow(0 4px 2px rgb(90 54 24 / 17%)); transition: transform .18s; }
     .food-art .food-image { position: relative; z-index: 1; display: block; width: 100%; max-width: 100%; height: 100%; object-fit: contain; }
     .food-card:not(.locked):hover .food-emoji { transform: translateY(-3px) scale(1.06); }
-    .food-lock-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(60 46 36 / 49%); color: white; font-size: 25px; }
+    .food-lock-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(60 46 36 / 22%); color: white; font-size: 25px; }
     .unlock-chip { position: absolute; z-index: 2; top: 7px; right: 7px; padding: 4px 6px; border-radius: 99px; background: #eef8ed; color: #27733d; font-size: 8px; font-weight: 900; }
     .unlock-label-compact { display: none; }
     .locked .unlock-chip { color: #755c40; background: #f2eee8; }
