@@ -1,4 +1,4 @@
-const CACHE_NAME = "kainan-sim-v18";
+const CACHE_NAME = "kainan-sim-v19";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -22,7 +22,7 @@ const APP_SHELL = [
   "./assets/audio/thank_you_boy.mp3",
   "./assets/audio/thank_you_woman.mp3",
   "./assets/audio/click_food.mp3",
-  "./assets/audio/nature_bgm.mp3",
+  "./assets/audio/bgm_musical.mp3",
   "./assets/sauces/sweet-sour.png",
   "./assets/sauces/spicy.png",
   "./assets/sauces/vinegar.png"

@@ -1866,12 +1866,12 @@
         sfx_correct_boy: "assets/audio/thank_you_boy.mp3",
         sfx_correct_woman: "assets/audio/thank_you_woman.mp3",
         sfx_click: "assets/audio/click_food.mp3",
-        bgm_nature: "assets/audio/nature_bgm.mp3"
+        bgm_musical: "assets/audio/bgm_musical.mp3"
       });
       const AudioManager = (() => {
         const effects = Object.fromEntries(
           Object.entries(AUDIO_SOURCES)
-            .filter(([name]) => name !== "bgm_nature")
+            .filter(([name]) => name !== "bgm_musical")
             .map(([name, source]) => {
               const audio = new Audio(source);
               audio.preload = "auto";
@@ -1879,10 +1879,14 @@
               return [name, audio];
             })
         );
-        const music = new Audio(AUDIO_SOURCES.bgm_nature);
-        music.preload = "auto";
-        music.volume = 1.0;
-        music.loop = true;
+        function createMusic() {
+          const audio = new Audio(AUDIO_SOURCES.bgm_musical);
+          audio.preload = "auto";
+          audio.volume = 1.0;
+          audio.loop = true;
+          return audio;
+        }
+        let music = createMusic();
 
         function startPlayback(audio, source, fallback, restart = false) {
           const onFailure = error => {
@@ -1907,7 +1911,13 @@
           playBgm(fallback) {
             if (bgmVolume === 0 || !music.paused) return;
             music.volume = bgmVolume / 100;
-            startPlayback(music, AUDIO_SOURCES.bgm_nature, fallback);
+            startPlayback(music, AUDIO_SOURCES.bgm_musical, fallback);
+          },
+          reinitializeBgm(fallback) {
+            music.pause();
+            music = createMusic();
+            music.load();
+            if (bgmVolume > 0) startPlayback(music, AUDIO_SOURCES.bgm_musical, fallback);
           },
           setVolumes() {
             Object.values(effects).forEach(audio => { audio.volume = sfxVolume / 100; });
@@ -4372,8 +4382,8 @@
           $("serve-button").focus();
         });
         document.addEventListener("pointerdown", () => {
-          if (state.sound.bgm && bgmTimer === null) AudioManager.playBgm(playMusicNote);
-        }, { once: false });
+          if (state.sound.bgm) AudioManager.reinitializeBgm(playMusicNote);
+        }, { once: true });
         document.addEventListener("keydown", event => {
           if (event.key !== "Escape") return;
           if (!$("credit-reminder-modal").hidden) {
@@ -4419,9 +4429,9 @@
       function init() {
         state = loadProgress();
         drinkPanelAutoOpened = state.unlockedDrinks.length > 0;
-        bgmVolume = readVolume(BGM_VOLUME_KEY, 100);
+        bgmVolume = 100;
         sfxVolume = readVolume(SFX_VOLUME_KEY, state.sound.sfx ? 100 : 0);
-        state.sound.bgm = bgmVolume > 0;
+        state.sound.bgm = true;
         state.sound.sfx = sfxVolume > 0;
         AudioManager.setVolumes();
         served = state.served;
