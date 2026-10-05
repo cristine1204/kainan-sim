@@ -131,7 +131,10 @@
     .customer-order-bubble { position: absolute; z-index: 3; top: 51px; left: 7px; display: grid; width: min(45%, 126px); gap: 3px; padding: 7px 8px; border: 2px solid #fff; border-radius: 12px 12px 12px 4px; background: #fffdf8; color: #744534; box-shadow: 0 4px 10px rgb(61 35 23 / 19%); pointer-events: none; }
     .customer-order-bubble::after { position: absolute; bottom: -7px; left: 11px; width: 10px; height: 10px; transform: rotate(45deg); border-right: 2px solid #fff; border-bottom: 2px solid #fff; background: inherit; content: ""; }
     .customer-order-bubble[hidden] { display: none; }
+    .bubble-heading { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
     .bubble-label { color: #a75337; font-size: 8px; font-weight: 950; letter-spacing: .45px; }
+    .utang-badge { padding: 2px 4px; border-radius: 99px; background: #ffe8a8; color: #744b11; font-size: 7px; font-weight: 950; white-space: nowrap; }
+    .utang-badge[hidden] { display: none; }
     .bubble-icons { display: flex; flex-wrap: wrap; gap: 3px; }
     .bubble-item { padding: 2px 4px; border-radius: 99px; background: #f7eddd; font-size: 11px; font-weight: 850; white-space: nowrap; }
     .bubble-item img { width: 18px; height: 18px; display: block; object-fit: contain; }
@@ -365,6 +368,9 @@
     .credit-reminder-actions .modal-submit { min-height: 42px; margin: 0; padding: 9px 12px; font-size: 11px; }
     .credit-actions { display: flex; gap: 8px; margin-top: 15px; }
     .credit-actions .modal-submit { margin-top: 0; }
+    .ledger-avatar { width: 32px; height: 38px; flex: 0 0 32px; }
+    .ledger-customer { display: flex; align-items: center; gap: 7px; }
+    .ledger-items { margin-top: 4px; color: #6b5844; font-size: 9px; line-height: 1.4; }
     .modal-submit.secondary-submit { border: 1px solid var(--line); background: white; color: var(--ink); }
     .modal-submit.secondary-submit:hover { background: #fffaf4; }
     .vip-banner { display: inline-flex; align-items: center; gap: 5px; margin-top: 7px; padding: 4px 7px; border-radius: 99px; background: #fff1d5; color: #825a20; font-size: 8px; font-weight: 900; }
@@ -1411,7 +1417,7 @@
             <div class="scene-window" aria-hidden="true"></div>
             <span class="scene-sign" id="scene-sign" aria-hidden="true">TUSOK-TUSOK</span>
             <div class="customer-order-bubble" id="customer-order-bubble" role="status" aria-live="polite" hidden>
-              <span class="bubble-label" id="customer-bubble-label" data-i18n="customer-bubble-label">MY ORDER!</span>
+              <span class="bubble-heading"><span class="bubble-label" id="customer-bubble-label" data-i18n="customer-bubble-label">MY ORDER!</span><span class="utang-badge" id="utang-badge" hidden>📝 UTANG</span></span>
               <span class="bubble-icons" id="customer-order-icons" aria-hidden="true"></span>
             </div>
             <div class="customer-avatar-slot"><div class="customer-avatar-container" id="customer-avatar-container"></div></div>
@@ -1565,7 +1571,7 @@
   <div class="modal-backdrop" id="credit-offer-modal" role="dialog" aria-modal="true" aria-labelledby="credit-offer-title" hidden>
     <section class="modal">
       <div class="modal-header"><div class="modal-emblem" aria-hidden="true">📝</div><div class="modal-eyebrow">REGULAR NA SUKI</div><h2 id="credit-offer-title">Lista sa Listahan?</h2><p class="modal-description" id="credit-offer-description">Maaari kang pagkatiwalaan ng kapitbahay na ito.</p></div>
-      <div class="credit-actions"><button class="modal-submit secondary-submit" id="credit-decline" type="button">Bayad ngayon</button><button class="modal-submit green-submit" id="credit-accept" type="button">Sige, lista mo!</button></div>
+      <div class="credit-actions"><button class="modal-submit secondary-submit" id="credit-decline" type="button">💵 Pera Muna / Cash Only</button><button class="modal-submit green-submit" id="credit-accept" type="button">📝 I-lista sa Utang</button></div>
     </section>
   </div>
 
@@ -1766,6 +1772,12 @@
           ...item,
           id: typeof item.id === "string" ? item.id.slice(0, 80) : `${item.dueAt}-${item.amount}`,
           customer: item.customer.slice(0, 60),
+          avatar: ["manong", "bebang", "bossing", "marites"].includes(item.avatar) ? item.avatar : customerAvatarId(item.customer),
+          items: Array.isArray(item.items) ? item.items.filter(entry =>
+            entry && FOODS.some(food => food.id === entry.id) && Number.isSafeInteger(entry.quantity) && entry.quantity > 0 && entry.quantity <= 9
+          ).slice(0, FOODS.length).map(entry => ({ id: entry.id, quantity: entry.quantity })) : [],
+          drink: DRINKS.some(drink => drink.id === item.drink) ? item.drink : null,
+          sauce: SAUCES.some(sauce => sauce.id === item.sauce) ? item.sauce : null,
           createdDay: typeof item.createdDay === "string" ? item.createdDay.slice(0, 10) : "",
           reminded: item.reminded === true,
           forgotten: item.forgotten === true
@@ -1860,6 +1872,7 @@
       let savedProgressExists = false;
       let bgmVolume = 100;
       let sfxVolume = 100;
+      let daySummaryActive = false;
 
       const $ = id => document.getElementById(id);
       const AudioManager = window.AudioManager;
@@ -2026,7 +2039,15 @@
       }
 
       function playSfx(kind) {
-        if (sfxVolume === 0) return;
+        if (sfxVolume === 0 || daySummaryActive) return;
+        if (kind === "level") {
+          AudioManager.playSFX("levelUp");
+          return;
+        }
+        if (kind === "new_day") {
+          AudioManager.playSFX("newDay");
+          return;
+        }
         const assetByKind = {
           click: "sfx_click",
           error: "sfx_wrong_order",
@@ -2237,8 +2258,8 @@
           ["#credit-title", "Neighborhood Credit Book", "Lista sa Listahan"],
           ["#credit-description", "Borrow today, repay tomorrow. Visit your suki to remind them.", "Utang ngayon, bayad bukas. Bisitahin muli ang suki para magpaalala."],
           ["#credit-offer-title", "Add it to the credit list?", "Ilista muna natin?"],
-          ["#credit-decline", "Pay now", "Bayad ngayon"],
-          ["#credit-accept", "Sure, put it on my list!", "Sige, ilista mo!"],
+          ["#credit-decline", "💵 Cash Only", "💵 Pera Muna / Cash Only"],
+          ["#credit-accept", "📝 List on Credit", "📝 I-lista sa Utang"],
           ["#home-settings-title", "Settings", "Mga Setting"],
           ["#home-settings-description", "Customize game sound and language.", "I-personalize ang tunog at wika ng laro."],
           ["#install-title", "Install Kainan Sim", "I-install ang Kainan Sim"],
@@ -2766,6 +2787,7 @@
           $("vip-banner").hidden = true;
           $("customer-order-bubble").hidden = true;
           $("customer-order-icons").replaceChildren();
+          $("utang-badge").hidden = true;
           scene.dataset.mood = customerMood;
           $("customer-mood").textContent = customerMood === "happy" ? "🥰" : customerMood === "angry" ? "💢" : "💚";
           return;
@@ -2791,7 +2813,8 @@
         const bubble = $("customer-order-bubble");
         bubble.hidden = false;
         $("customer-bubble-label").textContent = state.language === "tl" ? "ORDER KO!" : "MY ORDER!";
-        bubble.setAttribute("aria-label", orderDescription);
+        $("utang-badge").hidden = !order.creditOffer;
+        bubble.setAttribute("aria-label", `${order.creditOffer ? "Utang request. " : ""}${orderDescription}`);
         const bubbleIcons = $("customer-order-icons");
         bubbleIcons.replaceChildren();
         const orderIcons = Object.entries(order.items).map(([id, quantity]) => ({
@@ -2877,7 +2900,7 @@
           ? "marites"
           : vipId === "tanod" || /manong|mang |jun-jun/.test(customerName)
             ? "manong"
-            : /bebang|bebeng|maya/.test(customerName) ? "bebang" : "bossing";
+            : /bebang|bebeng|maya|mika/.test(customerName) ? "bebang" : "bossing";
       }
 
       function renderSauces() {
@@ -3115,7 +3138,7 @@
           drink,
           sauce: sauces[Math.floor(Math.random() * sauces.length)].id,
           vip,
-          creditOffer: !vip && Math.random() < .18
+          creditOffer: Math.random() < .15
         };
       }
 
@@ -3132,7 +3155,15 @@
           sprite.classList.remove("arriving");
           if (order && !customerTransitioning && patience > 0) {
             sprite.classList.add("waiting-idle");
-            AudioManager.speakCustomer(customerOrderSpeech(order), customerGender(order.customer));
+            if (order.creditOffer) {
+              const gender = customerGender(order.customer);
+              const creditLines = gender === "female"
+                ? ["Ate, pautang muna nitong pagkain, wala pa sahod eh!", "Pwedeng palista muna nitong order ko? Babayaran ko rin!"]
+                : ["Boss, pautang muna nitong order ko, sa katapusan na lang!", "Pards, list mo muna 'tong tusok-tusok, bukas bayad!"];
+              AudioManager.speakCustomer(creditLines[Math.floor(Math.random() * creditLines.length)], gender);
+            } else {
+              AudioManager.speakCustomer(customerOrderSpeech(order), customerGender(order.customer));
+            }
           }
           arrivalAnimationTimer = null;
         }, 760);
@@ -3219,13 +3250,20 @@
         $("customer-bubble-label").textContent = reason === "impatience"
           ? (state.language === "tl" ? "BILIS!" : "HURRY!")
           : (state.language === "tl" ? "MALI!" : "WRONG!");
+        $("utang-badge").hidden = true;
         const gender = customerGender(order.customer);
-        const complaints = gender === "female"
-          ? ["Mali naman po binigay mo!", "Kuya, mali po 'to!"]
-          : ["Mali naman ang binigay mo boss!", "Ano ba 'yan, mali 'to!"];
-        AudioManager.speakCustomer(complaints[Math.floor(Math.random() * complaints.length)], gender);
+        const rejectionLines = reason === "cash-only"
+          ? ["Damot naman, sa iba na lang!"]
+          : gender === "female"
+            ? ["Mali naman po binigay mo!", "Kuya, mali po 'to!"]
+            : ["Mali naman ang binigay mo boss!", "Ano ba 'yan, mali 'to!"];
+        AudioManager.speakCustomer(rejectionLines[Math.floor(Math.random() * rejectionLines.length)], gender);
         playSfx("error");
-        announce(reason === "impatience"
+        announce(reason === "cash-only"
+          ? (state.language === "tl"
+            ? "Cash only ang order, pero walang pambayad ang suki. Umalis siya nang hindi naghain."
+            : "The customer could not pay cash and left without the order.")
+          : reason === "impatience"
           ? (state.language === "tl"
             ? "Nainip ang suki at umalis nang walang order. Nawalan ka ng ₱5."
             : "The customer ran out of patience and left without ordering. You lost ₱5.")
@@ -3406,17 +3444,21 @@
         const tip = Math.round(quickTip * locationBonus);
         const spicyRainBonus = currentWeather === "rainy" && order.sauce === "spicy" ? Math.round(baseCoins * .5) : 0;
         const earnedCoins = baseCoins + drinkPrice + comboBonus + tip + spicyRainBonus;
-        const earnedXp = 35 + (order.drink ? 10 : 0);
+        const earnedXp = 35 + (order.drink ? 10 : 0) + (onCredit ? 15 : 0);
         state.daySales.served += 1;
         state.daySales.sales += baseCoins + drinkPrice + comboBonus;
         if (!onCredit) state.daySales.tips += tip + spicyRainBonus;
 
         if (onCredit) {
           const bill = baseCoins + drinkPrice + comboBonus;
-          state.goodwill = Math.min(100, state.goodwill + 10);
+          state.goodwill = Math.min(100, state.goodwill + 15);
           state.credits.push({
             id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             customer: order.customer,
+            avatar: customerAvatarId(order.customer, order.vip?.id),
+            items: Object.entries(order.items).map(([id, quantity]) => ({ id, quantity })),
+            drink: order.drink,
+            sauce: order.sauce,
             amount: bill,
             createdDay: todayKey(),
             dueAt: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1).getTime(),
@@ -3456,12 +3498,16 @@
         $("customer-mood").textContent = "🥰";
         showCustomerRewards(onCredit ? baseCoins + drinkPrice + comboBonus : earnedCoins, earnedXp, onCredit);
         if (state.level > previousLevel) showLevelUp(unlocks);
-        playCustomerThanks(order.customer);
+        if (onCredit) {
+          AudioManager.speakCustomer("Salamat boss, babayaran ko 'to!", customerGender(order.customer));
+        } else {
+          playCustomerThanks(order.customer);
+        }
         if (!onCredit) playSfx("cash");
         const tipMessage = tip ? ` (may ₱${tip} tip!)` : "";
         const weatherMessage = spicyRainBonus ? ` +₱${spicyRainBonus} rainy spicy bonus!` : "";
         announce(onCredit
-          ? (state.language === "tl" ? `Naka-lista kay ${order.customer}! +10 goodwill at +${earnedXp} XP.` : `${order.customer}'s order was added to the Credit Book! +10 goodwill and +${earnedXp} XP.`)
+          ? (state.language === "tl" ? `Naka-lista kay ${order.customer}! +15 Suki Loyalty at +${earnedXp} XP.` : `${order.customer}'s order was added to the Credit Book! +15 Suki Loyalty and +${earnedXp} XP.`)
           : (state.language === "tl"
             ? `Ayos! ₱${earnedCoins}${tipMessage}${weatherMessage} at +${earnedXp} XP. Salamat, boss!`
             : `Great! ₱${earnedCoins}${tip ? ` (₱${tip} tip!)` : ""}${spicyRainBonus ? ` +₱${spicyRainBonus} rainy spicy bonus!` : ""} and +${earnedXp} XP. Thanks, boss!`));
@@ -3486,8 +3532,12 @@
         }
         if (order.creditOffer) {
           pendingCredit = true;
-          const estimate = Object.entries(order.items).reduce((sum, [id, count]) => sum + foodFor(id).price * count, 0);
-          $("credit-offer-description").textContent = `${order.customer} is a regular suki. Ililista ang ₱${estimate} at dagdag +10 neighborhood goodwill. Babayaran ito bukas, plus tip.`;
+          const estimate = Object.entries(order.items).reduce((sum, [id, count]) => {
+            const premiumDouble = order.vip?.id === "rich" && (id === "kikiam" || id === "calamares");
+            return sum + Math.ceil(foodFor(id).price * (state.healthSeal ? 1.15 : 1)) * count * (premiumDouble ? 2 : 1);
+          }, 0)
+            + (order.drink ? Math.ceil(drinkFor(order.drink).price * (state.healthSeal ? 1.15 : 1)) + 12 : 0);
+          $("credit-offer-description").textContent = `${order.customer} is asking to put this ₱${estimate} order on the Listahan ng Utang. Listing it earns +15 Suki Loyalty and +15 XP. Choose cash-only to turn down the request.`;
           $("credit-offer-modal").hidden = false;
           $("credit-accept").focus();
           return;
@@ -3578,22 +3628,42 @@
           const forgot = credit.forgotten ? " · Nakalimot ang suki—paalalahanan para makabawi." : "";
           const heading = document.createElement("div");
           heading.className = "ledger-top";
+          const customerGroup = document.createElement("span");
+          customerGroup.className = "ledger-customer";
+          const avatar = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          avatar.classList.add("ledger-avatar");
+          avatar.setAttribute("viewBox", "0 0 100 120");
+          avatar.setAttribute("aria-hidden", "true");
+          const avatarUse = document.createElementNS("http://www.w3.org/2000/svg", "use");
+          avatarUse.setAttribute("href", `#avatar-${credit.avatar || customerAvatarId(credit.customer)}`);
+          avatar.append(avatarUse);
           const customer = document.createElement("strong");
           customer.className = "shop-title";
-          customer.textContent = `📝 ${credit.customer}`;
+          customer.textContent = credit.customer;
+          customerGroup.append(avatar, customer);
           const amount = document.createElement("strong");
           amount.className = "shop-cost";
           amount.textContent = `₱${credit.amount}`;
-          heading.append(customer, amount);
+          heading.append(customerGroup, amount);
           const details = document.createElement("div");
           details.className = "ledger-detail";
           details.textContent = `${due}${forgot} · Bayaran plus 10% tip.`;
+          const orderedItems = document.createElement("div");
+          orderedItems.className = "ledger-items";
+          const foodDetails = (credit.items || []).map(item => {
+            const food = foodFor(item.id);
+            return `${item.quantity} × ${food.name}`;
+          });
+          if (credit.drink) foodDetails.push(`1 × ${drinkFor(credit.drink).name}`);
+          const sauce = SAUCES.find(item => item.id === credit.sauce);
+          if (sauce) foodDetails.push(sauce.name);
+          orderedItems.textContent = foodDetails.length ? `Order: ${foodDetails.join(", ")}` : "Order details unavailable.";
           const remind = document.createElement("button");
           remind.className = "shop-buy ledger-remind";
           remind.type = "button";
           remind.dataset.remind = credit.id;
           remind.textContent = "Paalalahanan at singilin";
-          card.append(heading, details, remind);
+          card.append(heading, details, orderedItems, remind);
           list.append(card);
         });
       }
@@ -3759,6 +3829,10 @@
 
       function closeDay() {
         if (state.dayClosed) return;
+        daySummaryActive = true;
+        AudioManager.setDaySummaryActive(true);
+        window.clearTimeout(bgmTimer);
+        bgmTimer = null;
         if (order && !customerTransitioning) state.daySales.lost += 1;
         state.dayElapsedSeconds = DAY_DURATION_SECONDS;
         state.dayClosed = true;
@@ -3777,12 +3851,13 @@
         renderDayReport();
         persist();
         $("day-report-modal").hidden = false;
-        playSfx("close");
         $("next-day-button").focus();
       }
 
       function startNextDay() {
         $("day-report-modal").hidden = true;
+        daySummaryActive = false;
+        AudioManager.setDaySummaryActive(false);
         state.dayNumber += 1;
         state.dayElapsedSeconds = 0;
         state.dayClosed = false;
@@ -3797,6 +3872,8 @@
         selectedSauce = null;
         renderAll();
         persist();
+        playSfx("new_day");
+        AudioManager.playBgm(playMusicNote);
         nextCustomer();
       }
 
@@ -4302,7 +4379,7 @@
           if (!pendingCredit) return;
           $("credit-offer-modal").hidden = true;
           pendingCredit = null;
-          completeServe(false);
+          rejectCustomer("cash-only");
         });
         $("credit-accept").addEventListener("click", () => {
           if (!pendingCredit) return;
@@ -4311,6 +4388,7 @@
           completeServe(true);
         });
         document.querySelectorAll("[data-close-modal]").forEach(button => button.addEventListener("click", () => {
+          if (button.dataset.closeModal === "credit-offer-modal") pendingCredit = null;
           if (button.dataset.closeModal === "shop-modal") closeShopModal();
           else $(button.dataset.closeModal).hidden = true;
         }));
@@ -4385,6 +4463,8 @@
 
       function init() {
         state = loadProgress();
+        daySummaryActive = state.dayClosed;
+        AudioManager.setDaySummaryActive(daySummaryActive);
         drinkPanelAutoOpened = state.unlockedDrinks.length > 0;
         bgmVolume = 100;
         sfxVolume = readVolume(SFX_VOLUME_KEY, state.sound.sfx ? 100 : 0);

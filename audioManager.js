@@ -23,6 +23,8 @@
   let activeUtterance = null;
   let music = createMusic();
   let speechUnavailableNotified = false;
+  let daySummaryActive = false;
+  let generatedAudioContext = null;
 
   function createMusic() {
     const audio = new Audio(SOURCES.bgm_musical);
@@ -58,6 +60,7 @@
 
   function speakCustomer(text, gender) {
     const synthesis = window.speechSynthesis;
+    if (daySummaryActive) return false;
     if (!synthesis || typeof window.SpeechSynthesisUtterance !== "function") {
       if (!speechUnavailableNotified) {
         console.warn("Customer voice is unavailable because this browser does not support speech synthesis.");
@@ -96,19 +99,68 @@
     }
   }
 
+  function playSFX(name) {
+    if (daySummaryActive || sfxVolume === 0) return;
+    const patterns = {
+      levelUp: [
+        { frequency: 523.25, duration: 0.16, delay: 0 },
+        { frequency: 659.25, duration: 0.16, delay: 0.12 },
+        { frequency: 783.99, duration: 0.16, delay: 0.24 },
+        { frequency: 1046.5, duration: 0.42, delay: 0.36 }
+      ],
+      newDay: [
+        { frequency: 784, endFrequency: 1046.5, duration: 0.24, delay: 0 },
+        { frequency: 1046.5, endFrequency: 1396.9, duration: 0.3, delay: 0.16 },
+        { frequency: 880, duration: 0.34, delay: 0.45 }
+      ]
+    };
+    const pattern = patterns[name];
+    if (!pattern) throw new Error(`Unknown generated sound effect: ${name}`);
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) {
+      console.warn(`Unable to play ${name} sound effect because this browser does not support Web Audio.`);
+      return;
+    }
+    try {
+      if (!generatedAudioContext) generatedAudioContext = new AudioContextClass();
+      if (generatedAudioContext.state === "suspended") void generatedAudioContext.resume();
+      for (const note of pattern) {
+        const oscillator = generatedAudioContext.createOscillator();
+        const gain = generatedAudioContext.createGain();
+        const start = generatedAudioContext.currentTime + note.delay;
+        const end = start + note.duration;
+        const peak = 0.16 * sfxVolume / 100;
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(note.frequency, start);
+        if (note.endFrequency) oscillator.frequency.exponentialRampToValueAtTime(note.endFrequency, end);
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(peak, start + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, end);
+        oscillator.connect(gain);
+        gain.connect(generatedAudioContext.destination);
+        oscillator.start(start);
+        oscillator.stop(end + 0.02);
+      }
+    } catch (error) {
+      console.error(`Unable to play ${name} sound effect.`, error);
+    }
+  }
+
   window.AudioManager = Object.freeze({
     play(name, fallback) {
+      if (daySummaryActive) return;
       const audio = effects[name];
       if (!audio) throw new Error(`Unknown audio effect: ${name}`);
       audio.volume = sfxVolume / 100;
       startPlayback(audio, SOURCES[name], fallback, true);
     },
     playBgm(fallback) {
-      if (bgmVolume === 0 || !music.paused) return;
+      if (daySummaryActive || bgmVolume === 0 || !music.paused) return;
       applyMusicVolume();
       startPlayback(music, SOURCES.bgm_musical, fallback);
     },
     reinitializeBgm(fallback) {
+      if (daySummaryActive) return;
       music.pause();
       music = createMusic();
       music.load();
@@ -122,17 +174,34 @@
       if (bgmVolume === 0) music.pause();
     },
     getBgmVolume() {
-      return bgmVolume * (activeUtterance ? 0.2 : 1);
+      return daySummaryActive ? 0 : bgmVolume * (activeUtterance ? 0.2 : 1);
     },
+    playSFX,
     speakCustomer,
+    setDaySummaryActive(active) {
+      daySummaryActive = active === true;
+      if (daySummaryActive) {
+        const utterance = activeUtterance;
+        activeUtterance = null;
+        window.speechSynthesis?.cancel();
+        if (utterance) {
+          utterance.onend = null;
+          utterance.onerror = null;
+        }
+        music.pause();
+      } else {
+        applyMusicVolume();
+      }
+    },
     cancelCustomerSpeech() {
-      if (!activeUtterance) return;
       const utterance = activeUtterance;
       activeUtterance = null;
       window.speechSynthesis?.cancel();
       applyMusicVolume();
-      utterance.onend = null;
-      utterance.onerror = null;
+      if (utterance) {
+        utterance.onend = null;
+        utterance.onerror = null;
+      }
     }
   });
 })();
