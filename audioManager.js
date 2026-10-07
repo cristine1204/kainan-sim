@@ -135,11 +135,18 @@
       finishSpeech(utterance);
     };
 
+    if (activeUtterance) {
+      activeUtterance.onend = null;
+      activeUtterance.onerror = null;
+      activeUtterance = null;
+      synthesis.cancel();
+    }
     activeUtterance = utterance;
     applyMusicVolume();
     try {
-      synthesis.cancel();
+      synthesis.resume();
       synthesis.speak(utterance);
+      synthesis.resume();
       return true;
     } catch (error) {
       console.error("Unable to start customer speech synthesis.", error);

@@ -2162,6 +2162,7 @@
       let drinkPanelAutoOpened = false;
       let arrivalTimer = null;
       let arrivalAnimationTimer = null;
+      let arrivalAnimationCleanup = null;
       let customerExitTimer = null;
       let customerExitCleanup = null;
       let customerTransitioning = false;
@@ -3451,15 +3452,26 @@
         };
       }
 
+      function clearCustomerArrivalAnimation() {
+        window.clearTimeout(arrivalAnimationTimer);
+        arrivalAnimationTimer = null;
+        if (arrivalAnimationCleanup) {
+          $("customer-sprite")?.removeEventListener("animationend", arrivalAnimationCleanup);
+          arrivalAnimationCleanup = null;
+        }
+      }
+
       function playCustomerArrival() {
         const scene = $("customer-scene");
         const sprite = $("customer-sprite");
+        clearCustomerArrivalAnimation();
         scene.classList.remove("is-rejecting", "is-celebrating");
-        scene.classList.add("is-arriving");
         sprite.classList.remove("impatient", "happy", "rejecting", "waiting-idle");
-        sprite.classList.add("arriving");
-        window.clearTimeout(arrivalAnimationTimer);
-        arrivalAnimationTimer = window.setTimeout(() => {
+        let arrivalFinished = false;
+        const finishArrival = () => {
+          if (arrivalFinished) return;
+          arrivalFinished = true;
+          clearCustomerArrivalAnimation();
           scene.classList.remove("is-arriving");
           sprite.classList.remove("arriving");
           if (order && !customerTransitioning && patience > 0) {
@@ -3474,8 +3486,15 @@
               AudioManager.speakCustomer(customerOrderSpeech(order), customerGender(order.customer));
             }
           }
-          arrivalAnimationTimer = null;
-        }, 760);
+        };
+        const onArrivalAnimationEnd = event => {
+          if (event.target === sprite && event.animationName === "customer-enter") finishArrival();
+        };
+        arrivalAnimationCleanup = onArrivalAnimationEnd;
+        sprite.addEventListener("animationend", onArrivalAnimationEnd);
+        scene.classList.add("is-arriving");
+        sprite.classList.add("arriving");
+        arrivalAnimationTimer = window.setTimeout(finishArrival, 850);
       }
 
       function clearCustomerExitRemoval() {
@@ -3542,8 +3561,7 @@
         renderDrinks();
         renderSauces();
         renderTray();
-        window.clearTimeout(arrivalAnimationTimer);
-        arrivalAnimationTimer = null;
+        clearCustomerArrivalAnimation();
         const scene = $("customer-scene");
         const sprite = $("customer-sprite");
         scene.classList.remove("is-arriving", "is-celebrating");
@@ -3583,10 +3601,9 @@
 
       function nextCustomer(immediate = false) {
         window.clearTimeout(arrivalTimer);
-        window.clearTimeout(arrivalAnimationTimer);
+        clearCustomerArrivalAnimation();
         clearCustomerExitRemoval();
         arrivalTimer = null;
-        arrivalAnimationTimer = null;
         customerTransitioning = false;
         customerMood = "waiting";
         $("customer-scene").classList.remove("is-arriving", "is-rejecting", "is-celebrating");
@@ -4167,10 +4184,9 @@
         state.dayClosed = true;
         state.coins = Math.max(0, state.coins - DAILY_EXPENSES);
         window.clearTimeout(arrivalTimer);
-        window.clearTimeout(arrivalAnimationTimer);
+        clearCustomerArrivalAnimation();
         clearCustomerExitRemoval();
         arrivalTimer = null;
-        arrivalAnimationTimer = null;
         customerTransitioning = false;
         order = null;
         tray = {};
@@ -4406,10 +4422,9 @@
       function beginNewGame() {
         clearGameProgressStorage();
         window.clearTimeout(arrivalTimer);
-        window.clearTimeout(arrivalAnimationTimer);
+        clearCustomerArrivalAnimation();
         window.clearTimeout(bgmTimer);
         bgmTimer = null;
-        arrivalAnimationTimer = null;
         customerTransitioning = false;
         state = initialState();
         setLanguage("en");
